@@ -194,6 +194,9 @@ public class BungeeCord extends ProxyServer
     }
 
     public static String PREFIX = "§6BetterBungee §7- §e "; 
+    
+    
+    
     @SuppressFBWarnings("DM_DEFAULT_ENCODING")
     public BungeeCord() throws IOException
     {
@@ -286,6 +289,8 @@ public class BungeeCord extends ProxyServer
 
         pluginManager.loadPlugins();
         config.load();
+        
+        new BetterBungee();
 
         if ( config.isForgeSupport() )
         {

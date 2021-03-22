@@ -179,6 +179,7 @@ public class FBConfig {
 		  }
 		  return binary.toString();
 	}
+	@SuppressWarnings("unused")
 	private void log(int type, String message){
 		if(logType == LogType.NONE || ( logType == LogType.LOW && type == 0 )) return;
 		System.out.println(message);

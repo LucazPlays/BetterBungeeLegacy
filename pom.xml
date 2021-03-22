@@ -23,6 +23,13 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>com.github.wolf480pl</groupId>
 			<artifactId>jline-log4j2-appender</artifactId>
 			<version>1.0.0</version>
@@ -45,14 +52,14 @@
 			<scope>compile</scope>
 		</dependency>
 
-		
+
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>1.27</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -68,21 +75,21 @@
 			<version>4.1.51.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec-http</artifactId>
 			<version>4.1.51.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-handler</artifactId>
 			<version>4.1.51.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-transport-native-epoll</artifactId>
@@ -90,23 +97,23 @@
 			<classifier>linux-x86_64</classifier>
 			<scope>compile</scope>
 		</dependency>
-		
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sf.jopt-simple</groupId> -->
-<!-- 			<artifactId>jopt-simple</artifactId> -->
-<!-- 			<version>5.0.4</version> -->
-<!-- 			<scope>compile</scope> -->
-<!-- 		</dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>net.sf.jopt-simple</groupId> -->
+		<!-- <artifactId>jopt-simple</artifactId> -->
+		<!-- <version>5.0.4</version> -->
+		<!-- <scope>compile</scope> -->
+		<!-- </dependency> -->
 
 
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>junit</groupId> -->
-<!-- 			<artifactId>junit</artifactId> -->
-<!-- 			<version>4.13.1</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
-		
+		<!-- <dependency> -->
+		<!-- <groupId>junit</groupId> -->
+		<!-- <artifactId>junit</artifactId> -->
+		<!-- <version>4.13.1</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>findbugs-annotations</artifactId>
@@ -114,42 +121,42 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		
+
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.12</version>
 			<scope>provided</scope>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.8.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>21.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
-		
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.pingcap.tikv</groupId> -->
-<!-- 			<artifactId>tikv-client</artifactId> -->
-<!-- 			<version>2.3.10</version> -->
-<!-- 		</dependency> -->
+
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.pingcap.tikv</groupId> -->
+		<!-- <artifactId>tikv-client</artifactId> -->
+		<!-- <version>2.3.10</version> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>com.joliciel.talismane</groupId>
 			<artifactId>talismane-core</artifactId>
 			<version>6.1.1</version>
 			<scope>provided</scope>
 		</dependency>
-		
-		
-		
+
+
+
 	</dependencies>
 </project>

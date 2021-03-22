@@ -24,7 +24,7 @@ import net.md_5.bungee.util.CaseInsensitiveSet;
  * Core configuration for the proxy.
  */
 @Getter
-public class Configuration implements ProxyConfig
+public class Configuration2 implements ProxyConfig
 {
 
     /**
