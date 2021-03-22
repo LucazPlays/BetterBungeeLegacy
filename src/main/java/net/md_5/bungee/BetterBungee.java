@@ -6,14 +6,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.commons.io.FileUtils;
 
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
-import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -30,6 +26,7 @@ public class BetterBungee {
 
 	public BetterBungee() {
 		Thread betterbungeethread = new Thread(() -> {
+			sleep(1500);
 			createConfigs();
 			onStart();
 			while (BungeeCord.getInstance().isRunning) {
@@ -46,40 +43,53 @@ public class BetterBungee {
 
 	public void createConfigs() {
 		try {
-			File file = new File("BetterBungee");
-			file.mkdirs();
-			file = new File("BetterBungee/data.yml");
+			File file = new File("betterbungeeconfig.yml");
 			if (!file.exists()) {
 				file.createNewFile();
 				System.out.println("Created Config File");
 			}
-			
-
 			Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-			if (config.getString("accountdata.uuid") == null) {
-				config.set("accountdata.uuid", UUID.randomUUID().toString());
-				config.set("accountdata.password", DatatypeConverter.parseAnySimpleType(UUID.randomUUID().toString()));
-				System.out.println("Creating Config");
+			if (!config.contains("uuid")) {
+				config.set("uuid", UUID.randomUUID().toString());
+				config.set("key", generatepw());
 				ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
-				while (!register(config.getString("accountdata.uuid"), config.getString("accountdata.password"))) {
+				System.out.println("Creating Config");
+				while (!register(config.getString("uuid"), config.getString("key"))) {
 					sleep();
 					System.out.println("Recreating UUID and Password");
-					config.set("accountdata.uuid", UUID.randomUUID().toString());
-					config.set("accountdata.password", DatatypeConverter.parseAnySimpleType(UUID.randomUUID().toString()));
-					ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
+					config.set("uuid", UUID.randomUUID().toString());
+					config.set("key", generatepw());
 				}
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
-			System.out.println("Save Config File");
+			this.uuid = config.getString("uuid");
+			this.password = config.getString("key");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private static String generatepw() {
+		String stg = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123457890";
+		String pw = "";
+		int i = 32;
+		while (i-- > 0) {
+			pw += stg.charAt((int) (stg.length()*Math.random()));
+		}
+		return pw;
+	}
 
 	private void sleep() {
 		try {
 			Thread.sleep(12500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void sleep(int i) {
+		try {
+			Thread.sleep(i);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -94,9 +104,10 @@ public class BetterBungee {
 			if (response.getText().contains("Update Available")) {
 				System.out.println("Updated Available");
 				try {
-					FileUtils.copyURLToFile(new URL(betterbungee + "/downloadupdate"), new File("BungeeCordUpdate.jar"),
+					FileUtils.copyURLToFile(new URL(betterbungee + "/downloadupdate"), new File("BungeeCord.jar"),
 							30000, 30000);
 					System.out.println("Updated BungeeCord");
+					
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -107,22 +118,29 @@ public class BetterBungee {
 		login();
 	}
 
-	private void login() {
+	private boolean login() {
 		System.out.println("Login to API");
-		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/login?uuid=" + uuid + "?password=" + password);
+		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
-			session = response.getText();
+			if (!response.getText().contains("Invalid")) {
+				session = response.getText();
+				return true;
+			}
 		}
+		System.out.println(response.getText());
+		return false;
 	}
 
 	private boolean register(String uuid, String password) {
 		System.out.println("Register on API");
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/register?uuid=" + uuid + "?password=" + password);
+		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (response.getText().contains("Succeed")) {
+				this.uuid = uuid;
+				this.password = password;
 				return true;
 			}
+			System.out.println(response.getText());
 		}
 		return false;
 	}
@@ -134,6 +152,7 @@ public class BetterBungee {
 			if (text.contains("Alive")) {
 				return true;
 			}
+			System.out.println(response.getText());
 		}
 		return false;
 	}
