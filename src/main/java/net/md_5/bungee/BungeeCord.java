@@ -83,9 +83,7 @@ import net.md_5.bungee.command.ConsoleCommandCompleter;
 import net.md_5.bungee.command.ConsoleCommandSender;
 import net.md_5.bungee.compress.CompressFactory;
 import net.md_5.bungee.conf.Configuration;
-import net.md_5.bungee.conf.FBConfig;
 import net.md_5.bungee.conf.YamlConfig;
-import net.md_5.bungee.conf.YamlConfig2;
 import net.md_5.bungee.forge.ForgeConstants;
 import net.md_5.bungee.log.BungeeLogger;
 import net.md_5.bungee.log.LoggingOutputStream;
@@ -153,9 +151,6 @@ public class BungeeCord extends ProxyServer
     @Getter
     @Setter
     private ConfigurationAdapter configurationAdapter = new YamlConfig();
-
-    @SuppressWarnings("unused")
-	private YamlConfig2 config2 = new YamlConfig2();
     
     private final Collection<String> pluginChannels = new HashSet<>();
     @Getter
@@ -164,9 +159,6 @@ public class BungeeCord extends ProxyServer
     private final BungeeScheduler scheduler = new BungeeScheduler();
     @Getter
     private final ConsoleReader consoleReader;
-    
-	@SuppressWarnings("unused")
-	private static FBConfig fb = new FBConfig();
 	
     @Getter
     private final Logger logger;
