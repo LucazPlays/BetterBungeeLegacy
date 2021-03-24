@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 
 import lombok.Getter;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
 import net.md_5.bungee.config.Configuration;
@@ -65,8 +66,17 @@ public class BetterBungee {
 	}
 
 	public void onStart() {
-		update();
+		if (update()) {
+			ProxyServer.getInstance().stop("Update BungeeCord");
+		}
 		login();
+	}
+
+	@SuppressWarnings("unused")
+	private void addDefault(Configuration conf,String test , String test1) {
+		if (!conf.contains(test)) {
+			conf.set(test, test1);
+		}
 	}
 	
 	public void createConfigs() {
@@ -76,9 +86,26 @@ public class BetterBungee {
 				file.createNewFile();
 				System.out.println("Created Config File");
 			}
+			
 			Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-			String configuuid = "uuid";
-			String configkey = "key";
+			
+
+			String protection = "serversettings.protection";
+			String globallimit = "serversettings.globalcpslimit";
+			String limitperip = "serversettings.limitcpsperip";
+
+
+			addDefault(config,protection,"false");
+
+
+			addDefault(config,globallimit,"250");
+
+
+			addDefault(config,limitperip,"3");
+
+
+			String configuuid = "serverdata.uuid";
+			String configkey = "serverdata.key";
 			if (!config.contains(configuuid)) {
 				config.set(configuuid, UUID.randomUUID().toString());
 				config.set(configkey, generatepw());
@@ -92,8 +119,14 @@ public class BetterBungee {
 				}
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
-			this.uuid = config.getString("uuid");
-			this.password = config.getString("key");
+			this.uuid = config.getString(configuuid);
+			this.password = config.getString(configkey);
+
+			this.protection = config.getString(protection).equalsIgnoreCase("true");
+			this.globallimit = Integer.valueOf(config.getString(globallimit));
+			this.periplimit = Integer.valueOf(config.getString(limitperip));
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -125,7 +158,7 @@ public class BetterBungee {
 		}
 	}
 
-	private void update() {
+	private boolean update() {
 		if (!updated) {
 			lastupdatecheck = System.currentTimeMillis();
 			System.out.println("Checking for Updates");
@@ -138,6 +171,7 @@ public class BetterBungee {
 						try {
 							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
 							new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+							return true;
 						} catch (URISyntaxException e) {
 						}
 						System.out.println("Updated BungeeCord");
@@ -150,6 +184,7 @@ public class BetterBungee {
 				}
 			}
 		}
+		return false;
 	}
 
 	private boolean login() {

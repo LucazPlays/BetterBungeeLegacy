@@ -73,7 +73,6 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 		if (handler != null) {
 			channel = new ChannelWrapper(ctx);
 			handler.connected(channel);
-
 			if (!(handler instanceof InitialHandler || handler instanceof PingHandler)) {
 				ProxyServer.getInstance().getLogger().log(Level.INFO, "{0} has connected", handler);
 			}
@@ -85,7 +84,6 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 		if (handler != null) {
 			channel.markClosed();
 			handler.disconnected(channel);
-
 			if (!(handler instanceof InitialHandler || handler instanceof PingHandler)) {
 				ProxyServer.getInstance().getLogger().log(Level.INFO, "{0} has disconnected", handler);
 			}

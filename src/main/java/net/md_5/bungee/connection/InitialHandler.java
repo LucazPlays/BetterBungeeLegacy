@@ -315,7 +315,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		Preconditions.checkState(thisState == State.USERNAME, "Not expecting USERNAME");
 		this.loginRequest = loginRequest;
 
-		if (getName().contains(".")) {
+		if (getName().contains(".") || getName().contains(" ")) {
 			disconnect(bungee.getTranslation("name_invalid"));
 			return;
 		}
@@ -326,6 +326,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		}
 
 		int limit = BungeeCord.getInstance().config.getPlayerLimit();
+		
 		if (limit > 0 && bungee.getOnlineCount() >= limit) {
 			disconnect(bungee.getTranslation("proxy_full"));
 			return;
@@ -403,8 +404,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					disconnect(bungee.getTranslation("offline_mode_player"));
 				} else {
 					disconnect(bungee.getTranslation("mojang_fail"));
-					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net",
-							error);
+					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
 				}
 			}
 		};
@@ -547,7 +547,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	@Override
 	public void setOnlineMode(boolean onlineMode) {
 		Preconditions.checkState(thisState == State.USERNAME,
-				"Can only set online mode status whilst state is username");
+				"Can only set online mode status whilst state is username"); 
 		this.onlineMode = onlineMode;
 	}
 
