@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -35,14 +37,17 @@ public class BetterBungee {
 	boolean updated = false;
 
 	@Getter
+	boolean snapshotupdate = false;
+
+	@Getter
 	int periplimit = 2;
-	
+
 	@Getter
 	int globallimit = 100;
 
 	@Getter
 	boolean protection = false;
-	
+
 	public BetterBungee() {
 		Thread betterbungeethread = new Thread(() -> {
 			sleep(1500);
@@ -50,7 +55,19 @@ public class BetterBungee {
 			onStart();
 			while (BungeeCord.getInstance().isRunning) {
 				if (alive()) {
-					if (lastupdatecheck < System.currentTimeMillis()-1000*60*60*2) {
+					if (snapshotupdate) {
+						if (update()) {
+							ProxyServer.getInstance().broadcast(
+									TextComponent.fromLegacyText(BungeeCord.PREFIX + "§e Snapshot§7 Update Found"));
+							for (int i = 10; i > 0; i--) {
+								sleep(1000);
+								ProxyServer.getInstance().broadcast(TextComponent
+										.fromLegacyText(BungeeCord.PREFIX + "§7 Restart in §c" + i + "§7 seconds"));
+							}
+							sleep(1000);
+							ProxyServer.getInstance().stop("&6Updated BetterCord");
+						}
+					} else if (lastupdatecheck < System.currentTimeMillis() - 1000 * 60 * 60 * 2) {
 						update();
 					}
 					sleep();
@@ -67,18 +84,17 @@ public class BetterBungee {
 
 	public void onStart() {
 		if (update()) {
-			ProxyServer.getInstance().stop("Update BungeeCord");
+			ProxyServer.getInstance().stop("&6Updated BetterCord");
 		}
 		login();
 	}
 
-	@SuppressWarnings("unused")
-	private void addDefault(Configuration conf,String test , String test1) {
+	private void addDefault(Configuration conf, String test, String test1) {
 		if (!conf.contains(test)) {
 			conf.set(test, test1);
 		}
 	}
-	
+
 	public void createConfigs() {
 		try {
 			File file = new File("betterbungeeconfig.yml");
@@ -86,23 +102,28 @@ public class BetterBungee {
 				file.createNewFile();
 				System.out.println("Created Config File");
 			}
-			
+
 			Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-			
+
+			String prefix = "serversettings.prefix";
+
+			String snapshotupdater = "serversettings.snapshotupdater";
 
 			String protection = "serversettings.protection";
+
 			String globallimit = "serversettings.globalcpslimit";
+
 			String limitperip = "serversettings.limitcpsperip";
 
+			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
-			addDefault(config,protection,"false");
+			addDefault(config, snapshotupdater, "false");
 
+			addDefault(config, protection, "false");
 
-			addDefault(config,globallimit,"250");
+			addDefault(config, globallimit, "100");
 
-
-			addDefault(config,limitperip,"3");
-
+			addDefault(config, limitperip, "3");
 
 			String configuuid = "serverdata.uuid";
 			String configkey = "serverdata.key";
@@ -122,11 +143,13 @@ public class BetterBungee {
 			this.uuid = config.getString(configuuid);
 			this.password = config.getString(configkey);
 
+			this.snapshotupdate = config.getString(snapshotupdater).equalsIgnoreCase("true");
 			this.protection = config.getString(protection).equalsIgnoreCase("true");
 			this.globallimit = Integer.valueOf(config.getString(globallimit));
 			this.periplimit = Integer.valueOf(config.getString(limitperip));
-			
-			
+
+			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -137,7 +160,7 @@ public class BetterBungee {
 		String pw = "";
 		int i = 32;
 		while (i-- > 0) {
-			pw += stg.charAt((int) (stg.length()*Math.random()));
+			pw += stg.charAt((int) (stg.length() * Math.random()));
 		}
 		return pw;
 	}
@@ -159,37 +182,60 @@ public class BetterBungee {
 	}
 
 	private boolean update() {
-		if (!updated) {
+		if (snapshotupdate) {
+			RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/update");
+			if (!response.getFailed()) {
+				try {
+					String newestnapshotid = response.getText().replaceAll("\n", "").split(":")[1];
+//					System.out.println("Newest-Snapshot ID: "+newestnapshotid);
+//					System.out.println("Snapshot ID: "+String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()));
+					if (!newestnapshotid.equals(String.valueOf(
+							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+									.length()))) {
+						return updatefromlink(betterbungee + "/downloadsnapshot");
+					}
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+		} else if (!updated) {
 			lastupdatecheck = System.currentTimeMillis();
 			System.out.println("Checking for Updates");
 			RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/update?version=" + Version);
 			if (!response.getFailed()) {
 				if (response.getText().contains("Update Available")) {
 					System.out.println("Updated Available");
-					try {
-						FileUtils.copyURLToFile(new URL(betterbungee + "/downloadupdate"), new File("UpdatedBungeeCord.jar"),30000, 30000);
-						try {
-							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-							new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
-							return true;
-						} catch (URISyntaxException e) {
-						}
-						System.out.println("Updated BungeeCord");
-						updated = true;
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					return updatefromlink(betterbungee + "/downloadupdate");
 				}
 			}
 		}
 		return false;
 	}
 
+	private boolean updatefromlink(String link) {
+		try {
+			FileUtils.copyURLToFile(new URL(link), new File("UpdatedBungeeCord.jar"), 30000, 30000);
+			try {
+				new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
+				new File("UpdatedBungeeCord.jar").renameTo(
+						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				return true;
+			} catch (URISyntaxException e) {
+			}
+			System.out.println("Updated BungeeCord");
+			updated = true;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	private boolean login() {
 		System.out.println("Login to API");
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (!response.getText().contains("Invalid")) {
 				session = response.getText();
@@ -201,8 +247,9 @@ public class BetterBungee {
 	}
 
 	private boolean register(String uuid, String password) {
-		System.out.println("Register on API");
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
+		System.out.println("Register a new account on BetterBungeeAPI");
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (response.getText().contains("Succeed")) {
 				this.uuid = uuid;

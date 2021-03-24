@@ -20,7 +20,7 @@ public class NotifyManager {
 
 	public CopyOnWriteArrayList<String> players = new CopyOnWriteArrayList<String>();
 
-	public NotifyManager() {}
+	public NotifyManager() {loop();}
 
 	private NotifyManager run(Runnable run) {
 		if (async) {
