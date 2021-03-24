@@ -19,6 +19,6 @@ public class CommandBungee extends Command
     	} else {
     		Version ="§7Stable§8(§a"+ BungeeCord.getInstance().getBetterbungee().Version+"§a";
     	}
-        sender.sendMessage("§7This server is running §eBetterBungee§7 version §a" + BungeeCord.getInstance().getBetterbungee().Version + "§7 by §bLuca_zPlays");
+        sender.sendMessage("§7This server is running §eBetterBungee§7 version §a" + Version + "§7 by §bLuca_zPlays");
     }
 }
