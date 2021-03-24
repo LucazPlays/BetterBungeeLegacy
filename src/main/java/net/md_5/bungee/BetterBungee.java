@@ -50,6 +50,7 @@ public class BetterBungee {
 
 	public BetterBungee() {
 		Thread betterbungeethread = new Thread(() -> {
+			BungeeCordLauncher.crashed = false;
 			sleep(1500);
 			createConfigs();
 			onStart();
@@ -65,7 +66,7 @@ public class BetterBungee {
 										.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 							}
 							sleep(1000);
-							ProxyServer.getInstance().stop("&6Updated BetterCord");
+							ProxyServer.getInstance().stop("§6Updated BetterCord");
 						}
 					} else if (lastupdatecheck < System.currentTimeMillis() - 1000 * 60 * 60 * 2) {
 						update();

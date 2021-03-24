@@ -1,23 +1,79 @@
 package net.md_5.bungee;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.command.ConsoleCommandSender;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 
 public class BungeeCordLauncher
 {
 
+	private static boolean updatefromlink(String link) {
+		try {
+			FileUtils.copyURLToFile(new URL(link), new File("UpdatedBungeeCord.jar"), 30000, 30000);
+			try {
+				new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
+				new File("UpdatedBungeeCord.jar").renameTo(
+						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				return true;
+			} catch (URISyntaxException e) {
+			}
+			System.out.println("Hotfixed BetterBungee");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public static boolean crashed = true;
+	
+	static String betterbungee = "http://betterbungee.skydb.de";
+	
     public static void main(String[] args) throws Exception
     {
+    	
+    	new Thread(() -> {
+    		if (crashed) {
+    			try {
+    				try {
+						Thread.sleep(30000);
+					} catch (InterruptedException e) {
+					}
+        			updatefromlink(betterbungee + "/downloadupdate");
+        			File file = new File("betterbungeeconfig.yml");
+					Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+					String snapshotupdater = "serversettings.snapshotupdater";
+					config.set(snapshotupdater, "false");
+					ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
+					System.exit(2);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+    		}
+
+    	}).start();
+    	
         Security.setProperty( "networkaddress.cache.ttl", "30" );
         Security.setProperty( "networkaddress.cache.negative.ttl", "10" );
 
