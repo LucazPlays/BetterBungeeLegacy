@@ -13,6 +13,12 @@ public class CommandBungee extends Command
     @SuppressWarnings("deprecation")
 	@Override
     public void execute(final CommandSender sender, final String[] args) {
+    	String Version = "";
+    	if (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate()) {
+    		Version = "§7Snapshot§8(§c"+ BungeeCord.getInstance().getBetterbungee().Version+"§8)";
+    	} else {
+    		Version ="§7Stable§8(§a"+ BungeeCord.getInstance().getBetterbungee().Version+"§a";
+    	}
         sender.sendMessage("§7This server is running §eBetterBungee§7 version §a" + BungeeCord.getInstance().getBetterbungee().Version + "§7 by §bLuca_zPlays");
     }
 }

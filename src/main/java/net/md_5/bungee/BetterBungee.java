@@ -151,6 +151,9 @@ public class BetterBungee {
 
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
+			if (snapshotupdate) {
+				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

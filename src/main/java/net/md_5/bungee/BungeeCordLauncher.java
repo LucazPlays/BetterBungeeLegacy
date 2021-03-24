@@ -54,12 +54,12 @@ public class BungeeCordLauncher
     {
     	
     	new Thread(() -> {
+			try {
+				Thread.sleep(30000);
+			} catch (InterruptedException e) {
+			}
     		if (crashed) {
     			try {
-    				try {
-						Thread.sleep(30000);
-					} catch (InterruptedException e) {
-					}
         			updatefromlink(betterbungee + "/downloadupdate");
         			File file = new File("betterbungeeconfig.yml");
 					Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
