@@ -29,7 +29,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.3";
+	public String Version = "0.4";
 
 	long lastupdatecheck = 0;
 
