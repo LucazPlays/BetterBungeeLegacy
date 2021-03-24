@@ -552,7 +552,7 @@ public class BungeeCord extends ProxyServer
     @Override
     public String getVersion()
     {
-        return ( BungeeCord.class.getPackage().getImplementationVersion() == null ) ? "unknown" : BungeeCord.class.getPackage().getImplementationVersion();
+        return ( BungeeCord.class.getPackage().getImplementationVersion() == null ) ? betterbungee.Version : BungeeCord.class.getPackage().getImplementationVersion();
     }
 
     public void reloadMessages()
