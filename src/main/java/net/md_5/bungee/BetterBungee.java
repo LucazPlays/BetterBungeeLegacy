@@ -263,6 +263,9 @@ public class BetterBungee {
 	}
 
 	private boolean alive() {
+		if (session == null)  {
+			return false;
+		}
 		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/alive?session=" + session);
 		if (!response.getFailed()) {
 			String text = response.getText();
