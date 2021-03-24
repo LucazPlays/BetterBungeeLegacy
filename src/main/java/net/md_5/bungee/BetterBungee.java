@@ -58,11 +58,11 @@ public class BetterBungee {
 					if (snapshotupdate) {
 						if (update()) {
 							ProxyServer.getInstance().broadcast(
-									TextComponent.fromLegacyText(BungeeCord.PREFIX + "§e Snapshot§7 Update Found"));
+									TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
 							for (int i = 10; i > 0; i--) {
 								sleep(1000);
 								ProxyServer.getInstance().broadcast(TextComponent
-										.fromLegacyText(BungeeCord.PREFIX + "§7 Restart in §c" + i + "§7 seconds"));
+										.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 							}
 							sleep(1000);
 							ProxyServer.getInstance().stop("&6Updated BetterCord");
@@ -117,7 +117,7 @@ public class BetterBungee {
 
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
-			addDefault(config, snapshotupdater, "false");
+			addDefault(config, snapshotupdater, "true");
 
 			addDefault(config, protection, "false");
 
