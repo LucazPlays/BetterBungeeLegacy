@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Getter;
 
 public class Blacklist {
 
@@ -18,6 +19,7 @@ public class Blacklist {
     
     private int globalratelimit = 0;
     
+    @Getter
     private boolean protection = false;
 
 	private CopyOnWriteArrayList<String> blacklist = new CopyOnWriteArrayList<String>();

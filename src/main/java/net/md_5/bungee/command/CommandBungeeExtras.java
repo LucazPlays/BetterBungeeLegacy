@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ProxyReloadEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.util.FieldUtils;
@@ -20,41 +20,40 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 
 	public static String bungeename = "betterbungee";
 	
-	
+	private NotifyManager notify = NotifyManager.getInstance();
 	
 	public CommandBungeeExtras() {
 		super(bungeename, "bungeecord.command.betterbungee", new String[] {"bungeeutil"});
 	}
 
-	public static ArrayList<String> players = new ArrayList<>();
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void execute(final CommandSender sender, final String[] args) {
 
 		if (args.length >= 1) {
 
-			if (args[0].equalsIgnoreCase("reload")) {
-				if (!sender.hasPermission("bungeecord.command."+bungeename+".reload")) {
-					sender.sendMessage(BungeeCord.PREFIX + "§7Dazu hast du keine §9Rechte§7!");
-					return;
-				}
-				BungeeCord.getInstance().config.load();
-				BungeeCord.getInstance().reloadMessages();
-				BungeeCord.getInstance().stopListeners();
-				BungeeCord.getInstance().startListeners();
-				BungeeCord.getInstance().getPluginManager().callEvent(new ProxyReloadEvent(sender));
-				sender.sendMessage(BungeeCord.PREFIX + "§d§lH§f§l0§d§lpe §7wurde neugeladen!");
-
-				return;
-			}
+//			if (args[0].equalsIgnoreCase("reload")) {
+//				if (!sender.hasPermission("bungeecord.command."+bungeename+".reload")) {
+//					sender.sendMessage(BungeeCord.PREFIX + "§7Dazu hast du keine §9Rechte§7!");
+//					return;
+//				}
+//				BungeeCord.getInstance().config.load();
+//				BungeeCord.getInstance().reloadMessages();
+//				BungeeCord.getInstance().stopListeners();
+//				BungeeCord.getInstance().startListeners();
+//				BungeeCord.getInstance().getPluginManager().callEvent(new ProxyReloadEvent(sender));
+//				sender.sendMessage(BungeeCord.PREFIX + " &6Betterbungee §7wurde neugeladen!");
+//
+//				return;
+//			}
+			
 			if (args[0].equalsIgnoreCase("notifications")) {
 				if (sender.hasPermission("bungeecord.command."+bungeename+".notifications")) {
-					if (players.contains(sender.getName())) {
-						players.remove(sender.getName());
+					if (notify.players.contains(sender.getName())) {
+						notify.players.remove(sender.getName());
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §cDeaktiviert§7!");
 					} else {
-						players.add(sender.getName());
+						notify.players.add(sender.getName());
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §aAktiviert§7!");
 					}
 					return;
@@ -166,8 +165,8 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 		if (args.length == 1) {
 			if (sender.hasPermission("bungeecord.command."+bungeename+".notifications"))
 				sug.add("notifications");
-			if (sender.hasPermission("bungeecord.command."+bungeename+".reload"))
-				sug.add("reload");
+//			if (sender.hasPermission("bungeecord.command."+bungeename+".reload"))
+//				sug.add("reload");
 			if (sender.hasPermission("bungeecord.command."+bungeename+".pluginmanager"))
 				sug.add("pluginmanager");
 

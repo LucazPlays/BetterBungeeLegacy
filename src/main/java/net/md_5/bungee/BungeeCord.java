@@ -145,6 +145,10 @@ public class BungeeCord extends ProxyServer
      */
     @Getter
     public final PluginManager pluginManager;
+
+    @Getter
+    public BetterBungee betterbungee;
+    
     @Getter
     @Setter
     private ReconnectHandler reconnectHandler;
@@ -282,7 +286,7 @@ public class BungeeCord extends ProxyServer
         pluginManager.loadPlugins();
         config.load();
         
-        new BetterBungee();
+        betterbungee = new BetterBungee();
 
         if ( config.isForgeSupport() )
         {
