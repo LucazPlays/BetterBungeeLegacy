@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -85,7 +84,7 @@ public class BetterBungee {
 
 	public void onStart() {
 		if (update()) {
-			ProxyServer.getInstance().stop("&6Updated BetterCord");
+			ProxyServer.getInstance().stop("§D6Updated BetterCord");
 		}
 		login();
 	}
