@@ -11,23 +11,25 @@ import net.md_5.bungee.api.chat.ItemTag;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class Item extends Content {
+public class Item extends Content
+{
 
-	/**
-	 * Namespaced item ID. Will use 'minecraft:air' if null.
-	 */
-	private String id;
-	/**
-	 * Optional. Size of the item stack.
-	 */
-	private int count = -1;
-	/**
-	 * Optional. Item tag.
-	 */
-	private ItemTag tag;
+    /**
+     * Namespaced item ID. Will use 'minecraft:air' if null.
+     */
+    private String id;
+    /**
+     * Optional. Size of the item stack.
+     */
+    private int count = -1;
+    /**
+     * Optional. Item tag.
+     */
+    private ItemTag tag;
 
-	@Override
-	public HoverEvent.Action requiredAction() {
-		return HoverEvent.Action.SHOW_ITEM;
-	}
+    @Override
+    public HoverEvent.Action requiredAction()
+    {
+        return HoverEvent.Action.SHOW_ITEM;
+    }
 }

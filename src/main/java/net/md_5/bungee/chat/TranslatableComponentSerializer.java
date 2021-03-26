@@ -1,31 +1,47 @@
 package net.md_5.bungee.chat;
 
-import java.lang.reflect.*;
-import net.md_5.bungee.api.chat.*;
-import java.util.*;
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TranslatableComponent;
 
 public class TranslatableComponentSerializer extends BaseComponentSerializer implements JsonSerializer<TranslatableComponent>, JsonDeserializer<TranslatableComponent>
 {
+
     @Override
-    public TranslatableComponent deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) throws JsonParseException {
-        final TranslatableComponent component = new TranslatableComponent();
-        final JsonObject object = json.getAsJsonObject();
-        this.deserialize(object, component, context);
-        component.setTranslate(object.get("translate").getAsString());
-        if (object.has("with")) {
-            component.setWith(Arrays.asList((BaseComponent[])context.deserialize(object.get("with"), BaseComponent[].class)));
+    public TranslatableComponent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+    {
+        TranslatableComponent component = new TranslatableComponent();
+        JsonObject object = json.getAsJsonObject();
+        deserialize( object, component, context );
+        if ( !object.has( "translate" ) )
+        {
+            throw new JsonParseException( "Could not parse JSON: missing 'translate' property" );
+        }
+        component.setTranslate( object.get( "translate" ).getAsString() );
+        if ( object.has( "with" ) )
+        {
+            component.setWith( Arrays.asList( context.<BaseComponent[]>deserialize( object.get( "with" ), BaseComponent[].class ) ) );
         }
         return component;
     }
-    
+
     @Override
-    public JsonElement serialize(final TranslatableComponent src, final Type typeOfSrc, final JsonSerializationContext context) {
-        final JsonObject object = new JsonObject();
-        this.serialize(object, src, context);
-        object.addProperty("translate", src.getTranslate());
-        if (src.getWith() != null) {
-            object.add("with", context.serialize(src.getWith()));
+    public JsonElement serialize(TranslatableComponent src, Type typeOfSrc, JsonSerializationContext context)
+    {
+        JsonObject object = new JsonObject();
+        serialize( object, src, context );
+        object.addProperty( "translate", src.getTranslate() );
+        if ( src.getWith() != null )
+        {
+            object.add( "with", context.serialize( src.getWith() ) );
         }
         return object;
     }

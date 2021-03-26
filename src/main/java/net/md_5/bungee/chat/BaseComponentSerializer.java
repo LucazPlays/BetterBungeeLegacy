@@ -20,8 +20,7 @@ import net.md_5.bungee.api.chat.hover.content.Content;
 public class BaseComponentSerializer
 {
 
-    @SuppressWarnings("deprecation")
-	protected void deserialize(JsonObject object, BaseComponent component, JsonDeserializationContext context)
+    protected void deserialize(JsonObject object, BaseComponent component, JsonDeserializationContext context)
     {
         if ( object.has( "bold" ) )
         {

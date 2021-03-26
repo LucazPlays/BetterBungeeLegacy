@@ -251,8 +251,7 @@ public class BetterBungee {
 
 	private boolean register(String uuid, String password) {
 		System.out.println("Register a new account on BetterBungeeAPI");
-		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
+		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (response.getText().contains("Succeed")) {
 				this.uuid = uuid;
@@ -265,7 +264,7 @@ public class BetterBungee {
 	}
 
 	private boolean alive() {
-		if (session == null)  {
+		if (session == null) {
 			return false;
 		}
 		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/alive?session=" + session);

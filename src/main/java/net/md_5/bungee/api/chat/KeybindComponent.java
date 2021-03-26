@@ -1,64 +1,66 @@
 package net.md_5.bungee.api.chat;
 
-import net.md_5.bungee.api.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public final class KeybindComponent extends BaseComponent
 {
+
+    /**
+     * The keybind identifier to use.
+     * <br>
+     * Will be replaced with the actual key the client is using.
+     */
     private String keybind;
-    
-    public KeybindComponent(final KeybindComponent original) {
-        super(original);
-        this.setKeybind(original.getKeybind());
+
+    /**
+     * Creates a keybind component from the original to clone it.
+     *
+     * @param original the original for the new keybind component.
+     */
+    public KeybindComponent(KeybindComponent original)
+    {
+        super( original );
+        setKeybind( original.getKeybind() );
     }
-    
-    public KeybindComponent(final String keybind) {
-        this.setKeybind(keybind);
+
+    /**
+     * Creates a keybind component with the passed internal keybind value.
+     *
+     * @param keybind the keybind value
+     * @see Keybinds
+     */
+    public KeybindComponent(String keybind)
+    {
+        setKeybind( keybind );
     }
-    
+
     @Override
-    public BaseComponent duplicate() {
-        return new KeybindComponent(this);
+    public KeybindComponent duplicate()
+    {
+        return new KeybindComponent( this );
     }
-    
-    protected void toPlainText(final StringBuilder builder) {
-        builder.append(this.getKeybind());
-        super.toPlainText(builder);
-    }
-    
-    protected void toLegacyText(final StringBuilder builder) {
-        builder.append(this.getColor());
-        if (this.isBold()) {
-            builder.append(ChatColor.BOLD);
-        }
-        if (this.isItalic()) {
-            builder.append(ChatColor.ITALIC);
-        }
-        if (this.isUnderlined()) {
-            builder.append(ChatColor.UNDERLINE);
-        }
-        if (this.isStrikethrough()) {
-            builder.append(ChatColor.STRIKETHROUGH);
-        }
-        if (this.isObfuscated()) {
-            builder.append(ChatColor.MAGIC);
-        }
-        builder.append(this.getKeybind());
-        super.toLegacyText(builder);
-    }
-    
-    public String getKeybind() {
-        return this.keybind;
-    }
-    
-    public void setKeybind(final String keybind) {
-        this.keybind = keybind;
-    }
-    
+
     @Override
-    public String toString() {
-        return "KeybindComponent(keybind=" + this.getKeybind() + ")";
+    protected void toPlainText(StringBuilder builder)
+    {
+        builder.append( getKeybind() );
+        super.toPlainText( builder );
     }
-    
-    public KeybindComponent() {
+
+    @Override
+    protected void toLegacyText(StringBuilder builder)
+    {
+        addFormat( builder );
+        builder.append( getKeybind() );
+        super.toLegacyText( builder );
     }
 }
