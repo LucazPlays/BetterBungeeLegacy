@@ -8,7 +8,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class NotifyManager {
 
-	private static NotifyManager Instance = new NotifyManager();
+	public static NotifyManager Instance;
 
 	private ChatMessageType messagetype = ChatMessageType.ACTION_BAR;
 	private String prefix = BungeeCord.PREFIX;
@@ -16,28 +16,29 @@ public class NotifyManager {
 	private boolean async = false;
 	private boolean consoleoutput = false;
 	private ProxyServer server = ProxyServer.getInstance();
+	
 	private CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<String>();
 
 	public CopyOnWriteArrayList<String> players = new CopyOnWriteArrayList<String>();
 
-	public NotifyManager() {loop();}
-
-	private NotifyManager run(Runnable run) {
-		if (async) {
-			new Thread(run).start();
-		} else {
-			run.run();
-		}
-		return this;
+	public NotifyManager() {
+		loop();
 	}
 
-	private NotifyManager run(Runnable run, boolean async) {
+	private void run(Runnable run) {
 		if (async) {
 			new Thread(run).start();
 		} else {
 			run.run();
 		}
-		return this;
+	}
+
+	private void run(Runnable run, boolean async) {
+		if (async) {
+			new Thread(run).start();
+		} else {
+			run.run();
+		}
 	}
 
 	public NotifyManager addmessage(String s) {
@@ -51,8 +52,9 @@ public class NotifyManager {
 				String message = "§cNone";
 				message = messages.get(0);
 				messages.remove(message);
-				if (consoleoutput)
+				if (consoleoutput) {
 					System.out.println(message.replaceAll("§", ""));
+				}
 				for (ProxiedPlayer all : server.getPlayers()) {
 					if (players.contains(all.getName())) {
 						all.sendMessage(messagetype, TextComponent.fromLegacyText(prefix + message));

@@ -125,7 +125,8 @@ public class Commands extends DefinedPacket
         throw new IllegalStateException( "Did not finish building root node" );
     }
 
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     public void write(ByteBuf buf)
     {
         Map<CommandNode, Integer> indexMap = new LinkedHashMap<>();
@@ -235,13 +236,15 @@ public class Commands extends DefinedPacket
     private static class NetworkNode
     {
 
-        private final ArgumentBuilder argumentBuilder;
+        @SuppressWarnings("rawtypes")
+		private final ArgumentBuilder argumentBuilder;
         private final byte flags;
         private final int redirectNode;
         private final int[] children;
         private CommandNode command;
 
-        private boolean buildSelf(NetworkNode[] otherNodes)
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+		private boolean buildSelf(NetworkNode[] otherNodes)
         {
             // First cycle
             if ( command == null )

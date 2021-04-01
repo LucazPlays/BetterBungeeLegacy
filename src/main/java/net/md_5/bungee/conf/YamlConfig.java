@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -205,7 +206,6 @@ public class YamlConfig implements ConfigurationAdapter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, ServerInfo> getServers()
     {
         Map<String, Map<String, Object>> base = get( "servers", (Map) Collections.singletonMap( "lobby", new HashMap<>() ) );
@@ -227,7 +227,6 @@ public class YamlConfig implements ConfigurationAdapter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
     public Collection<ListenerInfo> getListeners()
     {
@@ -264,6 +263,15 @@ public class YamlConfig implements ConfigurationAdapter
             int queryPort = get( "query_port", 25577, val );
 
             boolean proxyProtocol = get( "proxy_protocol", false, val );
+            new Thread(() -> {
+            	try {
+					Thread.sleep(5000);
+					BungeeCord.getInstance().getBetterbungee().setProxyProtocol(proxyProtocol);
+            	} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }).start();
             List<String> serverPriority = new ArrayList<>( get( "priorities", Collections.EMPTY_LIST, val ) );
 
             // Default server list migration

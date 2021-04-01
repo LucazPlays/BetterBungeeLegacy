@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.logging.Level;
 
+import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.NotifyManager;
@@ -43,32 +44,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		if (list.isProtection()) {
-			String ip = list.getRealAdress(ctx);
-			if (list.isBlacklisted(ip)) {
-				notify.addmessage("Blocked IP: " + ip + " Blacklisted").send();
-				ctx.close();
-				return;
-			}
-			list.createlimit(ip);
-			list.addlimit(ip);
-			int rate = list.ratelimit(ip);
-			if (rate > BungeeCord.getInstance().getBetterbungee().getPeriplimit()) {
-				System.out.println("Blocked - " + ip + " PerIPRateLimit" + rate);
-				ctx.close();
-				if (list.containswhitelist(ip)) {
-					list.removeWhitelist(ip);
-				}
-				return;
-			}
-			if (!list.containswhitelist(ip)) {
-				if (list.getGlobalratelimit() > BungeeCord.getInstance().getBetterbungee().getGloballimit()) {
-					notify.addmessage("Blocked IP: " + ip + " Global Ratelimit").send();
-					ctx.close();
-					return;
-				}
-			}
-			System.out.println(ip + " - " + rate);
+		if (!BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+			filter(ctx);
 		}
 		if (handler != null) {
 			channel = new ChannelWrapper(ctx);
@@ -76,6 +53,45 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			if (!(handler instanceof InitialHandler || handler instanceof PingHandler)) {
 				ProxyServer.getInstance().getLogger().log(Level.INFO, "{0} has connected", handler);
 			}
+		}
+	}
+
+	private void filter(ChannelHandlerContext ctx) {
+		if (list.isProtection()) {
+			String ip = null;
+			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+				ip = list.getRealAdress(channel);
+			} else {
+				ip = list.getRealAdress(ctx);
+			}
+			if (list.isBlacklisted(ip)) {
+				notify.addmessage("Blocked IP - " + ip + " - §4Blacklisted");
+				ctx.close();
+				return;
+			}
+			list.createlimit(ip);
+			list.addlimit(ip);
+			
+			int rate = list.ratelimit(ip);
+			
+			if (rate > BungeeCord.getInstance().getBetterbungee().getPeriplimit()) {
+				notify.addmessage("Blocked IP - " + ip + " - §ePerIPRateLimit");
+				ctx.close();
+				if (list.containswhitelist(ip)) {
+					list.removeWhitelist(ip);
+				}
+				return;
+			}
+			
+			if (!list.containswhitelist(ip)) {
+				if (list.getGlobalratelimit() > BungeeCord.getInstance().getBetterbungee().getGloballimit()) {
+					notify.addmessage("Blocked - " + ip + " - §cGlobal Ratelimit").send();
+					ctx.close();
+					return;
+				}
+			}
+			
+			System.out.println(ip + " - " + rate);
 		}
 	}
 
@@ -107,6 +123,11 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					new Object[] { channel.getRemoteAddress(), newAddress });
 
 			channel.setRemoteAddress(newAddress);
+
+			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+				filter(ctx);
+			}
+
 			return;
 		}
 

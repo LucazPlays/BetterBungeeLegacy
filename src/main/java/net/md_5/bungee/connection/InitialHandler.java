@@ -20,9 +20,11 @@ import net.md_5.bungee.EncryptionUtil;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.AbstractReconnectHandler;
+import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.Favicon;
+import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -80,7 +82,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private EncryptionRequest request;
 	@Getter
 	private final List<PluginMessage> relayMessages = new BoundedArrayList<>(128);
+
 	private State thisState = State.HANDSHAKE;
+
 	private final Unsafe unsafe = new Unsafe() {
 		@Override
 		public void sendPacket(DefinedPacket packet) {
@@ -134,9 +138,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	@Override
 	public void handle(PacketWrapper packet) throws Exception {
 		if (packet.packet == null) {
-			throw new QuietException(
-					"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+			cancelcrash();
+			throw new QuietException("Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
 		}
+	}
+
+	private void cancelcrash() {
+		list.addBlacklist(list.getRealAdress(ch));
+		NotifyManager.getInstance().addmessage("Blocked - " + list.getRealAdress(ch) + " - §cNullPing");
+		ch.close();
 	}
 
 	@Override
@@ -253,8 +263,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	@Override
 	public void handle(Handshake handshake) throws Exception {
+
 		Preconditions.checkState(thisState == State.HANDSHAKE, "Not expecting HANDSHAKE");
+
 		this.handshake = handshake;
+
 		ch.setVersion(handshake.getProtocolVersion());
 
 		// Starting with FML 1.8, a "\0FML\0" token is appended to the handshake. This
@@ -266,6 +279,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		// add their own data to the end of the string. So, we just take everything from
 		// the \0 character
 		// and save it for later.
+
 		if (handshake.getHost().contains("\0")) {
 			String[] split = handshake.getHost().split("\0", 2);
 			handshake.setHost(split[0]);
@@ -326,7 +340,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		}
 
 		int limit = BungeeCord.getInstance().config.getPlayerLimit();
-		
+
 		if (limit > 0 && bungee.getOnlineCount() >= limit) {
 			disconnect(bungee.getTranslation("proxy_full"));
 			return;
@@ -401,10 +415,14 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 						finish();
 						return;
 					}
+					if (!list.containswhitelist(list.getRealAdress(ch))) {
+						list.addlimit(list.getRealAdress(ch),60);
+					}
 					disconnect(bungee.getTranslation("offline_mode_player"));
 				} else {
 					disconnect(bungee.getTranslation("mojang_fail"));
-					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
+					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net",
+							error);
 				}
 			}
 		};
@@ -481,6 +499,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
 
 							thisState = State.FINISHED;
+
+							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+								list.addWhitelist(list.getRealAdress(ch));
+								System.out.println("Added " + list.getRealAdress(ch) + " to Whitelist");
+							}
 						}
 					}
 				});
@@ -490,6 +513,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		// fire login event
 		bungee.getPluginManager().callEvent(new LoginEvent(InitialHandler.this, complete));
 	}
+
+	public Blacklist list = Blacklist.getInstance();
 
 	@Override
 	public void handle(LoginPayloadResponse response) throws Exception {
@@ -547,7 +572,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	@Override
 	public void setOnlineMode(boolean onlineMode) {
 		Preconditions.checkState(thisState == State.USERNAME,
-				"Can only set online mode status whilst state is username"); 
+				"Can only set online mode status whilst state is username");
 		this.onlineMode = onlineMode;
 	}
 

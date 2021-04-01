@@ -99,6 +99,11 @@ public abstract class ProxyServer
      */
     public abstract Map<String, ServerInfo> getServers();
 
+    
+    
+    public abstract Map<String, ServerInfo> getServersCopy();
+    
+
     /**
      * Gets the server info of a server.
      *

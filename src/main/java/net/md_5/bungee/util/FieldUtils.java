@@ -149,9 +149,11 @@ public class FieldUtils {
 									return false;
 								}
 							}
-							final URLClassLoader loader = (URLClassLoader) new PluginClassloader(
-									new URL[] { pluginfile.toURI().toURL() });
+							
+							URLClassLoader loader = (URLClassLoader) new PluginClassloader(new URL[] {pluginfile.toURI().toURL()});
+
 							final Class<?> mainclazz = loader.loadClass(desc.getMain());
+							
 							final Plugin plugin2 = (Plugin) mainclazz.getDeclaredConstructor((Class<?>[]) new Class[0])
 									.newInstance(new Object[0]);
 							Reflection.invokeMethod((Object) plugin2, "init",

@@ -10,6 +10,9 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 
 import lombok.Getter;
+import lombok.Setter;
+import net.md_5.bungee.api.Blacklist;
+import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
@@ -39,6 +42,9 @@ public class BetterBungee {
 	boolean snapshotupdate = false;
 
 	@Getter
+	int snapshotupdatecountdown = 10;
+
+	@Getter
 	int periplimit = 2;
 
 	@Getter
@@ -46,11 +52,17 @@ public class BetterBungee {
 
 	@Getter
 	boolean protection = false;
+	
+
+	@Getter
+	@Setter
+	boolean ProxyProtocol = false;
 
 	public BetterBungee() {
 		Thread betterbungeethread = new Thread(() -> {
 			BungeeCordLauncher.crashed = false;
 			sleep(1500);
+			NotifyManager.Instance = new NotifyManager();
 			createConfigs();
 			onStart();
 			while (BungeeCord.getInstance().isRunning) {
@@ -84,7 +96,7 @@ public class BetterBungee {
 
 	public void onStart() {
 		if (update()) {
-			ProxyServer.getInstance().stop("§D6Updated BetterCord");
+			ProxyServer.getInstance().stop("§6Updated BetterCord");
 		}
 		login();
 	}
@@ -109,6 +121,8 @@ public class BetterBungee {
 
 			String snapshotupdater = "serversettings.snapshotupdater";
 
+			String snapshotupdatercountdown= "serversettings.snapshotupdatercountdown";
+
 			String protection = "serversettings.protection";
 
 			String globallimit = "serversettings.globalcpslimit";
@@ -118,6 +132,8 @@ public class BetterBungee {
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
 			addDefault(config, snapshotupdater, "true");
+
+			addDefault(config, snapshotupdatercountdown, "10");
 
 			addDefault(config, protection, "false");
 
@@ -150,6 +166,8 @@ public class BetterBungee {
 
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
+			Blacklist.getInstance().setProtection(this.protection);
+			
 			if (snapshotupdate) {
 				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
 			}

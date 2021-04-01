@@ -20,8 +20,6 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 
 	public static String bungeename = "betterbungee";
 	
-	private NotifyManager notify = NotifyManager.getInstance();
-	
 	public CommandBungeeExtras() {
 		super(bungeename, "bungeecord.command.betterbungee", new String[] {"bungeeutil"});
 	}
@@ -49,11 +47,11 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			
 			if (args[0].equalsIgnoreCase("notifications")) {
 				if (sender.hasPermission("bungeecord.command."+bungeename+".notifications")) {
-					if (notify.players.contains(sender.getName())) {
-						notify.players.remove(sender.getName());
+					if (NotifyManager.getInstance().players.contains(sender.getName())) {
+						NotifyManager.getInstance().players.remove(sender.getName());
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §cDeaktiviert§7!");
 					} else {
-						notify.players.add(sender.getName());
+						NotifyManager.getInstance().players.add(sender.getName());
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §aAktiviert§7!");
 					}
 					return;

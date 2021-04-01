@@ -8,6 +8,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
+import lombok.Setter;
+import net.md_5.bungee.netty.ChannelWrapper;
 
 public class Blacklist {
 
@@ -18,7 +20,8 @@ public class Blacklist {
     
     
     private int globalratelimit = 0;
-    
+
+    @Setter
     @Getter
     private boolean protection = false;
 
@@ -105,9 +108,13 @@ public class Blacklist {
 			ratelimit.put(ip, 2);
 		}
 	}
-	
+
 	public void addlimit(String ip) {
 		ratelimit.put(ip, ratelimit.get(ip)+1);
+	}
+
+	public void addlimit(String ip,int i) {
+		ratelimit.put(ip, ratelimit.get(ip)+i);
 	}
 	
 	public void removelimit(String ip) {
@@ -152,6 +159,13 @@ public class Blacklist {
 
 	public String getRealAdress(ChannelHandlerContext ctx) {
         final SocketAddress remote = ctx.channel().remoteAddress();
+        final String addr = remote != null ? remote.toString() : "";
+		return addr.split("/")[1].split(":")[0];
+	}
+
+
+	public String getRealAdress(ChannelWrapper channel) {
+        final SocketAddress remote = channel.getRemoteAddress();
         final String addr = remote != null ? remote.toString() : "";
 		return addr.split("/")[1].split(":")[0];
 	}

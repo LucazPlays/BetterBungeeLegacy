@@ -226,8 +226,9 @@ public class BungeeCord extends ProxyServer
         consoleReader.addCompleter( new ConsoleCommandCompleter( this ) );
 
         logger = new BungeeLogger( "BungeeCord", "proxy.log", consoleReader );
+        logger.setLevel(Level.SEVERE);
         System.setErr( new PrintStream( new LoggingOutputStream( logger, Level.SEVERE ), true ) );
-        System.setOut( new PrintStream( new LoggingOutputStream( logger, Level.INFO ), true ) );
+        System.setOut( new PrintStream( new LoggingOutputStream( logger, Level.INFO ), false ) );
         
 //        PREFIX = config2.getPrefix();
         
@@ -646,6 +647,11 @@ public class BungeeCord extends ProxyServer
     {
         return config.getServers();
     }
+
+	@Override
+	public Map<String, ServerInfo> getServersCopy() {
+        return config.getServers();
+	}
 
     @Override
     public ServerInfo getServerInfo(String name)
