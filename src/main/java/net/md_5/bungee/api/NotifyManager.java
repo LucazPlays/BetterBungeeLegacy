@@ -16,6 +16,7 @@ public class NotifyManager {
 	private String defaultnomessage = "§cKeine";
 	private boolean async = false;
 	private boolean consoleoutput = false;
+	
 	private ProxyServer server = ProxyServer.getInstance();
 	
 	private CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<String>();
@@ -58,7 +59,7 @@ public class NotifyManager {
 				}
 				for (ProxiedPlayer all : server.getPlayers()) {
 					if (players.contains(all.getName())) {
-						all.sendMessage(messagetype, TextComponent.fromLegacyText(prefix + message));
+						all.sendMessage(players.get(all.getName()), TextComponent.fromLegacyText(prefix + message));
 					}
 				}
 			}
@@ -71,7 +72,23 @@ public class NotifyManager {
 			while (true) {
 				send();
 				try {
-					Thread.sleep(500);
+					if (messages.size() > 1750) {
+						Thread.sleep(1);
+					} else if (messages.size() > 1000) {
+						Thread.sleep(5);
+					} else if (messages.size() > 500) {
+						Thread.sleep(10);
+					} else if (messages.size() > 250) {
+						Thread.sleep(25);
+					} else if (messages.size() > 100) {
+						Thread.sleep(75);
+					} else if (messages.size() > 35) {
+						Thread.sleep(100);
+					} else if (messages.size() > 10) {
+						Thread.sleep(50);
+					} else if (messages.size() >= 0) {
+						Thread.sleep(2000);
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -92,6 +109,16 @@ public class NotifyManager {
 	public String getPrefix() {
 		return prefix;
 	}
+	
+	
+	
+	
+	public CopyOnWriteArrayList<String> getMessages() {
+		return messages;
+	}
+	
+	
+	
 
 	public NotifyManager setPrefix(String prefix) {
 		this.prefix = prefix;
