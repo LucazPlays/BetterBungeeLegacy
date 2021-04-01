@@ -1,5 +1,6 @@
 package net.md_5.bungee.api;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.md_5.bungee.BungeeCord;
@@ -19,7 +20,7 @@ public class NotifyManager {
 	
 	private CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<String>();
 
-	public CopyOnWriteArrayList<String> players = new CopyOnWriteArrayList<String>();
+	public ConcurrentHashMap<String,ChatMessageType> players = new ConcurrentHashMap<String,ChatMessageType>();
 
 	public NotifyManager() {
 		loop();

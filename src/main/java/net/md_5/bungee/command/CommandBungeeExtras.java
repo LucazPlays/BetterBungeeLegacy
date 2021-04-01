@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -51,7 +52,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 						NotifyManager.getInstance().players.remove(sender.getName());
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §cDeaktiviert§7!");
 					} else {
-						NotifyManager.getInstance().players.add(sender.getName());
+						NotifyManager.getInstance().players.put(sender.getName(),ChatMessageType.ACTION_BAR);
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §aAktiviert§7!");
 					}
 					return;

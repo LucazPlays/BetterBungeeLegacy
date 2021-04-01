@@ -585,7 +585,6 @@ public class BungeeCord extends ProxyServer
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Collection<ProxiedPlayer> getPlayers()
     {
         connectionLock.readLock().lock();
