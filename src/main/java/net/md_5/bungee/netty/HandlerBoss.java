@@ -59,11 +59,13 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	private void filter(ChannelHandlerContext ctx) {
 		if (list.isProtection()) {
 			String ip = null;
+			
 			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
 				ip = list.getRealAdress(channel);
 			} else {
 				ip = list.getRealAdress(ctx);
 			}
+			
 			if (list.isBlacklisted(ip)) {
 				notify.addmessage("§cBlocked §8- §e" + ip + " - §4Blacklisted");
 				ctx.close();
@@ -85,12 +87,11 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			
 			if (!list.containswhitelist(ip)) {
 				if (list.getGlobalratelimit() > BungeeCord.getInstance().getBetterbungee().getGloballimit()) {
-					notify.addmessage("§cBlocked - §e" + ip + " §8- §cGlobal Ratelimit").send();
+					notify.addmessage("§cBlocked - §e" + ip + " §8- §cGlobal Ratelimit");
 					ctx.close();
 					return;
 				}
 			}
-			System.out.println(ip + " - " + rate);
 		}
 	}
 
@@ -167,20 +168,15 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 								"{0} - bad packet ID, are mods in use!? {1}",
 								new Object[] { handler, cause.getCause().getMessage() });
 					} else if (cause.getCause() instanceof OverflowPacketException) {
-						ProxyServer.getInstance().getLogger().log(Level.WARNING,
-								"{0} - overflow in packet detected! {1}",
-								new Object[] { handler, cause.getCause().getMessage() });
+						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - overflow in packet detected! {1}", new Object[] { handler, cause.getCause().getMessage() });
 					}
-				} else if (cause instanceof IOException
-						|| (cause instanceof IllegalStateException && handler instanceof InitialHandler)) {
-					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - {1}: {2}",
-							new Object[] { handler, cause.getClass().getSimpleName(), cause.getMessage() });
+				} else if (cause instanceof IOException || (cause instanceof IllegalStateException && handler instanceof InitialHandler)) {
+					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - {1}: {2}", new Object[] { handler, cause.getClass().getSimpleName(), cause.getMessage() });
 				} else if (cause instanceof QuietException) {
 					ProxyServer.getInstance().getLogger().log(Level.SEVERE, "{0} - encountered exception: {1}",
 							new Object[] { handler, cause });
 				} else {
-					ProxyServer.getInstance().getLogger().log(Level.SEVERE, handler + " - encountered exception",
-							cause);
+					ProxyServer.getInstance().getLogger().log(Level.SEVERE, handler + " - encountered exception", cause);
 				}
 			}
 
@@ -188,11 +184,10 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				try {
 					handler.exception(cause);
 				} catch (Exception ex) {
-					ProxyServer.getInstance().getLogger().log(Level.SEVERE,
-							handler + " - exception processing exception", ex);
+					ProxyServer.getInstance().getLogger().log(Level.SEVERE, handler + " - exception processing exception", ex);
 				}
 			}
-
+			
 			ctx.close();
 		}
 	}
