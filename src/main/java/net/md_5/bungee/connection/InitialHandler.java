@@ -150,7 +150,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	private void cancelcrash() {
 		list.addBlacklist(list.getRealAdress(ch));
-		NotifyManager.getInstance().addmessage("Blocked - " + list.getRealAdress(ch) + " - §cNullPing");
+		NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §cNullPing");
 		ch.close();
 	}
 
