@@ -234,23 +234,27 @@ public class BetterBungee {
 	}
 
 	private boolean updatefromlink(String link) {
-		try {
-			FileUtils.copyURLToFile(new URL(link), new File("UpdatedBungeeCord.jar"), 30000, 30000);
+		if (download(link)) {
 			try {
 				new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-				new File("UpdatedBungeeCord.jar").renameTo(
-						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
 				return true;
 			} catch (URISyntaxException e) {
 			}
 			System.out.println("Updated BungeeCord");
 			updated = true;
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		return false;
+	}
+
+	private boolean download(String link) {
+		try {
+			FileUtils.copyURLToFile(new URL(link), new File("UpdatedBungeeCord.jar"), 30000, 30000);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	private boolean login() {

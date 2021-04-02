@@ -21,7 +21,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 	public static String bungeename = "betterbungee";
 
 	public CommandBungeeExtras() {
-		super(bungeename, "bungeecord.command.betterbungee", new String[] { "bungeeutil" });
+		super(bungeename, "bungeecord.command.betterbungee", new String[] { "bungeeutil", "bbungee" });
 	}
 
 	@Override
@@ -45,8 +45,19 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 //			}
 
 			if (args[0].equalsIgnoreCase("notifications")) {
+				if (args.length == 2) {
+					if (args[1].equalsIgnoreCase("chat")) {
+						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden auf Chat gestellt§7!");
+						NotifyManager.getInstance().players.put(sender.getName(), ChatMessageType.CHAT);
+					} else if (args[1].equalsIgnoreCase("actionbar")) {
+						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden auf ActionBar gestellt§7!");
+						NotifyManager.getInstance().players.put(sender.getName(), ChatMessageType.ACTION_BAR);
+					}
+					sender.sendMessage(BungeeCord.PREFIX + "§7Mache /" + bungeename + " notifications chat/actionbar");
+					return;
+				}
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".notifications")) {
-					if (NotifyManager.getInstance().players.contains(sender.getName())) {
+					if (NotifyManager.getInstance().players.containsKey(sender.getName())) {
 						NotifyManager.getInstance().players.remove(sender.getName());
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden §cDeaktiviert§7!");
 					} else {
