@@ -58,7 +58,7 @@ public class NotifyManager {
 					System.out.println(message.replaceAll("§", ""));
 				}
 				for (ProxiedPlayer all : server.getPlayers()) {
-					if (players.contains(all.getName())) {
+					if (players.containsKey(all.getName())) {
 						all.sendMessage(players.get(all.getName()), TextComponent.fromLegacyText(prefix + message));
 					}
 				}
@@ -72,7 +72,8 @@ public class NotifyManager {
 			while (true) {
 				send();
 				try {
-					if (messages.size() > 1750) {
+					if (messages.size() > 12500) {
+					} else if (messages.size() > 1750) {
 						Thread.sleep(1);
 					} else if (messages.size() > 1000) {
 						Thread.sleep(5);
@@ -83,10 +84,10 @@ public class NotifyManager {
 					} else if (messages.size() > 100) {
 						Thread.sleep(75);
 					} else if (messages.size() > 35) {
-						Thread.sleep(100);
+						Thread.sleep(250);
 					} else if (messages.size() > 10) {
-						Thread.sleep(50);
-					} else if (messages.size() >= 0) {
+						Thread.sleep(350);
+					} else if (messages.size() <= 10) {
 						Thread.sleep(2000);
 					}
 				} catch (InterruptedException e) {
