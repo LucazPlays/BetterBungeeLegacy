@@ -218,6 +218,8 @@ public class BetterBungee {
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
+			} else {
+				System.out.println("API Timed Out");
 			}
 		} else if (!updated) {
 			lastupdatecheck = System.currentTimeMillis();
@@ -228,6 +230,8 @@ public class BetterBungee {
 					System.out.println("Updated Available");
 					return updatefromlink(betterbungee + "/downloadupdate");
 				}
+			} else {
+				System.out.println("API Timed Out");
 			}
 		}
 		return false;
@@ -266,6 +270,8 @@ public class BetterBungee {
 				session = response.getText();
 				return true;
 			}
+		} else {
+			System.out.println("API Timed Out");
 		}
 		System.out.println(response.getText());
 		return false;
@@ -281,6 +287,8 @@ public class BetterBungee {
 				return true;
 			}
 			System.out.println(response.getText());
+		} else {
+			System.out.println("API Timed Out");
 		}
 		return false;
 	}
@@ -296,6 +304,8 @@ public class BetterBungee {
 				return true;
 			}
 			System.out.println(response.getText());
+		} else {
+			System.out.println("API Timed Out");
 		}
 		return false;
 	}

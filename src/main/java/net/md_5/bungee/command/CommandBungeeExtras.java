@@ -11,6 +11,7 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.NotifyManager;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -43,15 +44,23 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 //
 //				return;
 //			}
+			
+			if (args[0].equalsIgnoreCase("playerproxys")) {
+				sender.sendMessage(BungeeCord.PREFIX + "§aSpielerliste");
+				for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+				}
+			}
 
 			if (args[0].equalsIgnoreCase("notifications")) {
 				if (args.length == 2) {
 					if (args[1].equalsIgnoreCase("chat")) {
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden auf Chat gestellt§7!");
 						NotifyManager.getInstance().players.put(sender.getName(), ChatMessageType.CHAT);
+						return;
 					} else if (args[1].equalsIgnoreCase("actionbar")) {
 						sender.sendMessage(BungeeCord.PREFIX + "§9Notifications §7wurden auf ActionBar gestellt§7!");
 						NotifyManager.getInstance().players.put(sender.getName(), ChatMessageType.ACTION_BAR);
+						return;
 					}
 					sender.sendMessage(BungeeCord.PREFIX + "§7Mache /" + bungeename + " notifications chat/actionbar");
 					return;
@@ -188,10 +197,19 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			if (sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager")) {
 				sug.add("pluginmanager");
 			}
+			if (sender.hasPermission("bungeecord.command." + bungeename + ".playerproxys")) {
+				sug.add("playerproxys");
+			}
 
 		}
 
 		if (args.length == 2) {
+			if (args[0].equalsIgnoreCase("pluginmanager")) {
+				if (sender.hasPermission("bungeecord.command." + bungeename + ".notifications")) {
+					sug.add("chat");
+					sug.add("actionbar");
+				}
+			}
 			if (args[0].equalsIgnoreCase("pluginmanager")) {
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager")) {
 					sug.add("list");

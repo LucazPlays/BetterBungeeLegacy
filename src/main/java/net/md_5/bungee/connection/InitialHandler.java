@@ -500,9 +500,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 							thisState = State.FINISHED;
 
+							String ip = list.getRealAdress(ch);
 							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
-								list.addWhitelist(list.getRealAdress(ch));
-								System.out.println("Added " + list.getRealAdress(ch) + " to Whitelist");
+								if (list.containswhitelist(ip)) {
+									NotifyManager.getInstance().addmessage("§aAllowed §8- §e" + ip + " §8- §aWhitelisted");
+								} else {
+									list.addWhitelist(ip);
+									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
+									NotifyManager.getInstance().addmessage("§aAllowed §8- §e" + ip + " §8- §aWhitelisted");
+								}
 							}
 						}
 					}

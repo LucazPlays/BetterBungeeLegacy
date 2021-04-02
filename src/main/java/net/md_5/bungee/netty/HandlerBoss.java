@@ -65,7 +65,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				ip = list.getRealAdress(ctx);
 			}
 			if (list.isBlacklisted(ip)) {
-				notify.addmessage("Blocked IP - " + ip + " - §4Blacklisted");
+				notify.addmessage("§cBlocked §8- §e" + ip + " - §4Blacklisted");
 				ctx.close();
 				return;
 			}
@@ -75,7 +75,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			int rate = list.ratelimit(ip);
 			
 			if (rate > BungeeCord.getInstance().getBetterbungee().getPeriplimit()) {
-				notify.addmessage("Blocked IP - " + ip + " - §ePerIPRateLimit");
+				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRateLimit");
 				ctx.close();
 				if (list.containswhitelist(ip)) {
 					list.removeWhitelist(ip);
@@ -85,12 +85,11 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			
 			if (!list.containswhitelist(ip)) {
 				if (list.getGlobalratelimit() > BungeeCord.getInstance().getBetterbungee().getGloballimit()) {
-					notify.addmessage("Blocked - " + ip + " - §cGlobal Ratelimit").send();
+					notify.addmessage("§cBlocked - §e" + ip + " §8- §cGlobal Ratelimit").send();
 					ctx.close();
 					return;
 				}
 			}
-			
 			System.out.println(ip + " - " + rate);
 		}
 	}

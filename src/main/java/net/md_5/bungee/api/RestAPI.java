@@ -28,7 +28,6 @@ public class RestAPI {
 	        }
 	        in.close();
 		} catch (IOException e) {
-			e.printStackTrace();
 			return new RestAPIResponse("Error", true);
 		}
         return new RestAPIResponse(response, false);
