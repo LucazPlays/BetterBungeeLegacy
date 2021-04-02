@@ -27,7 +27,7 @@ public class ChannelWrapper
 
     @Getter
     @Setter
-    private SocketAddress proxyAddress;
+    private String proxyAddress;
     
     @Getter
     private volatile boolean closed;

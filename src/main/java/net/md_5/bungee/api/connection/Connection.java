@@ -29,6 +29,9 @@ public interface Connection
      */
     SocketAddress getSocketAddress();
 
+    
+    String getProxyAddress();
+
     /**
      * Disconnects this end of the connection for the specified reason. If this
      * is an {@link ProxiedPlayer} the respective server connection will be

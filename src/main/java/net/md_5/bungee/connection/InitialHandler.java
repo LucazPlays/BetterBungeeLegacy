@@ -576,7 +576,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	@Override
-	public SocketAddress getProxyAddress() {
+	public String getProxyAddress() {
 		return ch.getProxyAddress();
 	}
 

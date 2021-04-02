@@ -46,8 +46,6 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		if (!BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
 			filter(ctx);
-		} else {
-			channel.setProxyAddress(ctx.channel().remoteAddress());
 		}
 		if (handler != null) {
 			channel = new ChannelWrapper(ctx);
@@ -122,11 +120,13 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			
 			HAProxyMessage proxy = (HAProxyMessage) msg;
 			
+			channel.setProxyAddress(list.getRealAdress(ctx.channel().remoteAddress()));
+			
 			InetSocketAddress newAddress = new InetSocketAddress(proxy.sourceAddress(), proxy.sourcePort());
 
 			ProxyServer.getInstance().getLogger().log(Level.FINE, "Set remote address via PROXY {0} -> {1}",
 					new Object[] { channel.getRemoteAddress(), newAddress });
-			
+
 			channel.setRemoteAddress(newAddress);
 
 			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {

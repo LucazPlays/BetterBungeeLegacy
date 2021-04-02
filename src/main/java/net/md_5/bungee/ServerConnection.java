@@ -97,4 +97,9 @@ public class ServerConnection implements Server
         private final long id;
         private final long time;
     }
+
+	@Override
+	public String getProxyAddress() {
+		return ch.getProxyAddress();
+	}
 }

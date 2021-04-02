@@ -730,4 +730,10 @@ public final class UserConnection implements ProxiedPlayer
     {
         return serverSentScoreboard;
     }
+
+	@Override
+	public String getProxyAddress() {
+		// TODO Auto-generated method stub
+		return ch.getProxyAddress();
+	}
 }

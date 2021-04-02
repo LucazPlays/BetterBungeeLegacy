@@ -180,9 +180,4 @@ public abstract class AbstractPacketHandler
     public void handle(GameState gameState) throws Exception
     {
     }
-
-	public SocketAddress getProxyAddress() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
