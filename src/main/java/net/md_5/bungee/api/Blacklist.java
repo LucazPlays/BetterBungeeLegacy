@@ -164,6 +164,12 @@ public class Blacklist {
 	}
 
 
+	public String getRealAdress(SocketAddress socketaddress) {
+        final String addr = socketaddress.toString() != null ? socketaddress.toString() : "";
+		return addr.split("/")[1].split(":")[0];
+	}
+
+
 	public String getRealAdress(ChannelWrapper channel) {
         final SocketAddress remote = channel.getRemoteAddress();
         final String addr = remote != null ? remote.toString() : "";

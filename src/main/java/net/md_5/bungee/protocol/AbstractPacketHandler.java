@@ -1,5 +1,7 @@
 package net.md_5.bungee.protocol;
 
+import java.net.SocketAddress;
+
 import net.md_5.bungee.protocol.packet.BossBar;
 import net.md_5.bungee.protocol.packet.Chat;
 import net.md_5.bungee.protocol.packet.ClientSettings;
@@ -178,4 +180,9 @@ public abstract class AbstractPacketHandler
     public void handle(GameState gameState) throws Exception
     {
     }
+
+	public SocketAddress getProxyAddress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

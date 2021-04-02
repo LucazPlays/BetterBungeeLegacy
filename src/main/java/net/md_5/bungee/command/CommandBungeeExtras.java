@@ -12,6 +12,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -48,7 +49,9 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			if (args[0].equalsIgnoreCase("playerproxys")) {
 				sender.sendMessage(BungeeCord.PREFIX + "§aSpielerliste");
 				for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+					all.sendMessage(TextComponent.fromLegacyText("   §8 - §a" + all.getName() + " §8- §e" + all.getAddress().getAddress().getHostAddress() + " §8- §d"));
 				}
+				return;
 			}
 
 			if (args[0].equalsIgnoreCase("notifications")) {

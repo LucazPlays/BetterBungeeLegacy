@@ -46,6 +46,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		if (!BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
 			filter(ctx);
+		} else {
+			channel.setProxyAddress(ctx.channel().remoteAddress());
 		}
 		if (handler != null) {
 			channel = new ChannelWrapper(ctx);
@@ -67,17 +69,18 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			}
 			
 			if (list.isBlacklisted(ip)) {
-				notify.addmessage("§cBlocked §8- §e" + ip + " - §4Blacklisted");
+				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
 				ctx.close();
 				return;
 			}
+			
 			list.createlimit(ip);
 			list.addlimit(ip);
 			
 			int rate = list.ratelimit(ip);
 			
 			if (rate > BungeeCord.getInstance().getBetterbungee().getPeriplimit()) {
-				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRateLimit");
+				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
 				ctx.close();
 				if (list.containswhitelist(ip)) {
 					list.removeWhitelist(ip);
@@ -87,7 +90,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			
 			if (!list.containswhitelist(ip)) {
 				if (list.getGlobalratelimit() > BungeeCord.getInstance().getBetterbungee().getGloballimit()) {
-					notify.addmessage("§cBlocked - §e" + ip + " §8- §cGlobal Ratelimit");
+					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
 					ctx.close();
 					return;
 				}
@@ -116,12 +119,14 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		if (msg instanceof HAProxyMessage) {
+			
 			HAProxyMessage proxy = (HAProxyMessage) msg;
+			
 			InetSocketAddress newAddress = new InetSocketAddress(proxy.sourceAddress(), proxy.sourcePort());
 
 			ProxyServer.getInstance().getLogger().log(Level.FINE, "Set remote address via PROXY {0} -> {1}",
 					new Object[] { channel.getRemoteAddress(), newAddress });
-
+			
 			channel.setRemoteAddress(newAddress);
 
 			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
@@ -132,8 +137,10 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 		}
 
 		if (handler != null) {
+			
 			PacketWrapper packet = (PacketWrapper) msg;
 			boolean sendPacket = handler.shouldHandle(packet);
+			
 			try {
 				if (sendPacket && packet.packet != null) {
 					try {
@@ -142,6 +149,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 						sendPacket = false;
 					}
 				}
+				
 				if (sendPacket) {
 					handler.handle(packet);
 				}

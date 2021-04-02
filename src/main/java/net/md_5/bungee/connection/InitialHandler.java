@@ -72,6 +72,7 @@ import net.md_5.bungee.util.QuietException;
 public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	private final BungeeCord bungee;
+	
 	private ChannelWrapper ch;
 	@Getter
 	private final ListenerInfo listener;
@@ -79,6 +80,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private Handshake handshake;
 	@Getter
 	private LoginRequest loginRequest;
+	
 	private EncryptionRequest request;
 	@Getter
 	private final List<PluginMessage> relayMessages = new BoundedArrayList<>(128);
@@ -106,6 +108,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private boolean legacy;
 	@Getter
 	private String extraDataInHandshake = "";
+	
+	@Getter
+	private String proxyip;
 
 	@Override
 	public boolean shouldHandle(PacketWrapper packet) throws Exception {
@@ -568,6 +573,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	@Override
 	public SocketAddress getSocketAddress() {
 		return ch.getRemoteAddress();
+	}
+
+	@Override
+	public SocketAddress getProxyAddress() {
+		return ch.getProxyAddress();
 	}
 
 	@Override
