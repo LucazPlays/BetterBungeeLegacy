@@ -73,6 +73,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			}
 			
 			list.createlimit(ip);
+			
 			list.addlimit(ip);
 			
 			int rate = list.ratelimit(ip);

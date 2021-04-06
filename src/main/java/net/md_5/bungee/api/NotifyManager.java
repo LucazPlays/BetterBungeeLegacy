@@ -4,6 +4,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.BungeeTitle;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -63,6 +65,14 @@ public class NotifyManager {
 					}
 				}
 			}
+			if (Blacklist.getInstance().isUnderattack()) {
+				for (ProxiedPlayer all : server.getPlayers()) {
+					if (players.containsKey(all.getName())) {
+						ProxyServer.getInstance().createTitle().title(TextComponent.fromLegacyText("§cUnder Attack")).subTitle(TextComponent.fromLegacyText("§eCPS §8- §e"+Blacklist.getInstance().getAveragecps())).send(all);
+					}
+				}
+			}
+			
 		});
 		return this;
 	}
