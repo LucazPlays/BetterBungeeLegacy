@@ -520,7 +520,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 								}
 							}
-							
+
+							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+								
+							}
 							
 						}
 					}
