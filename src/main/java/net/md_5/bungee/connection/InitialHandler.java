@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import javax.crypto.SecretKey;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.EncryptionUtil;
@@ -173,8 +174,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		this.legacy = true;
 		final boolean v1_5 = ping.isV1_5();
 
+		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a") + BungeeCord.getInstance().getBetterbungee().Version;
+		
 		ServerPing legacy = new ServerPing(
-				new ServerPing.Protocol(bungee.getName() + " " + bungee.getGameVersion(), bungee.getProtocolVersion()),
+				new ServerPing.Protocol("§eBetterBungee" + " §8- " + Version, bungee.getProtocolVersion()),
 				new ServerPing.Players(listener.getMaxPlayers(), bungee.getOnlineCount(), null),
 				new TextComponent(TextComponent.fromLegacyText(listener.getMotd())), (Favicon) null);
 
@@ -212,7 +215,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private ServerPing getPingInfo(String motd, int protocol) {
-		return new ServerPing(new ServerPing.Protocol(bungee.getName() + " " + bungee.getGameVersion(), protocol),
+		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a") + BungeeCord.getInstance().getBetterbungee().Version;
+
+		return new ServerPing(new ServerPing.Protocol("§eBetterBungee §8- " + Version, protocol),
 				new ServerPing.Players(listener.getMaxPlayers(), bungee.getOnlineCount(), null), motd,
 				BungeeCord.getInstance().config.getFaviconObject());
 	}
@@ -384,6 +389,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	@Override
 	public void handle(final EncryptionResponse encryptResponse) throws Exception {
+		
 		Preconditions.checkState(thisState == State.ENCRYPT, "Not expecting ENCRYPT");
 
 		SecretKey sharedKey = EncryptionUtil.getSecret(encryptResponse, request);
@@ -426,8 +432,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					disconnect(bungee.getTranslation("offline_mode_player"));
 				} else {
 					disconnect(bungee.getTranslation("mojang_fail"));
-					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net",
-							error);
+					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
+					if (!list.containswhitelist(list.getRealAdress(ch))) {
+						list.addlimit(list.getRealAdress(ch),20);
+					}
 				}
 			}
 		};
@@ -507,14 +515,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 							String ip = list.getRealAdress(ch);
 							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
-								if (list.containswhitelist(ip)) {
-									NotifyManager.getInstance().addmessage("§aAllowed §8- §e" + ip + " §8- §aWhitelisted");
-								} else {
+								if (!list.containswhitelist(ip)) {
 									list.addWhitelist(ip);
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
-									NotifyManager.getInstance().addmessage("§aAllowed §8- §e" + ip + " §8- §aWhitelisted");
 								}
 							}
+							
+							
 						}
 					}
 				});

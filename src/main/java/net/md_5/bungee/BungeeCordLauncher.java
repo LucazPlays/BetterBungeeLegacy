@@ -32,8 +32,7 @@ public class BungeeCordLauncher
 			FileUtils.copyURLToFile(new URL(link), new File("UpdatedBungeeCord.jar"), 30000, 30000);
 			try {
 				new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-				new File("UpdatedBungeeCord.jar").renameTo(
-						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
 				return true;
 			} catch (URISyntaxException e) {
 			}
@@ -78,6 +77,7 @@ public class BungeeCordLauncher
         Security.setProperty( "networkaddress.cache.negative.ttl", "10" );
 
         OptionParser parser = new OptionParser();
+        
         parser.allowsUnrecognizedOptions();
         parser.acceptsAll( Arrays.asList( "help" ), "Show the help" );
         parser.acceptsAll( Arrays.asList( "v", "version" ), "Print version and exit" );
@@ -90,6 +90,7 @@ public class BungeeCordLauncher
             parser.printHelpOn( System.out );
             return;
         }
+        
         if ( options.has( "version" ) )
         {
             System.out.println( BungeeCord.class.getPackage().getImplementationVersion() );
@@ -114,7 +115,9 @@ public class BungeeCordLauncher
 
         BungeeCord bungee = new BungeeCord();
         ProxyServer.setInstance( bungee );
+        
         bungee.getLogger().info( "Enabled BungeeCord version " + bungee.getVersion() );
+        
         bungee.start();
 
         if ( !options.has( "noconsole" ) )

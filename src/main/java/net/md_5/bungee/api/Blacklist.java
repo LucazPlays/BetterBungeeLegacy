@@ -173,6 +173,11 @@ public class Blacklist {
 		return this.whitelist.contains(stg);
 	}
 
+	public void clearWhitelist() {
+		this.whitelist.clear();
+	}
+	
+
 	public void removeWhitelist(String stg) {
 		if (whitelist.contains(stg)) {
 			this.whitelist.remove(stg);

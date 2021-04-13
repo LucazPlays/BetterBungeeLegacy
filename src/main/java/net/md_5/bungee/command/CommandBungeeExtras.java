@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package net.md_5.bungee.command;
 
 import java.io.File;
@@ -30,7 +26,17 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 
 	@Override
 	public void execute(final CommandSender sender, final String[] args) {
-
+		if (!sender.hasPermission("bungeecord.command.betterbungee")) {
+			String Version = "";
+			if (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate()) {
+				Version = "§7Snapshot§8(§c" + BungeeCord.getInstance().getBetterbungee().Version + "§8)";
+			} else {
+				Version = "§7Stable§8(§a" + BungeeCord.getInstance().getBetterbungee().Version + "§8)";
+			}
+			sender.sendMessage(
+					"§7This server is running §eBetterBungee§7 version §a" + Version + "§7 by §bLuca_zPlays");
+			return;
+		}
 		if (args.length >= 1) {
 
 			if (args[0].equalsIgnoreCase("blacklist")) {
@@ -46,10 +52,10 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 						return;
 					} else if (args[1].equalsIgnoreCase("list")) {
 						sender.sendMessage("§7--- §4Blacklist§7 ---");
-						
+
 						int i = 0;
 						for (String ip : Blacklist.getInstance().getBlacklist()) {
-							sender.sendMessage("§c"+(i++) + "§8  -  §e"+ip);
+							sender.sendMessage("§c" + (i++) + "§8  -  §e" + ip);
 						}
 						sender.sendMessage("§7--- §4Blacklist§7 ---");
 						return;
@@ -57,18 +63,53 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 				} else if (args.length >= 3) {
 					if (args[1].equalsIgnoreCase("add")) {
 						Blacklist.getInstance().addBlacklist(args[2]);
-						sender.sendMessage(BungeeCord.PREFIX + "§cBlacklist§7 " + args[2] + " wurde geaddet!");
+						sender.sendMessage(BungeeCord.PREFIX + "§cBlacklist§7 " + args[2] + " added!");
 						return;
 					} else if (args[1].equalsIgnoreCase("remove")) {
 						Blacklist.getInstance().removeBlacklist(args[2]);
-						sender.sendMessage(BungeeCord.PREFIX + "§cBlacklist§7 " + args[2] + " wurde removed!");
+						sender.sendMessage(BungeeCord.PREFIX + "§cBlacklist§7 " + args[2] + " removed!");
 						return;
 					}
 				}
-				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee blacklist list");
-				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee blacklist clear");
-				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee blacklist add <ip>");
-				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee blacklist remove <ip>");
+			}
+
+			if (args[0].equalsIgnoreCase("whitelist")) {
+				if (!sender.hasPermission("bungeecord.command." + bungeename + ".whitelist")) {
+					sender.sendMessage(BungeeCord.PREFIX + "§7Dazu hast du keine §9Rechte§7!");
+					return;
+				}
+
+				if (args.length == 2) {
+					if (args[1].equalsIgnoreCase("clear")) {
+						Blacklist.getInstance().clearWhitelist();
+						sender.sendMessage(BungeeCord.PREFIX + "§aWhitelist§7 gecleart!");
+						return;
+					} else if (args[1].equalsIgnoreCase("list")) {
+						sender.sendMessage("§7--- §2Whitelist§7 ---");
+
+						int i = 0;
+						for (String ip : Blacklist.getInstance().getWhitelist()) {
+							sender.sendMessage("§a" + (i++) + "§8  -  §e" + ip);
+						}
+						
+						sender.sendMessage("§7--- §2Whitelist§7 ---");
+						return;
+					}
+				} else if (args.length >= 3) {
+					if (args[1].equalsIgnoreCase("add")) {
+						Blacklist.getInstance().addWhitelist(args[2]);
+						sender.sendMessage(BungeeCord.PREFIX + "§aWhitelist§7 " + args[2] + " added!");
+						return;
+					} else if (args[1].equalsIgnoreCase("remove")) {
+						Blacklist.getInstance().removeWhitelist(args[2]);
+						sender.sendMessage(BungeeCord.PREFIX + "§aWhitelist§7 " + args[2] + " removed!");
+						return;
+					}
+				}
+				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee whitelist list");
+				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee whitelist clear");
+				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee whitelist add <ip>");
+				sender.sendMessage(BungeeCord.PREFIX + "§7/betterbungee whitelist remove <ip>");
 				return;
 			}
 
@@ -239,11 +280,14 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			if (sender.hasPermission("bungeecord.command." + bungeename + ".blacklist")) {
 				sug.add("blacklist");
 			}
+			if (sender.hasPermission("bungeecord.command." + bungeename + ".whitelist")) {
+				sug.add("whitelist");
+			}
 
 		}
 
 		if (args.length == 2) {
-			if (args[0].equalsIgnoreCase("pluginmanager")) {
+			if (args[0].equalsIgnoreCase("notifications")) {
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".notifications")) {
 					sug.add("chat");
 					sug.add("actionbar");
@@ -251,6 +295,14 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			}
 			if (args[0].equalsIgnoreCase("blacklist")) {
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".blacklist")) {
+					sug.add("list");
+					sug.add("clear");
+					sug.add("add");
+					sug.add("remove");
+				}
+			}
+			if (args[0].equalsIgnoreCase("whitelist")) {
+				if (sender.hasPermission("bungeecord.command." + bungeename + ".whitelist")) {
 					sug.add("list");
 					sug.add("clear");
 					sug.add("add");

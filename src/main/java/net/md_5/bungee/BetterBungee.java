@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -31,15 +32,20 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.4";
+	public String Version = "0.7";
 
 	long lastupdatecheck = 0;
+
+	int updatecheckfrequency = 0;
 
 	@Getter
 	boolean updated = false;
 
 	@Getter
 	boolean snapshotupdate = false;
+
+	@Getter
+	boolean restartonupdate = false;
 
 	@Getter
 	int snapshotupdatecountdown = 10;
@@ -55,32 +61,52 @@ public class BetterBungee {
 	
 
 	@Getter
+	boolean disablebungeecommands = false;
+	
+
+	@Getter
 	@Setter
 	boolean ProxyProtocol = false;
 
+
+
+	@Getter
+	ArrayList<DownloadablePlugin> pluginlist = new ArrayList<>();
+	
+	
 	public BetterBungee() {
+		createConfigs();
 		Thread betterbungeethread = new Thread(() -> {
 			BungeeCordLauncher.crashed = false;
 			sleep(1500);
 			NotifyManager.Instance = new NotifyManager();
-			createConfigs();
 			onStart();
 			while (BungeeCord.getInstance().isRunning) {
 				if (alive()) {
 					if (snapshotupdate) {
 						if (update()) {
-							ProxyServer.getInstance().broadcast(
-									TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
-							for (int i = 10; i > 0; i--) {
+							if (restartonupdate) {
+								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
+								for (int i = snapshotupdatecountdown; i > 0; i--) {
+									sleep(1000);
+									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
+								}
 								sleep(1000);
-								ProxyServer.getInstance().broadcast(TextComponent
-										.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
+								ProxyServer.getInstance().stop("§6Updated BetterCord");
 							}
-							sleep(1000);
-							ProxyServer.getInstance().stop("§6Updated BetterCord");
 						}
-					} else if (lastupdatecheck < System.currentTimeMillis() - 1000 * 60 * 60 * 2) {
-						update();
+					} else if (lastupdatecheck < System.currentTimeMillis() - (1000 * 60 * updatecheckfrequency)) {
+						if (update()) {
+							if (restartonupdate) {
+								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§aStable§7 Update Found"));
+								for (int i = snapshotupdatecountdown; i > 0; i--) {
+									sleep(1000);
+									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
+								}
+								sleep(1000);
+								ProxyServer.getInstance().stop("§aUpdated BetterCord");
+							}
+						}
 					}
 					sleep();
 				} else {
@@ -110,6 +136,7 @@ public class BetterBungee {
 	public void createConfigs() {
 		try {
 			File file = new File("betterbungeeconfig.yml");
+			
 			if (!file.exists()) {
 				file.createNewFile();
 				System.out.println("Created Config File");
@@ -121,19 +148,29 @@ public class BetterBungee {
 
 			String snapshotupdater = "serversettings.snapshotupdater";
 
+			String restartonupdate = "serversettings.restartonupdate";
+
 			String snapshotupdatercountdown= "serversettings.snapshotupdatercountdown";
 
 			String protection = "serversettings.protection";
+
+			String disablebungeecommands = "serversettings.disablebungeecommands";
 
 			String globallimit = "serversettings.globalcpslimit";
 
 			String limitperip = "serversettings.limitcpsperip";
 
+			String updatecheckfrequencysetting = "serversettings.updatecheckfrequencyinminutes";
+
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
-			addDefault(config, snapshotupdater, "true");
+			addDefault(config, snapshotupdater, "false");
+
+			addDefault(config, restartonupdate, "true");
 
 			addDefault(config, snapshotupdatercountdown, "10");
+
+			addDefault(config, disablebungeecommands, "false");
 
 			addDefault(config, protection, "false");
 
@@ -141,8 +178,12 @@ public class BetterBungee {
 
 			addDefault(config, limitperip, "3");
 
+			addDefault(config, updatecheckfrequencysetting, "15");
+
 			String configuuid = "serverdata.uuid";
+			
 			String configkey = "serverdata.key";
+			
 			if (!config.contains(configuuid)) {
 				config.set(configuuid, UUID.randomUUID().toString());
 				config.set(configkey, generatepw());
@@ -157,13 +198,27 @@ public class BetterBungee {
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
 			this.uuid = config.getString(configuuid);
+			
 			this.password = config.getString(configkey);
 
+			
 			this.snapshotupdate = config.getString(snapshotupdater).equalsIgnoreCase("true");
+			
+			this.restartonupdate = config.getString(restartonupdate).equalsIgnoreCase("true");
+			
+			this.snapshotupdatecountdown = Integer.valueOf(config.getString(snapshotupdatercountdown));
+					
 			this.protection = config.getString(protection).equalsIgnoreCase("true");
+			
 			this.globallimit = Integer.valueOf(config.getString(globallimit));
+			
 			this.periplimit = Integer.valueOf(config.getString(limitperip));
 
+			this.disablebungeecommands = config.getString(disablebungeecommands).equalsIgnoreCase("true");
+			
+			this.updatecheckfrequency = Integer.valueOf(config.getString(limitperip));
+			
+			
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
@@ -171,6 +226,7 @@ public class BetterBungee {
 			if (snapshotupdate) {
 				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -210,9 +266,7 @@ public class BetterBungee {
 					String newestnapshotid = response.getText().replaceAll("\n", "").split(":")[1];
 //					System.out.println("Newest-Snapshot ID: "+newestnapshotid);
 //					System.out.println("Snapshot ID: "+String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()));
-					if (!newestnapshotid.equals(String.valueOf(
-							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-									.length()))) {
+					if (!newestnapshotid.equals(String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()))) {
 						return updatefromlink(betterbungee + "/downloadsnapshot");
 					}
 				} catch (URISyntaxException e) {
@@ -226,9 +280,13 @@ public class BetterBungee {
 			System.out.println("Checking for Updates");
 			RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/update?version=" + Version);
 			if (!response.getFailed()) {
-				if (response.getText().contains("Update Available")) {
-					System.out.println("Updated Available");
-					return updatefromlink(betterbungee + "/downloadupdate");
+				try {
+					String newestupdateid = response.getText().replaceAll("\n", "").split(":")[1];
+					if (!newestupdateid.equals(String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()))) {
+						return updatefromlink(betterbungee + "/downloadupdate");
+					}
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
 				}
 			} else {
 				System.out.println("API Timed Out");
@@ -263,8 +321,7 @@ public class BetterBungee {
 
 	private boolean login() {
 		System.out.println("Login to API");
-		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
+		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (!response.getText().contains("Invalid")) {
 				session = response.getText();
@@ -297,13 +354,18 @@ public class BetterBungee {
 		if (session == null) {
 			return false;
 		}
+					
 		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/alive?session=" + session);
+		
 		if (!response.getFailed()) {
 			String text = response.getText();
 			if (text.contains("Alive")) {
 				return true;
 			}
 			System.out.println(response.getText());
+			
+			
+			
 		} else {
 			System.out.println("API Timed Out");
 		}

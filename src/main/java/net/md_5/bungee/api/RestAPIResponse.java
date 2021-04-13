@@ -4,9 +4,9 @@ import java.io.IOException;
 
 public class RestAPIResponse {
 
-	String text;
+	private String text;
 
-	boolean failed;
+	private boolean failed;
 	
 	public RestAPIResponse(String text,boolean failed) {
 		this.text = text;

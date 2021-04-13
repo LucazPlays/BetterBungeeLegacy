@@ -3,7 +3,6 @@ package net.md_5.bungee.command;
 import net.md_5.bungee.api.*;
 import net.md_5.bungee.api.connection.*;
 
-@SuppressWarnings("deprecation")
 public class CommandIP extends PlayerCommand
 {
     public CommandIP() {
@@ -19,8 +18,7 @@ public class CommandIP extends PlayerCommand
         final ProxiedPlayer user = ProxyServer.getInstance().getPlayer(args[0]);
         if (user == null) {
             sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
-        }
-        else {
+        } else {
             sender.sendMessage(ProxyServer.getInstance().getTranslation("command_ip", args[0], user.getSocketAddress()));
         }
     }

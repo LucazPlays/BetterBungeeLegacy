@@ -10,8 +10,7 @@ public class CommandBungee extends Command
         super("bungee");
     }
     
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void execute(final CommandSender sender, final String[] args) {
     	String Version = "";
     	if (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate()) {
@@ -20,5 +19,6 @@ public class CommandBungee extends Command
     		Version ="§7Stable§8(§a"+ BungeeCord.getInstance().getBetterbungee().Version+"§8)";
     	}
         sender.sendMessage("§7This server is running §eBetterBungee§7 version §a" + Version + "§7 by §bLuca_zPlays");
+        sender.sendMessage("§7Infos at §bhttp://betterbungee.tk");
     }
 }

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.Blacklist;
+import net.md_5.bungee.api.IPChecker;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.connection.CancelSendSignal;
@@ -94,6 +95,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					return;
 				}
 			}
+			
+			IPChecker.getInstance().addtocheck(ip);
 		}
 	}
 
