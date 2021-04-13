@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
@@ -19,6 +21,8 @@ public class IPChecker {
 	private boolean serviceonline = false;
 	
 	CopyOnWriteArrayList<String> checklist = new CopyOnWriteArrayList<String>();
+	
+	ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 	
 	public IPChecker() {
 		new Thread(() -> {
@@ -50,6 +54,10 @@ public class IPChecker {
 			
 		}
 		return true;
+	}
+
+	public void start(Runnable run) {
+		threads.execute(run);
 	}
 
 	public boolean addtocheck(String ip) {

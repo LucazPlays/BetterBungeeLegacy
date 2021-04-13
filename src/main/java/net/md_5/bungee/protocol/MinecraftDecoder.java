@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.net.SocketAddress;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -43,7 +44,7 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 			if (prot.getDirection() == Direction.TO_SERVER) {
 				if (slice.readableBytes() > 8000) {
 					
-					ProxiedPlayer player = getPlayer(ctx);
+					ProxiedPlayer player = getPlayer(ctx.channel().remoteAddress());
 
 					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + player.getName() + " §8- §dto big packet " + packetId);
 					
@@ -86,9 +87,9 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 		}
 	}
 
-	private ProxiedPlayer getPlayer(ChannelHandlerContext ctx) {
+	private ProxiedPlayer getPlayer(SocketAddress socket) {
 		for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
-			if (ctx.channel().remoteAddress().equals(all.getSocketAddress())) {
+			if (socket.equals(all.getSocketAddress())) {
 				return all;
 			}
 		}

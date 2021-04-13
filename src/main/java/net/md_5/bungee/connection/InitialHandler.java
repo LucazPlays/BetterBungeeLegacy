@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import javax.crypto.SecretKey;
 import lombok.Getter;
@@ -27,6 +28,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.IPChecker;
 import net.md_5.bungee.api.NotifyManager;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -482,6 +484,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					disconnect(result.getCancelReasonComponents());
 					return;
 				}
+				
 				if (ch.isClosed()) {
 					return;
 				}
@@ -516,21 +519,32 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 							String ip = list.getRealAdress(ch);
 							
-
-
-							if (BungeeCord.getInstance().getBetterbungee().isDenyVPNonJoin()) {
-								if (!IPChecker.getInstance().isipresidental(ip)) {
-									
-									return;
-								}
-							}
-							
 							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
 								if (!list.containswhitelist(ip)) {
 									list.addWhitelist(ip);
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 								}
 							}
+							
+
+							
+							if (BungeeCord.getInstance().getBetterbungee().isDenyVPNonJoin()) {
+								IPChecker.getInstance().start(() -> {
+									if (!IPChecker.getInstance().isipresidental(ip)) {
+										ProxiedPlayer player = getPlayer(getSocketAddress());
+										ProxyServer.getInstance().getScheduler().schedule(null, () -> {
+											if (player != null) {
+												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterbungee().getDenyVPNkickmessage()));
+												NotifyManager.getInstance().addmessage("§cKicked §8- §e" + player.getName() + " §8- §6VPN");
+											}
+											
+										}, 200, TimeUnit.MILLISECONDS);
+										NotifyManager.getInstance().addmessage("§6Detected §8- §e" + ip + " §8- §6VPN");
+										return;
+									}
+								});
+							}
+							
 						}
 					}
 				});
@@ -541,6 +555,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		bungee.getPluginManager().callEvent(new LoginEvent(InitialHandler.this, complete));
 	}
 
+	private ProxiedPlayer getPlayer(SocketAddress socket) {
+		for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+			if (socket.equals(all.getSocketAddress())) {
+				return all;
+			}
+		}
+		return null;
+	}
+	
 	public Blacklist list = Blacklist.getInstance();
 
 	@Override
