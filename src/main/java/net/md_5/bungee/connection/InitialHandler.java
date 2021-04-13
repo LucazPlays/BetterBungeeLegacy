@@ -544,16 +544,18 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								IPChecker.getInstance().start(() -> {
 									if (!IPChecker.getInstance().isipresidental(ip)) {
 										ProxiedPlayer player = getPlayer(getSocketAddress());
-										ProxyServer.getInstance().getScheduler().schedule(null, () -> {
-											if (player != null) {
-												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance()
-														.getBetterbungee().getDenyVPNkickmessage()));
-												NotifyManager.getInstance().addmessage(
-														"§cKicked §8- §e" + player.getName() + " §8- §6VPN");
-											}
-
-										}, 200, TimeUnit.MILLISECONDS);
-										NotifyManager.getInstance().addmessage("§6Detected §8- §e" + ip + " §8- §6VPN");
+										if (!player.hasPermission(BungeeCord.getInstance().getBetterbungee().getDenyVPNbypasspermission())) {
+											ProxyServer.getInstance().getScheduler().schedule(null, () -> {
+												if (player != null) {
+													player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance()
+															.getBetterbungee().getDenyVPNkickmessage()));
+													NotifyManager.getInstance().addmessage(
+															"§cKicked §8- §e" + player.getName() + " §8- §6VPN");
+												}
+	
+											}, 200, TimeUnit.MILLISECONDS);
+											NotifyManager.getInstance().addmessage("§6Detected §8- §e" + ip + " §8- §6VPN");
+										}
 										return;
 									}
 								});
