@@ -76,7 +76,7 @@ import net.md_5.bungee.util.QuietException;
 public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	private final BungeeCord bungee;
-	
+
 	private ChannelWrapper ch;
 	@Getter
 	private final ListenerInfo listener;
@@ -84,7 +84,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private Handshake handshake;
 	@Getter
 	private LoginRequest loginRequest;
-	
+
 	private EncryptionRequest request;
 	@Getter
 	private final List<PluginMessage> relayMessages = new BoundedArrayList<>(128);
@@ -112,7 +112,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private boolean legacy;
 	@Getter
 	private String extraDataInHandshake = "";
-	
+
 	@Getter
 	private String proxyip;
 
@@ -148,13 +148,18 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	public void handle(PacketWrapper packet) throws Exception {
 		if (packet.packet == null) {
 			cancelcrash();
-			throw new QuietException("Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+			throw new QuietException(
+					"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
 		}
 	}
 
 	private void cancelcrash() {
+		cancelcrash("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §cNullPing");
+	}
+
+	private void cancelcrash(String cause) {
 		list.addBlacklist(list.getRealAdress(ch));
-		NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §cNullPing");
+		NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
 		ch.close();
 	}
 
@@ -177,8 +182,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		this.legacy = true;
 		final boolean v1_5 = ping.isV1_5();
 
-		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a") + BungeeCord.getInstance().getBetterbungee().Version;
-		
+		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a")
+				+ BungeeCord.getInstance().getBetterbungee().Version;
+
 		ServerPing legacy = new ServerPing(
 				new ServerPing.Protocol("§eBetterBungee" + " §8- " + Version, bungee.getProtocolVersion()),
 				new ServerPing.Players(listener.getMaxPlayers(), bungee.getOnlineCount(), null),
@@ -218,7 +224,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private ServerPing getPingInfo(String motd, int protocol) {
-		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a") + BungeeCord.getInstance().getBetterbungee().Version;
+		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a")
+				+ BungeeCord.getInstance().getBetterbungee().Version;
 
 		return new ServerPing(new ServerPing.Protocol("§eBetterBungee §8- " + Version, protocol),
 				new ServerPing.Players(listener.getMaxPlayers(), bungee.getOnlineCount(), null), motd,
@@ -333,6 +340,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			}
 			break;
 		default:
+			cancelcrash();
 			throw new QuietException("Cannot request protocol " + handshake.getRequestedProtocol());
 		}
 	}
@@ -392,58 +400,63 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	@Override
 	public void handle(final EncryptionResponse encryptResponse) throws Exception {
-		
-		Preconditions.checkState(thisState == State.ENCRYPT, "Not expecting ENCRYPT");
+		try {
+			Preconditions.checkState(thisState == State.ENCRYPT, "Not expecting ENCRYPT");
 
-		SecretKey sharedKey = EncryptionUtil.getSecret(encryptResponse, request);
-		BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
-		ch.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
-		BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
-		ch.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
+			SecretKey sharedKey = EncryptionUtil.getSecret(encryptResponse, request);
+			BungeeCipher decrypt = EncryptionUtil.getCipher(false, sharedKey);
+			ch.addBefore(PipelineUtils.FRAME_DECODER, PipelineUtils.DECRYPT_HANDLER, new CipherDecoder(decrypt));
+			BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
+			ch.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
 
-		String encName = URLEncoder.encode(InitialHandler.this.getName(), "UTF-8");
+			String encName = URLEncoder.encode(InitialHandler.this.getName(), "UTF-8");
 
-		MessageDigest sha = MessageDigest.getInstance("SHA-1");
-		for (byte[] bit : new byte[][] { request.getServerId().getBytes("ISO_8859_1"), sharedKey.getEncoded(),
-				EncryptionUtil.keys.getPublic().getEncoded() }) {
-			sha.update(bit);
-		}
-		String encodedHash = URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
+			MessageDigest sha = MessageDigest.getInstance("SHA-1");
+			for (byte[] bit : new byte[][] { request.getServerId().getBytes("ISO_8859_1"), sharedKey.getEncoded(),
+					EncryptionUtil.keys.getPublic().getEncoded() }) {
+				sha.update(bit);
+			}
+			String encodedHash = URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
 
-		String preventProxy = (BungeeCord.getInstance().config.isPreventProxyConnections()
-				&& getSocketAddress() instanceof InetSocketAddress)
-						? "&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")
-						: "";
-		String authURL = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + encName
-				+ "&serverId=" + encodedHash + preventProxy;
-
-		Callback<String> handler = new Callback<String>() {
-			@Override
-			public void done(String result, Throwable error) {
-				if (error == null) {
-					LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
-					if (obj != null && obj.getId() != null) {
-						loginProfile = obj;
-						name = obj.getName();
-						uniqueId = Util.getUUID(obj.getId());
-						finish();
-						return;
-					}
-					if (!list.containswhitelist(list.getRealAdress(ch))) {
-						list.addlimit(list.getRealAdress(ch),60);
-					}
-					disconnect(bungee.getTranslation("offline_mode_player"));
-				} else {
-					disconnect(bungee.getTranslation("mojang_fail"));
-					bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
-					if (!list.containswhitelist(list.getRealAdress(ch))) {
-						list.addlimit(list.getRealAdress(ch),20);
+			String preventProxy = (BungeeCord.getInstance().config.isPreventProxyConnections()
+					&& getSocketAddress() instanceof InetSocketAddress)
+							? "&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")
+							: "";
+			String authURL = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + encName
+					+ "&serverId=" + encodedHash + preventProxy;
+			Callback<String> handler = new Callback<String>() {
+				@Override
+				public void done(String result, Throwable error) {
+					if (error == null) {
+						LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
+						if (obj != null && obj.getId() != null) {
+							loginProfile = obj;
+							name = obj.getName();
+							uniqueId = Util.getUUID(obj.getId());
+							finish();
+							return;
+						}
+						if (!list.containswhitelist(list.getRealAdress(ch))) {
+							list.addlimit(list.getRealAdress(ch), 60);
+						}
+						disconnect(bungee.getTranslation("offline_mode_player"));
+					} else {
+						disconnect(bungee.getTranslation("mojang_fail"));
+						bungee.getLogger().log(Level.SEVERE,
+								"Error authenticating " + getName() + " with minecraft.net", error);
+						if (!list.containswhitelist(list.getRealAdress(ch))) {
+							list.addlimit(list.getRealAdress(ch), 20);
+						}
 					}
 				}
-			}
-		};
-
-		HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
+			};
+			HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
+			
+			
+		} catch (Exception ex) {
+			cancelcrash();
+			return;
+		}
 	}
 
 	private void finish() {
@@ -473,6 +486,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		}
 
 		offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getName()).getBytes(Charsets.UTF_8));
+		
 		if (uniqueId == null) {
 			uniqueId = offlineId;
 		}
@@ -484,7 +498,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					disconnect(result.getCancelReasonComponents());
 					return;
 				}
-				
+
 				if (ch.isClosed()) {
 					return;
 				}
@@ -518,33 +532,33 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							thisState = State.FINISHED;
 
 							String ip = list.getRealAdress(ch);
-							
+
 							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
 								if (!list.containswhitelist(ip)) {
 									list.addWhitelist(ip);
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 								}
 							}
-							
 
-							
 							if (BungeeCord.getInstance().getBetterbungee().isDenyVPNonJoin()) {
 								IPChecker.getInstance().start(() -> {
 									if (!IPChecker.getInstance().isipresidental(ip)) {
 										ProxiedPlayer player = getPlayer(getSocketAddress());
 										ProxyServer.getInstance().getScheduler().schedule(null, () -> {
 											if (player != null) {
-												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterbungee().getDenyVPNkickmessage()));
-												NotifyManager.getInstance().addmessage("§cKicked §8- §e" + player.getName() + " §8- §6VPN");
+												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance()
+														.getBetterbungee().getDenyVPNkickmessage()));
+												NotifyManager.getInstance().addmessage(
+														"§cKicked §8- §e" + player.getName() + " §8- §6VPN");
 											}
-											
+
 										}, 200, TimeUnit.MILLISECONDS);
 										NotifyManager.getInstance().addmessage("§6Detected §8- §e" + ip + " §8- §6VPN");
 										return;
 									}
 								});
 							}
-							
+
 						}
 					}
 				});
@@ -563,7 +577,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		}
 		return null;
 	}
-	
+
 	public Blacklist list = Blacklist.getInstance();
 
 	@Override
