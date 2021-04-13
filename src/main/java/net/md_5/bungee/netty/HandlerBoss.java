@@ -58,15 +58,14 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	}
 
 	private void filter(ChannelHandlerContext ctx) {
+		String ip = null;
+		
+		if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+			ip = list.getRealAdress(channel);
+		} else {
+			ip = list.getRealAdress(ctx);
+		}
 		if (list.isProtection()) {
-			String ip = null;
-			
-			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
-				ip = list.getRealAdress(channel);
-			} else {
-				ip = list.getRealAdress(ctx);
-			}
-			
 			if (list.isBlacklisted(ip)) {
 				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
 				ctx.close();
@@ -95,9 +94,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					return;
 				}
 			}
-			
-			IPChecker.getInstance().addtocheck(ip);
 		}
+		IPChecker.getInstance().addtocheck(ip);
 	}
 
 	@Override

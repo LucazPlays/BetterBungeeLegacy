@@ -15,6 +15,7 @@ import lombok.Setter;
 import net.md_5.bungee.netty.ChannelWrapper;
 
 public class IPChecker {
+	
 	@Getter
 	private static IPChecker Instance = new IPChecker();
 
@@ -60,8 +61,10 @@ public class IPChecker {
 		threads.execute(run);
 	}
 
-	public boolean addtocheck(String ip) {
-		return serviceonline;
+	public void addtocheck(String ip) {
+		if (!checklist.contains(ip)) {
+			checklist.add(ip);
+		}
 	}
 
 	public void checkthemall() {

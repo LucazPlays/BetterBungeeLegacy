@@ -154,7 +154,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private void cancelcrash() {
-		cancelcrash("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §cNullPing");
+		cancelcrash("NullPing");
 	}
 
 	private void cancelcrash(String cause) {
