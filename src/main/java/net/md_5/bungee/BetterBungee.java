@@ -32,7 +32,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.7";
+	public String Version = "0.82";
 
 	long lastupdatecheck = 0;
 
@@ -67,6 +67,10 @@ public class BetterBungee {
 	@Getter
 	@Setter
 	boolean ProxyProtocol = false;
+
+	@Getter
+	@Setter
+	boolean denyVPNonJoin = false;
 
 
 
@@ -153,6 +157,8 @@ public class BetterBungee {
 			String snapshotupdatercountdown= "serversettings.snapshotupdatercountdown";
 
 			String protection = "serversettings.protection";
+			
+			String denyvpns = "serversettings.denyvpnjoins";
 
 			String disablebungeecommands = "serversettings.disablebungeecommands";
 
@@ -173,6 +179,8 @@ public class BetterBungee {
 			addDefault(config, disablebungeecommands, "false");
 
 			addDefault(config, protection, "false");
+
+			addDefault(config, denyvpns, "false");
 
 			addDefault(config, globallimit, "100");
 
@@ -207,8 +215,10 @@ public class BetterBungee {
 			this.restartonupdate = config.getString(restartonupdate).equalsIgnoreCase("true");
 			
 			this.snapshotupdatecountdown = Integer.valueOf(config.getString(snapshotupdatercountdown));
-					
+
 			this.protection = config.getString(protection).equalsIgnoreCase("true");
+
+			this.denyVPNonJoin = config.getString(denyvpns).equalsIgnoreCase("true");
 			
 			this.globallimit = Integer.valueOf(config.getString(globallimit));
 			
