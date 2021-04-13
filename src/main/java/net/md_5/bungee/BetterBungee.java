@@ -73,6 +73,11 @@ public class BetterBungee {
 	boolean denyVPNonJoin = false;
 
 
+	@Getter
+	@Setter
+	String denyVPNkickmessage = "Kicked by AntiVPN";
+
+
 
 	@Getter
 	ArrayList<DownloadablePlugin> pluginlist = new ArrayList<>();
@@ -157,8 +162,10 @@ public class BetterBungee {
 			String snapshotupdatercountdown= "serversettings.snapshotupdatercountdown";
 
 			String protection = "serversettings.protection";
-			
+
 			String denyvpns = "serversettings.denyvpnjoins";
+			
+			String denyvpnkickmessage = "serversettings.denyvpnkickmessage";
 
 			String disablebungeecommands = "serversettings.disablebungeecommands";
 
@@ -181,6 +188,8 @@ public class BetterBungee {
 			addDefault(config, protection, "false");
 
 			addDefault(config, denyvpns, "false");
+			
+			addDefault(config, denyvpnkickmessage, "Kicked by AntiVPN");
 
 			addDefault(config, globallimit, "100");
 
@@ -219,6 +228,8 @@ public class BetterBungee {
 			this.protection = config.getString(protection).equalsIgnoreCase("true");
 
 			this.denyVPNonJoin = config.getString(denyvpns).equalsIgnoreCase("true");
+
+			this.denyVPNkickmessage = config.getString(denyvpnkickmessage);
 			
 			this.globallimit = Integer.valueOf(config.getString(globallimit));
 			

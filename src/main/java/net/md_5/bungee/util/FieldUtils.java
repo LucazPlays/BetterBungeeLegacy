@@ -150,6 +150,7 @@ public class FieldUtils {
 								}
 							}
 							
+							@SuppressWarnings("resource")
 							URLClassLoader loader = (URLClassLoader) new PluginClassloader(new URL[] {pluginfile.toURI().toURL()});
 
 							final Class<?> mainclazz = loader.loadClass(desc.getMain());

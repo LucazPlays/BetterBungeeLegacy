@@ -25,6 +25,7 @@ import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.Favicon;
+import net.md_5.bungee.api.IPChecker;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -514,17 +515,22 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							thisState = State.FINISHED;
 
 							String ip = list.getRealAdress(ch);
+							
+
+
+							if (BungeeCord.getInstance().getBetterbungee().isDenyVPNonJoin()) {
+								if (!IPChecker.getInstance().isipresidental(ip)) {
+									
+									return;
+								}
+							}
+							
 							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
 								if (!list.containswhitelist(ip)) {
 									list.addWhitelist(ip);
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 								}
 							}
-
-							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
-								
-							}
-							
 						}
 					}
 				});

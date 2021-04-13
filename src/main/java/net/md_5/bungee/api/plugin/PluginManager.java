@@ -234,6 +234,7 @@ public class PluginManager {
 		}
 		if (status) {
 			try {
+				@SuppressWarnings("resource")
 				final URLClassLoader loader = new PluginClassloader(new URL[] { plugin.getFile().toURI().toURL() });
 				final Class<?> main = loader.loadClass(plugin.getMain());
 				final Plugin clazz = (Plugin) main.getDeclaredConstructor((Class<?>[]) new Class[0])

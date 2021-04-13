@@ -24,7 +24,8 @@ public class PluginmanagerEventBus extends EventBus {
     } 
   }
   
-  public void post(Object event) {
+  @Override
+public void post(Object event) {
     if (event instanceof AsyncEvent)
       synchronized (lock) {
         uncompletedEvents.add((AsyncEvent)event);
