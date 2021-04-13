@@ -29,9 +29,9 @@ public class IPChecker {
 						serviceonline = false;
 					} else {
 						serviceonline = true;
-						
 					}
 					Thread.sleep(60000);
+					checkthemall();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -57,13 +57,17 @@ public class IPChecker {
 	}
 
 	public void checkthemall() {
-		String ips = "";
-		
-		for (String ip : checklist) {
-			ips += ip + ",";
+		if (serviceonline) {
+			String ips = "";
+			
+			for (String ip : checklist) {
+				ips += ip + ",";
+			}
+			
+			checklist.clear();
+			
+			RestAPIResponse ipcheckeralive = RestAPI.getInstance().info("http://ipcheck.skydb.de/check?ip="+ips);
 		}
-		
-		RestAPIResponse ipcheckeralive = RestAPI.getInstance().info("http://ipcheck.skydb.de/check?ip="+ips);
 	}
 	
 	
