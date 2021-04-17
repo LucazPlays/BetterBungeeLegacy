@@ -6,7 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.io.FileUtils;
 
@@ -81,10 +83,22 @@ public class BetterBungee {
 	@Setter
 	String denyVPNbypasspermission = "antivpn.bypass";
 
+	@Getter
+	@Setter
+	boolean discordintegration = false;
+
+	
+	@Getter
+	@Setter
+	CopyOnWriteArrayList<String> serverlistusers = new CopyOnWriteArrayList<>();
+
 
 
 	@Getter
 	ArrayList<DownloadablePlugin> pluginlist = new ArrayList<>();
+
+	@Getter
+	boolean manuelupdates = false;
 	
 	
 	public BetterBungee() {
@@ -181,6 +195,10 @@ public class BetterBungee {
 
 			String updatecheckfrequencysetting = "serversettings.updatecheckfrequencyinminutes";
 
+			String discordintegration = "serversettings.discordintegration";
+
+			String manuelupdates = "serversettings.manuelupdates";
+
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
 			addDefault(config, snapshotupdater, "false");
@@ -204,6 +222,10 @@ public class BetterBungee {
 			addDefault(config, limitperip, "3");
 
 			addDefault(config, updatecheckfrequencysetting, "15");
+
+			addDefault(config, discordintegration, "false");
+
+			addDefault(config, manuelupdates, "false");
 
 			String configuuid = "serverdata.uuid";
 			
@@ -246,8 +268,12 @@ public class BetterBungee {
 			this.periplimit = Integer.valueOf(config.getString(limitperip));
 
 			this.disablebungeecommands = config.getString(disablebungeecommands).equalsIgnoreCase("true");
-			
+
 			this.updatecheckfrequency = Integer.valueOf(config.getString(limitperip));
+
+			this.discordintegration = config.getString(discordintegration).equalsIgnoreCase("true");
+
+			this.manuelupdates  = config.getString(manuelupdates).equalsIgnoreCase("true");
 			
 			
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
@@ -257,6 +283,25 @@ public class BetterBungee {
 			if (snapshotupdate) {
 				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
 			}
+			
+			if (this.discordintegration) {
+				NotifyManager.getInstance().setDiscord(this.discordintegration);
+				new Thread(() -> {
+					while (BungeeCord.getInstance().isRunning) {
+						if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
+							if (discord(NotifyManager.getInstance().getDiscordmessages())) {
+								NotifyManager.getInstance().getDiscordmessages().clear();
+							}
+						}
+						try {
+							Thread.sleep(1000);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			}
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -290,6 +335,9 @@ public class BetterBungee {
 	}
 
 	private boolean update() {
+		if (this.manuelupdates) {
+			return false;
+		}
 		if (snapshotupdate) {
 			RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/update");
 			if (!response.getFailed()) {
@@ -381,6 +429,23 @@ public class BetterBungee {
 		return false;
 	}
 
+	private boolean discord(CopyOnWriteArrayList<String> copyOnWriteArrayList) {
+		if (session == null) {
+			return false;
+		}
+		
+		String messages = "";
+		
+		for (String message : copyOnWriteArrayList) {
+			if (message != null) {
+				messages += stringtobase64(message) + ",";
+			}
+		}
+		
+		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/senddiscord?session=" + session + "&discordmessages="+messages);
+		return !response.getFailed();
+	}
+	
 	private boolean alive() {
 		if (session == null) {
 			return false;
@@ -401,5 +466,13 @@ public class BetterBungee {
 			System.out.println("API Timed Out");
 		}
 		return false;
+	}
+
+	private String stringtobase64(String stg) {
+		return new String(Base64.getEncoder().encode(stg.getBytes()));
+	}
+
+	private String base64tostring(String stg) {
+		return new String(Base64.getDecoder().decode(stg.getBytes()));
 	}
 }

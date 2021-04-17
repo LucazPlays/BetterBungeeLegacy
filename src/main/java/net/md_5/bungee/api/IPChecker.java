@@ -70,15 +70,17 @@ public class IPChecker {
 	public void checkthemall() {
 		if (serviceonline) {
 			if (checklist.size() > 0) {
+				
 				String ips = "";
 				
 				for (String ip : checklist) {
 					ips += ip + ",";
 				}
+
+				
+				RestAPIResponse ipcheckeralive = RestAPI.getInstance().info("http://ipcheck.skydb.de/check?ips="+ips);
 				
 				checklist.clear();
-				
-				RestAPIResponse ipcheckeralive = RestAPI.getInstance().info("http://ipcheck.skydb.de/check?ip="+ips);
 			}
 		}
 	}

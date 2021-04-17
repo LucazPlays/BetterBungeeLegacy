@@ -3,6 +3,8 @@ package net.md_5.bungee.api;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeTitle;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -18,10 +20,16 @@ public class NotifyManager {
 	private String defaultnomessage = "§cKeine";
 	private boolean async = false;
 	private boolean consoleoutput = false;
+
+	@Setter
+	private boolean discord = false;
 	
 	private ProxyServer server = ProxyServer.getInstance();
-	
+
 	private CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<String>();
+
+	@Getter
+	private CopyOnWriteArrayList<String> discordmessages = new CopyOnWriteArrayList<String>();
 
 	public ConcurrentHashMap<String,ChatMessageType> players = new ConcurrentHashMap<String,ChatMessageType>();
 
@@ -47,6 +55,9 @@ public class NotifyManager {
 
 	public NotifyManager addmessage(String s) {
 		messages.add(s);
+		if (discord) {
+			discordmessages.add(s);
+		}
 		return this;
 	}
 

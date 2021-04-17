@@ -65,6 +65,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 		} else {
 			ip = list.getRealAdress(ctx);
 		}
+		
 		if (list.isProtection()) {
 			if (list.isBlacklisted(ip)) {
 				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");

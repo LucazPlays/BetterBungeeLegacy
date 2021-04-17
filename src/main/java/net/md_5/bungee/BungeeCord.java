@@ -195,6 +195,9 @@ public class BungeeCord extends ProxyServer {
 		registerChannel("BungeeCord");
 	}
 
+	@Getter
+	private static IPChecker IpChecker = IPChecker.getInstance();
+
 	public static BungeeCord getInstance() {
 		return (BungeeCord) ProxyServer.getInstance();
 	}
@@ -247,10 +250,10 @@ public class BungeeCord extends ProxyServer {
 
 		logger = new BungeeLogger("BungeeCord", "proxy.log", consoleReader);
 
-		logger.setLevel(Level.INFO);
+		logger.setLevel(Level.SEVERE);
 
 		System.setErr(new PrintStream(new LoggingOutputStream(logger, Level.SEVERE), true));
-		System.setOut(new PrintStream(new LoggingOutputStream(logger, Level.INFO), true));
+		System.setOut(new PrintStream(new LoggingOutputStream(logger, Level.INFO), false));
 
 //        PREFIX = config2.getPrefix();
 
@@ -352,8 +355,7 @@ public class BungeeCord extends ProxyServer {
 
 				if (connectionThrottle != null) {
 					connectionThrottle = null;
-					getLogger().log(Level.WARNING,
-							"Since PROXY protocol is in use, internal connection throttle has been disabled.");
+					getLogger().log(Level.SEVERE, "Since PROXY protocol is in use, internal connection throttle has been disabled.");
 				}
 			}
 
@@ -362,7 +364,7 @@ public class BungeeCord extends ProxyServer {
 				public void operationComplete(ChannelFuture future) throws Exception {
 					if (future.isSuccess()) {
 						listeners.add(future.channel());
-						getLogger().log(Level.INFO, "Listening on {0}", info.getSocketAddress());
+						getLogger().log(Level.SEVERE, "Listening on {0}", info.getSocketAddress());
 					} else {
 						getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(),
 								future.cause());
@@ -383,7 +385,7 @@ public class BungeeCord extends ProxyServer {
 					public void operationComplete(ChannelFuture future) throws Exception {
 						if (future.isSuccess()) {
 							listeners.add(future.channel());
-							getLogger().log(Level.INFO, "Started query on {0}", future.channel().localAddress());
+							getLogger().log(Level.SEVERE, "Started query on {0}", future.channel().localAddress());
 						} else {
 							getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(),
 									future.cause());
@@ -399,7 +401,7 @@ public class BungeeCord extends ProxyServer {
 
 	public void stopListeners() {
 		for (Channel listener : listeners) {
-			getLogger().log(Level.INFO, "Closing listener {0}", listener);
+			getLogger().log(Level.SEVERE, "Closing listener {0}", listener);
 			try {
 				listener.close().syncUninterruptibly();
 			} catch (ChannelException ex) {
@@ -425,7 +427,6 @@ public class BungeeCord extends ProxyServer {
 	}
 
 	// This must be run on a separate thread to avoid deadlock!
-	@SuppressWarnings("deprecation")
 	@SuppressFBWarnings("DM_EXIT")
 	private void independentThreadStop(final String reason, boolean callSystemExit) {
 		
@@ -449,7 +450,7 @@ public class BungeeCord extends ProxyServer {
 
 		connectionLock.readLock().lock();
 		try {
-			getLogger().log(Level.INFO, "Disconnecting {0} connections", connections.size());
+			getLogger().log(Level.SEVERE, "Disconnecting {0} connections", connections.size());
 			for (UserConnection user : connections.values()) {
 				user.disconnect(reason);
 			}
