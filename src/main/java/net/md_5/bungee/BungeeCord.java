@@ -244,16 +244,16 @@ public class BungeeCord extends ProxyServer {
 		System.setProperty("library.jansi.version", "BungeeCord");
 
 		AnsiConsole.systemInstall();
+		
 		consoleReader = new ConsoleReader();
 		consoleReader.setExpandEvents(false);
 		consoleReader.addCompleter(new ConsoleCommandCompleter(this));
 
-		logger = new BungeeLogger("BungeeCord", "proxy.log", consoleReader);
-
-		logger.setLevel(Level.SEVERE);
-
-		System.setErr(new PrintStream(new LoggingOutputStream(logger, Level.SEVERE), true));
-		System.setOut(new PrintStream(new LoggingOutputStream(logger, Level.INFO), false));
+        logger = new BungeeLogger("BungeeCord", "proxy.log", consoleReader);
+        
+        
+        System.setErr(new PrintStream(new LoggingOutputStream(this.logger, Level.SEVERE), true));
+        System.setOut(new PrintStream(new LoggingOutputStream(this.logger, Level.INFO), true));
 
 //        PREFIX = config2.getPrefix();
 
@@ -270,11 +270,13 @@ public class BungeeCord extends ProxyServer {
 		getPluginManager().registerCommand(null, new CommandBungeeExtras());
 		
 		if (!Boolean.getBoolean("net.md_5.bungee.native.disable")) {
+			
 			if (EncryptionUtil.nativeFactory.load()) {
 				logger.info("Using mbed TLS based native cipher.");
 			} else {
 				logger.info("Using standard Java JCE cipher.");
 			}
+			
 			if (CompressFactory.zlib.load()) {
 				logger.info("Using zlib based native compressor.");
 			} else {
@@ -314,8 +316,7 @@ public class BungeeCord extends ProxyServer {
 			registerChannel(ForgeConstants.FML_HANDSHAKE_TAG);
 			registerChannel(ForgeConstants.FORGE_REGISTER);
 
-			getLogger().warning(
-					"MinecraftForge support is currently unmaintained and may have unresolved issues. Please use at your own risk.");
+			getLogger().warning("MinecraftForge support is currently unmaintained and may have unresolved issues. Please use at your own risk.");
 		}
 
 		isRunning = true;
@@ -345,7 +346,6 @@ public class BungeeCord extends ProxyServer {
 		});
 	}
 
-	@SuppressWarnings("deprecation")
 	public void startListeners() {
 		for (final ListenerInfo info : config.getListeners()) {
 			if (info.isProxyProtocol()) {
@@ -377,8 +377,7 @@ public class BungeeCord extends ProxyServer {
 					.localAddress(info.getSocketAddress()).bind().addListener(listener);
 
 			if (info.isQueryEnabled()) {
-				Preconditions.checkArgument(info.getSocketAddress() instanceof InetSocketAddress,
-						"Can only create query listener on UDP address");
+				Preconditions.checkArgument(info.getSocketAddress() instanceof InetSocketAddress, "Can only create query listener on UDP address");
 
 				ChannelFutureListener bindListener = new ChannelFutureListener() {
 					@Override
@@ -532,8 +531,7 @@ public class BungeeCord extends ProxyServer {
 
 	@Override
 	public String getVersion() {
-		return (BungeeCord.class.getPackage().getImplementationVersion() == null) ? "unknown"
-				: BungeeCord.class.getPackage().getImplementationVersion();
+		return (BungeeCord.class.getPackage().getImplementationVersion() == null) ? "unknown" : BungeeCord.class.getPackage().getImplementationVersion();
 	}
 
 	public void reloadMessages() {
@@ -678,7 +676,6 @@ public class BungeeCord extends ProxyServer {
 		broadcast(TextComponent.fromLegacyText(message));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void broadcast(BaseComponent... message) {
 		getConsole().sendMessage(BaseComponent.toLegacyText(message));
@@ -687,7 +684,6 @@ public class BungeeCord extends ProxyServer {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void broadcast(BaseComponent message) {
 		getConsole().sendMessage(message.toLegacyText());

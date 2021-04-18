@@ -29,13 +29,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.github.wolf480pl</groupId>
-			<artifactId>jline-log4j2-appender</artifactId>
-			<version>1.0.0</version>
-			<scope>compile</scope>
-		</dependency>
-
 
 		<dependency>
 			<groupId>com.mojang</groupId>
@@ -129,19 +122,19 @@
 		</dependency>
 
 
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.0</version>
-			<scope>compile</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.google.code.gson</groupId> -->
+<!-- 			<artifactId>gson</artifactId> -->
+<!-- 			<version>2.8.0</version> -->
+<!-- 			<scope>compile</scope> -->
+<!-- 		</dependency> -->
 
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>21.0</version>
-			<scope>compile</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.google.guava</groupId> -->
+<!-- 			<artifactId>guava</artifactId> -->
+<!-- 			<version>21.0</version> -->
+<!-- 			<scope>compile</scope> -->
+<!-- 		</dependency> -->
 
 
 		<!-- <dependency> -->
@@ -151,12 +144,12 @@
 		<!-- </dependency> -->
 		
 		
-		<dependency>
-			<groupId>com.joliciel.talismane</groupId>
-			<artifactId>talismane-core</artifactId>
-			<version>6.1.1</version>
-			<scope>compile</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.joliciel.talismane</groupId> -->
+<!-- 			<artifactId>talismane-core</artifactId> -->
+<!-- 			<version>6.1.1</version> -->
+<!-- 			<scope>compile</scope> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>org.eclipse.jetty.npn</groupId>

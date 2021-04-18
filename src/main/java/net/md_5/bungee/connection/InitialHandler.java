@@ -436,16 +436,19 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							finish();
 							return;
 						}
-						if (!list.containswhitelist(list.getRealAdress(ch))) {
-							list.addlimit(list.getRealAdress(ch), 60);
+						if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+							if (!list.containswhitelist(list.getRealAdress(ch))) {
+								list.addlimit(list.getRealAdress(ch), 60);
+							}
 						}
 						disconnect(bungee.getTranslation("offline_mode_player"));
 					} else {
 						disconnect(bungee.getTranslation("mojang_fail"));
-						bungee.getLogger().log(Level.SEVERE,
-								"Error authenticating " + getName() + " with minecraft.net", error);
-						if (!list.containswhitelist(list.getRealAdress(ch))) {
-							list.addlimit(list.getRealAdress(ch), 20);
+						bungee.getLogger().log(Level.SEVERE,"Error authenticating " + getName() + " with minecraft.net", error);
+						if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+							if (!list.containswhitelist(list.getRealAdress(ch))) {
+								list.addlimit(list.getRealAdress(ch), 20);
+							}
 						}
 					}
 				}

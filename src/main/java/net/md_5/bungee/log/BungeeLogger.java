@@ -14,13 +14,11 @@ public class BungeeLogger extends Logger
     private final LogDispatcher dispatcher = new LogDispatcher( this );
 
     @SuppressFBWarnings("SC_START_IN_CTOR")
-    public BungeeLogger(String loggerName, String filePattern, ConsoleReader reader)
-    {
+    public BungeeLogger(String loggerName, String filePattern, ConsoleReader reader) {
         super( loggerName, null );
         setLevel( Level.ALL );
 
-        try
-        {
+        try {
             FileHandler fileHandler = new FileHandler( filePattern, 1 << 24, 8, true );
             fileHandler.setFormatter( new ConciseFormatter( false ) );
             addHandler( fileHandler );
@@ -29,8 +27,7 @@ public class BungeeLogger extends Logger
             consoleHandler.setLevel( Level.parse( System.getProperty( "net.md_5.bungee.console-log-level", "INFO" ) ) );
             consoleHandler.setFormatter( new ConciseFormatter( true ) );
             addHandler( consoleHandler );
-        } catch ( IOException ex )
-        {
+        } catch ( IOException ex ) {
             System.err.println( "Could not register logger!" );
             ex.printStackTrace();
         }
