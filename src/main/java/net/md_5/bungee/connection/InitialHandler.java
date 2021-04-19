@@ -148,8 +148,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	public void handle(PacketWrapper packet) throws Exception {
 		if (packet.packet == null) {
 			cancelcrash();
-			throw new QuietException(
-					"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+			throw new QuietException("Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
 		}
 	}
 
@@ -158,9 +157,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private void cancelcrash(String cause) {
-		list.addBlacklist(list.getRealAdress(ch));
-		NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
-		ch.close();
+		if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+			list.addBlacklist(list.getRealAdress(ch));
+			NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+			ch.close();
+		}
 	}
 
 	@Override
@@ -550,10 +551,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 										if (!player.hasPermission(BungeeCord.getInstance().getBetterbungee().getDenyVPNbypasspermission())) {
 											ProxyServer.getInstance().getScheduler().schedule(null, () -> {
 												if (player != null) {
-													player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance()
-															.getBetterbungee().getDenyVPNkickmessage()));
-													NotifyManager.getInstance().addmessage(
-															"§cKicked §8- §e" + player.getName() + " §8- §6VPN");
+													player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterbungee().getDenyVPNkickmessage()));
+													NotifyManager.getInstance().addmessage("§cKicked §8- §e" + player.getName() + " §8- §6VPN");
 												}
 	
 											}, 200, TimeUnit.MILLISECONDS);

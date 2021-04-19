@@ -36,6 +36,11 @@ public class BetterBungee {
 
 	public String Version = "0.82";
 
+
+	long lastfirewallsync = 0;
+	
+	
+	
 	long lastupdatecheck = 0;
 
 	int updatecheckfrequency = 0;
@@ -99,6 +104,8 @@ public class BetterBungee {
 
 	@Getter
 	boolean manuelupdates = false;
+
+	private boolean firewallsync;
 	
 	
 	public BetterBungee() {
@@ -123,6 +130,7 @@ public class BetterBungee {
 							}
 						}
 					} else if (lastupdatecheck < System.currentTimeMillis() - (1000 * 60 * updatecheckfrequency)) {
+						lastupdatecheck = System.currentTimeMillis();
 						if (update()) {
 							if (restartonupdate) {
 								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§aStable§7 Update Found"));
@@ -135,7 +143,24 @@ public class BetterBungee {
 							}
 						}
 					}
+					
+					if (this.firewallsync) {
+						if (lastfirewallsync < System.currentTimeMillis() - (1000 * 60 * 60)) {
+							lastfirewallsync = System.currentTimeMillis();
+						}
+					}
+					
+					
+					//
+					//        Hier weitermachen faggot #187
+					//
+					
+					
+					
+					
 					sleep();
+					
+					
 				} else {
 					System.out.println("Session Expired");
 					sleep(120000);
@@ -180,6 +205,8 @@ public class BetterBungee {
 			String snapshotupdatercountdown= "serversettings.snapshotupdatercountdown";
 
 			String protection = "serversettings.protection";
+			
+			String firewallsync = "serversettings.firewallsync";
 
 			String denyvpns = "serversettings.denyvpnjoins";
 			
@@ -210,6 +237,8 @@ public class BetterBungee {
 			addDefault(config, disablebungeecommands, "false");
 
 			addDefault(config, protection, "false");
+
+			addDefault(config, firewallsync, "true");
 
 			addDefault(config, denyvpns, "false");
 
@@ -257,6 +286,8 @@ public class BetterBungee {
 
 			this.protection = config.getString(protection).equalsIgnoreCase("true");
 
+			this.firewallsync = config.getString(firewallsync).equalsIgnoreCase("true");
+
 			this.denyVPNonJoin = config.getString(denyvpns).equalsIgnoreCase("true");
 
 			this.denyVPNkickmessage = config.getString(denyvpnkickmessage);
@@ -283,7 +314,7 @@ public class BetterBungee {
 			if (snapshotupdate) {
 				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
 			}
-			
+
 			if (this.discordintegration) {
 				NotifyManager.getInstance().setDiscord(this.discordintegration);
 				new Thread(() -> {
@@ -295,6 +326,25 @@ public class BetterBungee {
 						}
 						try {
 							Thread.sleep(1000);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			}
+			
+
+			if (this.firewallsync) {
+				NotifyManager.getInstance().setDiscord(this.firewallsync);
+				new Thread(() -> {
+					while (BungeeCord.getInstance().isRunning) {
+						if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
+							if (discord(NotifyManager.getInstance().getDiscordmessages())) {
+								NotifyManager.getInstance().getDiscordmessages().clear();
+							}
+						}
+						try {
+							Thread.sleep(60000);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -455,7 +505,8 @@ public class BetterBungee {
 		if (session == null) {
 			return false;
 		}
-					
+		
+		
 		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/alive?session=" + session);
 		
 		if (!response.getFailed()) {
