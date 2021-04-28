@@ -3,8 +3,8 @@ package net.md_5.bungee.api;
 public class IPCheckerResult {
 
 	
-	public String getIp() {
-		return ip;
+	public String getIP() {
+		return IP;
 	}
 
 
@@ -58,7 +58,7 @@ public class IPCheckerResult {
 	}
 
 
-	private String ip;
+	private String IP;
 
 	private String Company;
 
@@ -79,7 +79,4 @@ public class IPCheckerResult {
 	private boolean TOR;
 
 	private boolean Residental;
-	
-	
-	public IPCheckerResult() {}
 }
