@@ -161,7 +161,7 @@ public class BetterBungee {
 											.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 								}
 								sleep(1000);
-								ProxyServer.getInstance().stop("§aUpdated BetterCord");
+								ProxyServer.getInstance().stop("§7Restarting §eProxy-Server§7 due to a §aUpdate§7 from §6BetterBungee");
 							}
 						}
 					}
@@ -287,6 +287,7 @@ public class BetterBungee {
 				}
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
+			
 			this.uuid = config.getString(configuuid);
 
 			this.password = config.getString(configkey);
@@ -326,6 +327,10 @@ public class BetterBungee {
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
+
+			Blacklist.getInstance().setGlobalratelimit(this.globallimit);
+
+			Blacklist.getInstance().setPerIPratelimit(this.periplimit);
 
 			if (snapshotupdate) {
 				Version = String.valueOf(

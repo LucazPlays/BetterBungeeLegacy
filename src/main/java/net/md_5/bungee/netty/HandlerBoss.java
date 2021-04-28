@@ -80,7 +80,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			
 			int rate = list.ratelimit(ip);
 			
-			if (rate > BungeeCord.getInstance().getBetterbungee().getPeriplimit()) {
+			if (rate > list.getPerIPratelimit()) {
 				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
 				ctx.close();
 				if (list.containswhitelist(ip)) {
@@ -90,7 +90,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			}
 			
 			if (!list.containswhitelist(ip)) {
-				if (list.getGlobalratelimit() > BungeeCord.getInstance().getBetterbungee().getGloballimit()) {
+				if (list.getGlobalratelimit() > list.getGlobalratelimit()) {
 					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
 					ctx.close();
 					return;

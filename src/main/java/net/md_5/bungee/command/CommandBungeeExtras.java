@@ -43,10 +43,28 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 					sender.sendMessage(BungeeCord.PREFIX + "§7Dazu hast du keine §9Rechte§7!");
 					return;
 				}
+				if (args[1].equalsIgnoreCase("info")) {
+					sender.sendMessage(BungeeCord.PREFIX + "§eSettings");
+
+					sender.sendMessage(TextComponent.fromLegacyText("§8 - §7Global Rate Limit: §e" + Blacklist.getInstance().getGlobalratelimit()));
+
+					sender.sendMessage(TextComponent.fromLegacyText("§8 - §7Per IP Rate Limit: §e" + Blacklist.getInstance().getPerIPratelimit()));
+				}
 				if (args[1].equalsIgnoreCase("setgloballimit")) {
 					try {
 						int integer = Integer.valueOf(args[2]);
+						Blacklist.getInstance().setGlobalratelimit(integer);
 						sender.sendMessage(BungeeCord.PREFIX + "§eGlobal Rate Limit§7 auf §a" + integer + "§7 gesetzt!");
+					} catch (Exception ex) {
+						sender.sendMessage(BungeeCord.PREFIX + "§7Bitte gebe eine Zahl ein");
+					}
+					return;
+				}
+				if (args[1].equalsIgnoreCase("setperiplimit")) {
+					try {
+						int integer = Integer.valueOf(args[2]);
+						Blacklist.getInstance().setGlobalratelimit(integer);
+						sender.sendMessage(BungeeCord.PREFIX + "§ePer IP Limit§7 auf §a" + integer + "§7 gesetzt!");
 					} catch (Exception ex) {
 						sender.sendMessage(BungeeCord.PREFIX + "§7Bitte gebe eine Zahl ein");
 					}
@@ -314,6 +332,8 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			if (args[0].equalsIgnoreCase("firewall")) {
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".firewall")) {
 					sug.add("setgloballimit");
+					sug.add("setperiplimit");
+					sug.add("info");
 				}
 			}
 			if (args[0].equalsIgnoreCase("blacklist")) {

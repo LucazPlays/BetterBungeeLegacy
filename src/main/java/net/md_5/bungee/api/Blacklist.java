@@ -21,6 +21,8 @@ public class Blacklist {
 
 	private int globalratelimit = 0;
 
+	private int peripratelimit = 0;
+
 	private CopyOnWriteArrayList<Integer> averagecpslist = new CopyOnWriteArrayList<Integer>();
 
 	@Getter
@@ -183,7 +185,6 @@ public class Blacklist {
 		BungeeCord.getInstance().getBetterbungee().getRemovewhitelist().addAll(getWhitelist());
 		this.whitelist.clear();
 	}
-	
 
 	public void removeWhitelist(String stg) {
 		if (whitelist.contains(stg)) {
@@ -202,6 +203,19 @@ public class Blacklist {
 
 	public void addGlobalratelimit(int add) {
 		this.globalratelimit += add;
+	}
+
+
+	public int getPerIPratelimit() {
+		return peripratelimit;
+	}
+
+	public void setPerIPratelimit(int globalratelimit) {
+		this.peripratelimit = globalratelimit;
+	}
+
+	public void addPerIPratelimit(int add) {
+		this.peripratelimit += add;
 	}
 
 	public String getRealAdress(ChannelHandlerContext ctx) {

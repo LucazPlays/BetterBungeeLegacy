@@ -36,7 +36,7 @@ public class CommandIP extends PlayerCommand
         }
     }
 
-	public void sendipmessage(final CommandSender sender, IPCheckerResult result) {
+	public static void sendipmessage(final CommandSender sender, IPCheckerResult result) {
 		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "     §8[§6IPINFO§8]"));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + result.getIP()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7City: §e" + result.getCity()));
