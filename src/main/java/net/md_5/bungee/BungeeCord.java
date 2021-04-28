@@ -196,7 +196,7 @@ public class BungeeCord extends ProxyServer {
 	}
 
 	@Getter
-	private static IPChecker IpChecker = IPChecker.getInstance();
+	private IPChecker IpChecker = IPChecker.getInstance();
 
 	public static BungeeCord getInstance() {
 		return (BungeeCord) ProxyServer.getInstance();
@@ -349,9 +349,7 @@ public class BungeeCord extends ProxyServer {
 	public void startListeners() {
 		for (final ListenerInfo info : config.getListeners()) {
 			if (info.isProxyProtocol()) {
-				getLogger().log(Level.WARNING,
-						"Using PROXY protocol for listener {0}, please ensure this listener is adequately firewalled.",
-						info.getSocketAddress());
+				getLogger().log(Level.WARNING, "Using PROXY protocol for listener {0}, please ensure this listener is adequately firewalled.",	info.getSocketAddress());
 
 				if (connectionThrottle != null) {
 					connectionThrottle = null;
@@ -366,8 +364,7 @@ public class BungeeCord extends ProxyServer {
 						listeners.add(future.channel());
 						getLogger().log(Level.SEVERE, "Listening on {0}", info.getSocketAddress());
 					} else {
-						getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(),
-								future.cause());
+						getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(), future.cause());
 					}
 				}
 			};
@@ -391,9 +388,7 @@ public class BungeeCord extends ProxyServer {
 						}
 					}
 				};
-				new RemoteQuery(this, info).start(PipelineUtils.getDatagramChannel(),
-						new InetSocketAddress(info.getHost().getAddress(), info.getQueryPort()), eventLoops,
-						bindListener);
+				new RemoteQuery(this, info).start(PipelineUtils.getDatagramChannel(), new InetSocketAddress(info.getHost().getAddress(), info.getQueryPort()), eventLoops, bindListener);
 			}
 		}
 	}

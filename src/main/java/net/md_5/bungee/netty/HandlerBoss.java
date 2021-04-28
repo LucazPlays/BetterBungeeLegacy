@@ -3,6 +3,7 @@ package net.md_5.bungee.netty;
 import com.google.common.base.Preconditions;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.unix.Errors.NativeIoException;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.haproxy.HAProxyMessage;
@@ -172,17 +173,50 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - read timed out", handler);
 				} else if (cause instanceof DecoderException) {
 					if (cause instanceof CorruptedFrameException) {
-						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}",
-								new Object[] { handler, cause.getMessage() });
+						if (Blacklist.getInstance().isProtection()) {
+							String ip = null;
+							if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+								ip = list.getRealAdress(channel);
+							} else {
+								ip = list.getRealAdress(ctx);
+							}
+							
+							Blacklist.getInstance().addBlacklist(ip);
+							NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cCorruptedFrame");
+							ctx.close();
+							return;
+						}
+						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}",new Object[] { handler, cause.getMessage() });
 					} else if (cause.getCause() instanceof BadPacketException) {
-						ProxyServer.getInstance().getLogger().log(Level.WARNING,
-								"{0} - bad packet ID, are mods in use!? {1}",
+						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - bad packet ID, are mods in use!? {1}",
 								new Object[] { handler, cause.getCause().getMessage() });
 					} else if (cause.getCause() instanceof OverflowPacketException) {
 						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - overflow in packet detected! {1}", new Object[] { handler, cause.getCause().getMessage() });
 					}
 				} else if (cause instanceof IOException || (cause instanceof IllegalStateException && handler instanceof InitialHandler)) {
-					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - {1}: {2}", new Object[] { handler, cause.getClass().getSimpleName(), cause.getMessage() });
+					if (cause instanceof IllegalStateException) {
+						if (Blacklist.getInstance().isProtection()) {
+							String ip = null;
+							if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+								ip = list.getRealAdress(channel);
+							} else {
+								ip = list.getRealAdress(ctx);
+							}
+							
+							Blacklist.getInstance().addBlacklist(ip);
+							NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cIllegalState");
+							ctx.close();
+							return;
+						}
+					}
+					if (cause instanceof NativeIoException) {
+						if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+							ctx.close();
+							return;
+						}
+					}
+					
+					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - {1}: {2}", new Object[] { handler, cause.getClass().getSimpleName(), cause.getMessage() + ""});
 				} else if (cause instanceof QuietException) {
 					ProxyServer.getInstance().getLogger().log(Level.SEVERE, "{0} - encountered exception: {1}",
 							new Object[] { handler, cause });
@@ -195,6 +229,12 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				try {
 					handler.exception(cause);
 				} catch (Exception ex) {
+					if (ex instanceof NativeIoException) {
+						if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+							ctx.close();
+							return;
+						}
+					}
 					ProxyServer.getInstance().getLogger().log(Level.SEVERE, handler + " - exception processing exception", ex);
 				}
 			}

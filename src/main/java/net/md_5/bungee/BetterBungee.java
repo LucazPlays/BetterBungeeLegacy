@@ -36,11 +36,8 @@ public class BetterBungee {
 
 	public String Version = "0.82";
 
-
 	long lastfirewallsync = 0;
-	
-	
-	
+
 	long lastupdatecheck = 0;
 
 	int updatecheckfrequency = 0;
@@ -65,11 +62,9 @@ public class BetterBungee {
 
 	@Getter
 	boolean protection = false;
-	
 
 	@Getter
 	boolean disablebungeecommands = false;
-	
 
 	@Getter
 	@Setter
@@ -78,7 +73,6 @@ public class BetterBungee {
 	@Getter
 	@Setter
 	boolean denyVPNonJoin = false;
-
 
 	@Getter
 	@Setter
@@ -92,12 +86,25 @@ public class BetterBungee {
 	@Setter
 	boolean discordintegration = false;
 
-	
 	@Getter
 	@Setter
 	CopyOnWriteArrayList<String> serverlistusers = new CopyOnWriteArrayList<>();
 
+	@Getter
+	@Setter
+	CopyOnWriteArrayList<String> addwhitelist = new CopyOnWriteArrayList<>();
 
+	@Getter
+	@Setter
+	CopyOnWriteArrayList<String> addblacklist = new CopyOnWriteArrayList<>();
+
+	@Getter
+	@Setter
+	CopyOnWriteArrayList<String> removewhitelist = new CopyOnWriteArrayList<>();
+
+	@Getter
+	@Setter
+	CopyOnWriteArrayList<String> removeblacklist = new CopyOnWriteArrayList<>();
 
 	@Getter
 	ArrayList<DownloadablePlugin> pluginlist = new ArrayList<>();
@@ -105,9 +112,19 @@ public class BetterBungee {
 	@Getter
 	boolean manuelupdates = false;
 
+	@Getter
+	private boolean packetsizelimit = false;
+	
+	@Getter
+	private int packetsizelimitsize = 8000;
+
+	@Getter
 	private boolean firewallsync;
-	
-	
+
+	@Getter
+	@Setter
+	boolean apiconnection = false;
+
 	public BetterBungee() {
 		createConfigs();
 		Thread betterbungeethread = new Thread(() -> {
@@ -117,13 +134,16 @@ public class BetterBungee {
 			onStart();
 			while (BungeeCord.getInstance().isRunning) {
 				if (alive()) {
+					apiconnection = true;
 					if (snapshotupdate) {
 						if (update()) {
 							if (restartonupdate) {
-								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
+								ProxyServer.getInstance().broadcast(
+										TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
 								for (int i = snapshotupdatecountdown; i > 0; i--) {
 									sleep(1000);
-									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
+									ProxyServer.getInstance().broadcast(TextComponent
+											.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 								}
 								sleep(1000);
 								ProxyServer.getInstance().stop("§6Updated BetterCord");
@@ -133,35 +153,21 @@ public class BetterBungee {
 						lastupdatecheck = System.currentTimeMillis();
 						if (update()) {
 							if (restartonupdate) {
-								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§aStable§7 Update Found"));
+								ProxyServer.getInstance().broadcast(
+										TextComponent.fromLegacyText(BungeeCord.PREFIX + "§aStable§7 Update Found"));
 								for (int i = snapshotupdatecountdown; i > 0; i--) {
 									sleep(1000);
-									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
+									ProxyServer.getInstance().broadcast(TextComponent
+											.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 								}
 								sleep(1000);
 								ProxyServer.getInstance().stop("§aUpdated BetterCord");
 							}
 						}
 					}
-					
-					if (this.firewallsync) {
-						if (lastfirewallsync < System.currentTimeMillis() - (1000 * 60 * 60)) {
-							lastfirewallsync = System.currentTimeMillis();
-						}
-					}
-					
-					
-					//
-					//        Hier weitermachen faggot #187
-					//
-					
-					
-					
-					
 					sleep();
-					
-					
 				} else {
+					apiconnection = false;
 					System.out.println("Session Expired");
 					sleep(120000);
 					login();
@@ -188,7 +194,7 @@ public class BetterBungee {
 	public void createConfigs() {
 		try {
 			File file = new File("betterbungeeconfig.yml");
-			
+
 			if (!file.exists()) {
 				file.createNewFile();
 				System.out.println("Created Config File");
@@ -202,16 +208,16 @@ public class BetterBungee {
 
 			String restartonupdate = "serversettings.restartonupdate";
 
-			String snapshotupdatercountdown= "serversettings.snapshotupdatercountdown";
+			String snapshotupdatercountdown = "serversettings.snapshotupdatercountdown";
 
 			String protection = "serversettings.protection";
-			
+
 			String firewallsync = "serversettings.firewallsync";
 
 			String denyvpns = "serversettings.denyvpnjoins";
-			
+
 			String denyvpnkickmessage = "serversettings.denyvpnkickmessage";
-			
+
 			String denyvpnbypasspermission = "serversettings.denyvpnbypasspermission";
 
 			String disablebungeecommands = "serversettings.disablebungeecommands";
@@ -225,6 +231,10 @@ public class BetterBungee {
 			String discordintegration = "serversettings.discordintegration";
 
 			String manuelupdates = "serversettings.manuelupdates";
+
+			String packetsizelimit = "serversettings.packetsizelimit";
+
+			String packetsizelimitsize = "serversettings.packetsizelimitsize";
 
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
@@ -245,7 +255,7 @@ public class BetterBungee {
 			addDefault(config, denyvpnkickmessage, "Kicked by AntiVPN");
 
 			addDefault(config, denyvpnbypasspermission, "antivpn.bypass");
-			
+
 			addDefault(config, globallimit, "100");
 
 			addDefault(config, limitperip, "3");
@@ -256,10 +266,14 @@ public class BetterBungee {
 
 			addDefault(config, manuelupdates, "false");
 
+			addDefault(config, packetsizelimit, "false");
+
+			addDefault(config, packetsizelimitsize, "8000");
+
 			String configuuid = "serverdata.uuid";
-			
+
 			String configkey = "serverdata.key";
-			
+
 			if (!config.contains(configuuid)) {
 				config.set(configuuid, UUID.randomUUID().toString());
 				config.set(configkey, generatepw());
@@ -274,14 +288,13 @@ public class BetterBungee {
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
 			this.uuid = config.getString(configuuid);
-			
+
 			this.password = config.getString(configkey);
 
-			
 			this.snapshotupdate = config.getString(snapshotupdater).equalsIgnoreCase("true");
-			
+
 			this.restartonupdate = config.getString(restartonupdate).equalsIgnoreCase("true");
-			
+
 			this.snapshotupdatecountdown = Integer.valueOf(config.getString(snapshotupdatercountdown));
 
 			this.protection = config.getString(protection).equalsIgnoreCase("true");
@@ -291,11 +304,11 @@ public class BetterBungee {
 			this.denyVPNonJoin = config.getString(denyvpns).equalsIgnoreCase("true");
 
 			this.denyVPNkickmessage = config.getString(denyvpnkickmessage);
-			
+
 			this.denyVPNbypasspermission = config.getString(denyvpnbypasspermission);
-			
+
 			this.globallimit = Integer.valueOf(config.getString(globallimit));
-			
+
 			this.periplimit = Integer.valueOf(config.getString(limitperip));
 
 			this.disablebungeecommands = config.getString(disablebungeecommands).equalsIgnoreCase("true");
@@ -304,24 +317,31 @@ public class BetterBungee {
 
 			this.discordintegration = config.getString(discordintegration).equalsIgnoreCase("true");
 
-			this.manuelupdates  = config.getString(manuelupdates).equalsIgnoreCase("true");
-			
-			
+			this.manuelupdates = config.getString(manuelupdates).equalsIgnoreCase("true");
+
+			this.packetsizelimit = config.getString(packetsizelimit).equalsIgnoreCase("true");
+
+			this.packetsizelimitsize = Integer.valueOf(config.getString(packetsizelimitsize));
+
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
-			
+
 			if (snapshotupdate) {
-				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
+				Version = String.valueOf(
+						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+								.length());
 			}
 
 			if (this.discordintegration) {
 				NotifyManager.getInstance().setDiscord(this.discordintegration);
 				new Thread(() -> {
 					while (BungeeCord.getInstance().isRunning) {
-						if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
-							if (discord(NotifyManager.getInstance().getDiscordmessages())) {
-								NotifyManager.getInstance().getDiscordmessages().clear();
+						if (apiconnection) {
+							if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
+								if (discord(NotifyManager.getInstance().getDiscordmessages())) {
+									NotifyManager.getInstance().getDiscordmessages().clear();
+								}
 							}
 						}
 						try {
@@ -332,32 +352,65 @@ public class BetterBungee {
 					}
 				}).start();
 			}
-			
 
 			if (this.firewallsync) {
-				NotifyManager.getInstance().setDiscord(this.firewallsync);
+				NotifyManager.getInstance().setDiscord(this.discordintegration);
 				new Thread(() -> {
 					while (BungeeCord.getInstance().isRunning) {
-						if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
-							if (discord(NotifyManager.getInstance().getDiscordmessages())) {
-								NotifyManager.getInstance().getDiscordmessages().clear();
+						if (apiconnection) {
+							if (this.firewallsync) {
+								if (lastfirewallsync < System.currentTimeMillis() - (1000 * 10)) {
+									lastfirewallsync = System.currentTimeMillis();
+
+									if (addwhitelist.size() > 0) {
+										addwhitelist(addwhitelist);
+										addwhitelist.clear();
+									}
+
+									if (addblacklist.size() > 0) {
+										addblacklist(addblacklist);
+										addblacklist.clear();
+									}
+
+									if (removewhitelist.size() > 0) {
+										removewhitelist(removewhitelist);
+										removewhitelist.clear();
+									}
+
+									if (removeblacklist.size() > 0) {
+										removeblacklist(removeblacklist);
+										removeblacklist.clear();
+									}
+								}
 							}
+
 						}
 						try {
-							Thread.sleep(60000);
+							Thread.sleep(3000);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
 				}).start();
 			}
-			
-			
-			
-			
-			
-			
-			
+
+//			if (this.firewallsync) {
+//				new Thread(() -> {
+//					while (BungeeCord.getInstance().isRunning) {
+//						if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
+//							if (discord(NotifyManager.getInstance().getDiscordmessages())) {
+//								NotifyManager.getInstance().getDiscordmessages().clear();
+//							}
+//						}
+//						try {
+//							Thread.sleep(60000);
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
+//					}
+//				}).start();
+//			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -374,11 +427,7 @@ public class BetterBungee {
 	}
 
 	private void sleep() {
-		try {
-			Thread.sleep(15000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		sleep(15000);
 	}
 
 	private void sleep(int i) {
@@ -400,7 +449,9 @@ public class BetterBungee {
 					String newestnapshotid = response.getText().replaceAll("\n", "").split(":")[1];
 //					System.out.println("Newest-Snapshot ID: "+newestnapshotid);
 //					System.out.println("Snapshot ID: "+String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()));
-					if (!newestnapshotid.equals(String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()))) {
+					if (!newestnapshotid.equals(String.valueOf(
+							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+									.length()))) {
 						return updatefromlink(betterbungee + "/downloadsnapshot");
 					}
 				} catch (URISyntaxException e) {
@@ -416,7 +467,9 @@ public class BetterBungee {
 			if (!response.getFailed()) {
 				try {
 					String newestupdateid = response.getText().replaceAll("\n", "").split(":")[1];
-					if (!newestupdateid.equals(String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()))) {
+					if (!newestupdateid.equals(String.valueOf(
+							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+									.length()))) {
 						return updatefromlink(betterbungee + "/downloadupdate");
 					}
 				} catch (URISyntaxException e) {
@@ -433,7 +486,8 @@ public class BetterBungee {
 		if (download(link)) {
 			try {
 				new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-				new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				new File("UpdatedBungeeCord.jar").renameTo(
+						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
 				return true;
 			} catch (URISyntaxException e) {
 			}
@@ -455,7 +509,8 @@ public class BetterBungee {
 
 	private boolean login() {
 		System.out.println("Login to API");
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (!response.getText().contains("Invalid")) {
 				session = response.getText();
@@ -470,7 +525,8 @@ public class BetterBungee {
 
 	private boolean register(String uuid, String password) {
 		System.out.println("Register a new account on BetterBungeeAPI");
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (response.getText().contains("Succeed")) {
 				this.uuid = uuid;
@@ -488,36 +544,106 @@ public class BetterBungee {
 		if (session == null) {
 			return false;
 		}
-		
+
 		String messages = "";
-		
+
 		for (String message : copyOnWriteArrayList) {
 			if (message != null) {
 				messages += stringtobase64(message) + ",";
 			}
 		}
-		
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/senddiscord?session=" + session + "&discordmessages="+messages);
+
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/senddiscord?session=" + session + "&discordmessages=" + messages);
 		return !response.getFailed();
 	}
-	
+
+	private boolean addblacklist(CopyOnWriteArrayList<String> blacklist) {
+		if (session == null) {
+			return false;
+		}
+
+		String messages = "";
+
+		for (String message : blacklist) {
+			if (message != null) {
+				messages += message + ",";
+			}
+		}
+
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/addblacklist?session=" + session + "&blacklist=" + messages);
+		return !response.getFailed();
+	}
+
+	private boolean removeblacklist(CopyOnWriteArrayList<String> blacklist) {
+		if (session == null) {
+			return false;
+		}
+
+		String messages = "";
+
+		for (String message : blacklist) {
+			if (message != null) {
+				messages += message + ",";
+			}
+		}
+
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/removeblacklist?session=" + session + "&blacklist=" + messages);
+		return !response.getFailed();
+	}
+
+	private boolean addwhitelist(CopyOnWriteArrayList<String> whitelist) {
+		if (session == null) {
+			return false;
+		}
+
+		String messages = "";
+
+		for (String message : whitelist) {
+			if (message != null) {
+				messages += message + ",";
+			}
+		}
+
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/addwhitelist?session=" + session + "&whitelist=" + messages);
+		return !response.getFailed();
+	}
+
+	private boolean removewhitelist(CopyOnWriteArrayList<String> whitelist) {
+		if (session == null) {
+			return false;
+		}
+
+		String messages = "";
+
+		for (String message : whitelist) {
+			if (message != null) {
+				messages += message + ",";
+			}
+		}
+
+		RestAPIResponse response = RestAPI.getInstance()
+				.info(betterbungee + "/removewhitelist?session=" + session + "&whitelist=" + messages);
+		return !response.getFailed();
+	}
+
 	private boolean alive() {
 		if (session == null) {
 			return false;
 		}
-		
-		
+
 		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/alive?session=" + session);
-		
+
 		if (!response.getFailed()) {
 			String text = response.getText();
 			if (text.contains("Alive")) {
 				return true;
 			}
 			System.out.println(response.getText());
-			
-			
-			
+
 		} else {
 			System.out.println("API Timed Out");
 		}

@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.netty.ChannelWrapper;
 
 public class Blacklist {
@@ -51,6 +52,7 @@ public class Blacklist {
 		if (!protection) {
 			return;
 		}
+		BungeeCord.getInstance().getBetterbungee().getRemoveblacklist().add(stg);
 		blacklist.add(stg);
 		return;
 	}
@@ -68,6 +70,7 @@ public class Blacklist {
 			return false;
 		}
 		String ip = inet.toString();
+		BungeeCord.getInstance().getBetterbungee().getAddblacklist().add(ip);
 		return blacklist.add(ip);
 	}
 
@@ -75,6 +78,7 @@ public class Blacklist {
 		if (!protection) {
 			return;
 		}
+		BungeeCord.getInstance().getBetterbungee().getRemoveblacklist().addAll(getBlacklist());
 		blacklist.clear();
 	}
 
@@ -82,6 +86,7 @@ public class Blacklist {
 		if (!protection) {
 			return false;
 		}
+		BungeeCord.getInstance().getBetterbungee().getRemoveblacklist().add(stg);
 		return blacklist.remove(stg);
 	}
 
@@ -165,6 +170,7 @@ public class Blacklist {
 
 	public void addWhitelist(String stg) {
 		if (!whitelist.contains(stg)) {
+			BungeeCord.getInstance().getBetterbungee().getAddblacklist().add(stg);
 			this.whitelist.add(stg);
 		}
 	}
@@ -174,12 +180,14 @@ public class Blacklist {
 	}
 
 	public void clearWhitelist() {
+		BungeeCord.getInstance().getBetterbungee().getRemovewhitelist().addAll(getWhitelist());
 		this.whitelist.clear();
 	}
 	
 
 	public void removeWhitelist(String stg) {
 		if (whitelist.contains(stg)) {
+			BungeeCord.getInstance().getBetterbungee().getRemovewhitelist().add(stg);
 			this.whitelist.remove(stg);
 		}
 	}

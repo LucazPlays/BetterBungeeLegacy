@@ -42,6 +42,23 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 			int packetId = DefinedPacket.readVarInt(in);
 			
 			if (prot.getDirection() == Direction.TO_SERVER) {
+				if (Blacklist.getInstance().isProtection()) {
+					if (packetId > Protocol.MAX_PACKET_ID) {
+						String ip = Blacklist.getInstance().getRealAdress(ctx);
+						Blacklist.getInstance().addBlacklist(ip);
+						NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cBadpacket");
+	
+						ctx.close();
+	
+						slice = null;
+						
+						if (slice != null) {
+							slice.release();
+						}
+						
+						return;
+					}
+				}
 				if (slice.readableBytes() > 8000) {
 					
 					ProxiedPlayer player = getPlayer(ctx.channel().remoteAddress());

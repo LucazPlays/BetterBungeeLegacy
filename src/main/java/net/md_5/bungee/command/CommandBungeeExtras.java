@@ -38,6 +38,21 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			return;
 		}
 		if (args.length >= 1) {
+			if (args[0].equalsIgnoreCase("firewall")) {
+				if (!sender.hasPermission("bungeecord.command." + bungeename + ".firewall")) {
+					sender.sendMessage(BungeeCord.PREFIX + "§7Dazu hast du keine §9Rechte§7!");
+					return;
+				}
+				if (args[1].equalsIgnoreCase("setgloballimit")) {
+					try {
+						int integer = Integer.valueOf(args[2]);
+						sender.sendMessage(BungeeCord.PREFIX + "§eGlobal Rate Limit§7 auf §a" + integer + "§7 gesetzt!");
+					} catch (Exception ex) {
+						sender.sendMessage(BungeeCord.PREFIX + "§7Bitte gebe eine Zahl ein");
+					}
+					return;
+				}
+			}
 
 			if (args[0].equalsIgnoreCase("blacklist")) {
 				if (!sender.hasPermission("bungeecord.command." + bungeename + ".blacklist")) {
@@ -271,6 +286,9 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			if (sender.hasPermission("bungeecord.command." + bungeename + ".notifications")) {
 				sug.add("notifications");
 			}
+			if (sender.hasPermission("bungeecord.command." + bungeename + ".firewall")) {
+				sug.add("firewall");
+			}
 			if (sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager")) {
 				sug.add("pluginmanager");
 			}
@@ -291,6 +309,11 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".notifications")) {
 					sug.add("chat");
 					sug.add("actionbar");
+				}
+			}
+			if (args[0].equalsIgnoreCase("firewall")) {
+				if (sender.hasPermission("bungeecord.command." + bungeename + ".firewall")) {
+					sug.add("setgloballimit");
 				}
 			}
 			if (args[0].equalsIgnoreCase("blacklist")) {
@@ -321,8 +344,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 
 		if (args.length == 3) {
 			if (args[1].equalsIgnoreCase("reload") || args[1].equalsIgnoreCase("unload")) {
-				if (sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager.reload")
-						|| sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager.unload")) {
+				if (sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager.reload") || sender.hasPermission("bungeecord.command." + bungeename + ".pluginmanager.unload")) {
 					for (Plugin pl : BungeeCord.getInstance().pluginManager.getPlugins()) {
 						sug.add(pl.getDescription().getName());
 					}
