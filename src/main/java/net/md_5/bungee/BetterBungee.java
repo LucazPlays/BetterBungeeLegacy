@@ -34,7 +34,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.82";
+	public String Version = "0.85";
 
 	long lastfirewallsync = 0;
 
@@ -443,7 +443,7 @@ public class BetterBungee {
 			return false;
 		}
 		if (snapshotupdate) {
-			RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/update");
+			RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/update");
 			if (!response.getFailed()) {
 				try {
 					String newestnapshotid = response.getText().replaceAll("\n", "").split(":")[1];
@@ -463,7 +463,7 @@ public class BetterBungee {
 		} else if (!updated) {
 			lastupdatecheck = System.currentTimeMillis();
 			System.out.println("Checking for Updates");
-			RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/update?version=" + Version);
+			RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/update?version=" + Version);
 			if (!response.getFailed()) {
 				try {
 					String newestupdateid = response.getText().replaceAll("\n", "").split(":")[1];
@@ -510,7 +510,7 @@ public class BetterBungee {
 	private boolean login() {
 		System.out.println("Login to API");
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
+				.get(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (!response.getText().contains("Invalid")) {
 				session = response.getText();
@@ -526,7 +526,7 @@ public class BetterBungee {
 	private boolean register(String uuid, String password) {
 		System.out.println("Register a new account on BetterBungeeAPI");
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
+				.get(betterbungee + "/register?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (response.getText().contains("Succeed")) {
 				this.uuid = uuid;
@@ -554,7 +554,7 @@ public class BetterBungee {
 		}
 
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/senddiscord?session=" + session + "&discordmessages=" + messages);
+				.get(betterbungee + "/senddiscord?session=" + session + "&discordmessages=" + messages);
 		return !response.getFailed();
 	}
 
@@ -572,7 +572,7 @@ public class BetterBungee {
 		}
 
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/addblacklist?session=" + session + "&blacklist=" + messages);
+				.get(betterbungee + "/addblacklist?session=" + session + "&blacklist=" + messages);
 		return !response.getFailed();
 	}
 
@@ -590,7 +590,7 @@ public class BetterBungee {
 		}
 
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/removeblacklist?session=" + session + "&blacklist=" + messages);
+				.get(betterbungee + "/removeblacklist?session=" + session + "&blacklist=" + messages);
 		return !response.getFailed();
 	}
 
@@ -608,7 +608,7 @@ public class BetterBungee {
 		}
 
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/addwhitelist?session=" + session + "&whitelist=" + messages);
+				.get(betterbungee + "/addwhitelist?session=" + session + "&whitelist=" + messages);
 		return !response.getFailed();
 	}
 
@@ -626,7 +626,7 @@ public class BetterBungee {
 		}
 
 		RestAPIResponse response = RestAPI.getInstance()
-				.info(betterbungee + "/removewhitelist?session=" + session + "&whitelist=" + messages);
+				.get(betterbungee + "/removewhitelist?session=" + session + "&whitelist=" + messages);
 		return !response.getFailed();
 	}
 
@@ -635,7 +635,7 @@ public class BetterBungee {
 			return false;
 		}
 
-		RestAPIResponse response = RestAPI.getInstance().info(betterbungee + "/alive?session=" + session);
+		RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/alive?session=" + session);
 
 		if (!response.getFailed()) {
 			String text = response.getText();

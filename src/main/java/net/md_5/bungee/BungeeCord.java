@@ -424,8 +424,6 @@ public class BungeeCord extends ProxyServer {
 	@SuppressFBWarnings("DM_EXIT")
 	private void independentThreadStop(final String reason, boolean callSystemExit) {
 		
-		IPChecker.getInstance().checkthemall();
-		
 		// Acquire the shutdown lock
 		// This needs to actually block here, otherwise running 'end' and then ctrl+c
 		// will cause the thread to terminate prematurely

@@ -97,7 +97,6 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				}
 			}
 		}
-		IPChecker.getInstance().addtocheck(ip);
 	}
 
 	@Override

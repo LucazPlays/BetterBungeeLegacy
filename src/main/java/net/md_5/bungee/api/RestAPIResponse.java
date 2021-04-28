@@ -1,22 +1,19 @@
 package net.md_5.bungee.api;
 
-import java.io.IOException;
-
 public class RestAPIResponse {
 
 	private String text;
 
 	private boolean failed;
+
+	private String url;
 	
-	public RestAPIResponse(String text,boolean failed) {
+	public RestAPIResponse(String text,boolean failed, String url) {
+		this.url = url;
 		this.text = text;
 		this.failed = failed;
 	}
 
-	public RestAPIResponse(String string, boolean b, IOException ex) {
-		this.text = text;
-		this.failed = failed;
-	}
 
 	public String getText() {
 		return text;
@@ -24,5 +21,10 @@ public class RestAPIResponse {
 
 	public boolean getFailed() {
 		return failed;
+	}
+
+
+	public String getUrl() {
+		return url;
 	}
 }

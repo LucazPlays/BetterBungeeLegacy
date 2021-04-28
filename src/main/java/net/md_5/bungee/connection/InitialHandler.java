@@ -148,7 +148,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	public void handle(PacketWrapper packet) throws Exception {
 		if (packet.packet == null) {
 			cancelcrash("QuietException");
-			throw new QuietException("Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+			throw new QuietException(
+					"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
 		}
 	}
 
@@ -419,9 +420,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			}
 			String encodedHash = URLEncoder.encode(new BigInteger(sha.digest()).toString(16), "UTF-8");
 
-			String preventProxy = (BungeeCord.getInstance().config.isPreventProxyConnections() && getSocketAddress() instanceof InetSocketAddress) ? "&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")
+			String preventProxy = (BungeeCord.getInstance().config.isPreventProxyConnections()
+					&& getSocketAddress() instanceof InetSocketAddress)
+							? "&ip=" + URLEncoder.encode(getAddress().getAddress().getHostAddress(), "UTF-8")
 							: "";
-			String authURL = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + encName + "&serverId=" + encodedHash + preventProxy;
+			String authURL = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + encName
+					+ "&serverId=" + encodedHash + preventProxy;
+
 			Callback<String> handler = new Callback<String>() {
 				@Override
 				public void done(String result, Throwable error) {
@@ -442,7 +447,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 						disconnect(bungee.getTranslation("offline_mode_player"));
 					} else {
 						disconnect(bungee.getTranslation("mojang_fail"));
-						bungee.getLogger().log(Level.SEVERE,"Error authenticating " + getName() + " with minecraft.net", error);
+						bungee.getLogger().log(Level.SEVERE,
+								"Error authenticating " + getName() + " with minecraft.net", error);
 						if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
 							if (!list.containswhitelist(list.getRealAdress(ch))) {
 								list.addlimit(list.getRealAdress(ch), 20);
@@ -452,10 +458,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				}
 			};
 			HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
-			
-			
+
 		} catch (Exception ex) {
-			cancelcrash("AuthSmasher");
+			cancelcrash("Crypto Crasher? xD");
 			return;
 		}
 	}
@@ -487,7 +492,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		}
 
 		offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getName()).getBytes(Charsets.UTF_8));
-		
+
 		if (uniqueId == null) {
 			uniqueId = offlineId;
 		}
@@ -513,12 +518,16 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							userCon.init();
 
 							unsafe.sendPacket(new LoginSuccess(getUniqueId(), getName()));
+
 							ch.setProtocol(Protocol.GAME);
 
 							ch.getHandle().pipeline().get(HandlerBoss.class)
 									.setHandler(new UpstreamBridge(bungee, userCon));
+
 							bungee.getPluginManager().callEvent(new PostLoginEvent(userCon));
+
 							ServerInfo server;
+
 							if (bungee.getReconnectHandler() != null) {
 								server = bungee.getReconnectHandler().getServer(userCon);
 							} else {
@@ -540,26 +549,23 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 								}
 							}
-
+							
 							if (BungeeCord.getInstance().getBetterbungee().isDenyVPNonJoin()) {
 								IPChecker.getInstance().start(() -> {
 									if (!IPChecker.getInstance().isipresidental(ip)) {
-										ProxiedPlayer player = getPlayer(getSocketAddress());
-										if (!player.hasPermission(BungeeCord.getInstance().getBetterbungee().getDenyVPNbypasspermission())) {
-											ProxyServer.getInstance().getScheduler().schedule(null, () -> {
-												if (player != null) {
-													player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterbungee().getDenyVPNkickmessage()));
-													NotifyManager.getInstance().addmessage("§cKicked §8- §e" + player.getName() + " §8- §6VPN");
-												}
-	
-											}, 200, TimeUnit.MILLISECONDS);
-											NotifyManager.getInstance().addmessage("§6Detected §8- §e" + ip + " §8- §6VPN");
+										ProxiedPlayer player = userCon;
+										if (player != null) {
+											if (!player.hasPermission(BungeeCord.getInstance().getBetterbungee().getDenyVPNbypasspermission())) {
+												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterbungee().getDenyVPNkickmessage()));
+												NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
+											} else {
+												NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
+											}
 										}
 										return;
 									}
 								});
 							}
-
 						}
 					}
 				});

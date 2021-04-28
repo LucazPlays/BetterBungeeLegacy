@@ -8,6 +8,7 @@ import java.net.SocketAddress;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
@@ -59,7 +60,8 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 						return;
 					}
 				}
-				if (slice.readableBytes() > 8000) {
+				if (BungeeCord.getInstance().getBetterbungee().isPacketsizelimit()) {
+				if (slice.readableBytes() > BungeeCord.getInstance().getBetterbungee().getPacketsizelimitsize()) {
 					
 					ProxiedPlayer player = getPlayer(ctx.channel().remoteAddress());
 
@@ -76,6 +78,7 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 					}
 					
 					return;
+				}
 				}
 			}
 

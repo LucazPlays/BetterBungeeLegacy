@@ -3,8 +3,9 @@ package net.md_5.bungee.api;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class RestAPI {
 
@@ -14,12 +15,25 @@ public class RestAPI {
 		return instance;
 	}
 
-	public RestAPIResponse info(String urlstring) {
+	public RestAPIResponse get(String urlstring) {
+		return get(urlstring,15000, null);
+    }
+
+	public RestAPIResponse get(String urlstring,Proxy proxy) {
+		return get(urlstring,15000, proxy);
+    }
+
+	public RestAPIResponse get(String urlstring,int timeout,Proxy proxy) {
         String response = "";
 		try {
-	        URL url = new URL(urlstring);
-	        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-	        con.setConnectTimeout(15000);
+	        URL url = new URL(urlstring.replaceAll("\n", ""));
+	        URLConnection con = null;
+	        if (proxy == null) {
+	        	con = url.openConnection();
+	        } else {
+	        	con = url.openConnection(proxy);
+	        }
+	        con.setConnectTimeout(timeout);
 	        con.setRequestProperty("User-Agent", "Mozilla/5.0");
 	        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 	        String inputLine;
@@ -28,8 +42,9 @@ public class RestAPI {
 	        }
 	        in.close();
 		} catch (IOException e) {
-			return new RestAPIResponse("Error", true);
+			e.printStackTrace();
+			return new RestAPIResponse("Error", true, urlstring);
 		}
-        return new RestAPIResponse(response, false);
+        return new RestAPIResponse(response, false, urlstring);
     }
 }
