@@ -12,8 +12,8 @@ public class ServerListAPI {
 	public ServerListAPI() {}
 	
 	public void pinged(String ip) {
-		if (!BungeeCord.getInstance().getBetterbungee().getServerlistusers().contains(ip)) {
-			BungeeCord.getInstance().getBetterbungee().getServerlistusers().add(ip);
+		if (!BungeeCord.getInstance().getBetterBungee().getServerlistusers().contains(ip)) {
+			BungeeCord.getInstance().getBetterBungee().getServerlistusers().add(ip);
 		}
 	}
 	

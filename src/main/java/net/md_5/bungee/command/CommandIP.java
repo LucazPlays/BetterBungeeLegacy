@@ -26,19 +26,23 @@ public class CommandIP extends PlayerCommand {
 			String ip = args[0];
 			if (isValidInet4Address(ip)) {
 				IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
-				sendipmessage(sender, result);
+				sendipmessage(sender, result,true);
 			} else {
 				sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
 			}
 		} else {
 			IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
-			sendipmessage(sender, result);
+			sendipmessage(sender, result,sender.hasPermission("bungeecord.command.ip.uncensored"));
 		}
 	}
 
-	public static void sendipmessage(final CommandSender sender, IPCheckerResult result) {
+	public static void sendipmessage(final CommandSender sender, IPCheckerResult result,boolean uncensored) {
 		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
-		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + result.getIP()));
+		if (uncensored) {
+			sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + result.getIP()));
+		} else {
+			sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §c" + "§lCENSORED"));
+		}
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7Country: §e" + result.getCountry()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7CountryCode: §e" + result.getCountryCode()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7City: §e" + result.getCity()));

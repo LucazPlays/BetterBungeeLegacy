@@ -34,7 +34,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.86";
+	public String Version = "0.87";
 
 	long lastfirewallsync = 0;
 
@@ -335,9 +335,7 @@ public class BetterBungee {
 			Blacklist.getInstance().setPerIPratelimit(this.periplimit);
 
 			if (snapshotupdate) {
-				Version = String.valueOf(
-						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-								.length());
+				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
 			}
 
 			if (this.discordintegration) {

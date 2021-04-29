@@ -153,7 +153,7 @@ public class BungeeCord extends ProxyServer {
 	public final PluginManager pluginManager;
 
 	@Getter
-	public BetterBungee betterbungee;
+	private BetterBungee BetterBungee;
 
 	@Getter
 	@Setter
@@ -239,7 +239,7 @@ public class BungeeCord extends ProxyServer {
 		// BungeeCord. This version is only used when extracting the libraries to their
 		// temp folder.
 
-		betterbungee = new BetterBungee();
+		BetterBungee = new BetterBungee();
 		
 		System.setProperty("library.jansi.version", "BungeeCord");
 
@@ -260,7 +260,7 @@ public class BungeeCord extends ProxyServer {
 		pluginManager = new PluginManager(this);
 
 
-		if (!betterbungee.isDisablebungeecommands()) {
+		if (!BetterBungee.isDisablebungeecommands()) {
 			getPluginManager().registerCommand(null, new CommandReload());
 			getPluginManager().registerCommand(null, new CommandEnd());
 			getPluginManager().registerCommand(null, new CommandIP());

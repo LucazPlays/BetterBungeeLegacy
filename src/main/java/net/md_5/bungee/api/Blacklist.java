@@ -3,6 +3,8 @@ package net.md_5.bungee.api;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -21,6 +23,8 @@ public class Blacklist {
 
 	private int globalratelimit = 0;
 
+	private int connectionratelimit = 0;
+
 	private int peripratelimit = 0;
 
 	private CopyOnWriteArrayList<Integer> averagecpslist = new CopyOnWriteArrayList<Integer>();
@@ -35,11 +39,22 @@ public class Blacklist {
 	@Getter
 	private boolean protection = false;
 
-	private CopyOnWriteArrayList<String> blacklist = new CopyOnWriteArrayList<String>();
+	private List<String> blacklist = Collections.synchronizedList(new ArrayList<String>());
 
-	private CopyOnWriteArrayList<String> whitelist = new CopyOnWriteArrayList<String>();
+	private List<String> whitelist = Collections.synchronizedList(new ArrayList<String>());
 
-	public CopyOnWriteArrayList<String> getBlacklist() {
+	
+	//gets removed if the new lists are good tested
+	private CopyOnWriteArrayList<String> oldblacklist = new CopyOnWriteArrayList<String>();
+
+	
+	
+	//gets removed if the new lists are good tested
+	private CopyOnWriteArrayList<String> oldwhitelist = new CopyOnWriteArrayList<String>();
+
+	
+	
+	public List<String> getBlacklist() {
 		return blacklist;
 	}
 
@@ -54,7 +69,7 @@ public class Blacklist {
 		if (!protection) {
 			return;
 		}
-		BungeeCord.getInstance().getBetterbungee().getRemoveblacklist().add(stg);
+		BungeeCord.getInstance().getBetterBungee().getRemoveblacklist().add(stg);
 		blacklist.add(stg);
 		return;
 	}
@@ -72,7 +87,7 @@ public class Blacklist {
 			return false;
 		}
 		String ip = inet.toString();
-		BungeeCord.getInstance().getBetterbungee().getAddblacklist().add(ip);
+		BungeeCord.getInstance().getBetterBungee().getAddblacklist().add(ip);
 		return blacklist.add(ip);
 	}
 
@@ -80,7 +95,7 @@ public class Blacklist {
 		if (!protection) {
 			return;
 		}
-		BungeeCord.getInstance().getBetterbungee().getRemoveblacklist().addAll(getBlacklist());
+		BungeeCord.getInstance().getBetterBungee().getRemoveblacklist().addAll(getBlacklist());
 		blacklist.clear();
 	}
 
@@ -88,11 +103,11 @@ public class Blacklist {
 		if (!protection) {
 			return false;
 		}
-		BungeeCord.getInstance().getBetterbungee().getRemoveblacklist().add(stg);
+		BungeeCord.getInstance().getBetterBungee().getRemoveblacklist().add(stg);
 		return blacklist.remove(stg);
 	}
 
-	public void setBlacklist(CopyOnWriteArrayList<String> blacklist) {
+	public void setBlacklist(List<String> blacklist) {
 		this.blacklist = blacklist;
 	}
 
@@ -115,7 +130,7 @@ public class Blacklist {
 
 					int average = 0;
 
-					averagecpslist.add(globalratelimit);
+					averagecpslist.add(connectionratelimit);
 
 					if (averagecpslist.size() > 10) {
 						averagecpslist.remove(0);
@@ -129,7 +144,7 @@ public class Blacklist {
 						averagecps = average / averagecpslist.size();
 					}
 
-					globalratelimit = 0;
+					connectionratelimit = 0;
 
 					Thread.sleep(1000);
 
@@ -162,17 +177,17 @@ public class Blacklist {
 		ratelimit.put(ip, ratelimit.get(ip) - 1);
 	}
 
-	public CopyOnWriteArrayList<String> getWhitelist() {
+	public List<String> getWhitelist() {
 		return whitelist;
 	}
 
-	public void setWhitelist(CopyOnWriteArrayList<String> whitelist) {
+	public void setWhitelist(List<String> whitelist) {
 		this.whitelist = whitelist;
 	}
 
 	public void addWhitelist(String stg) {
 		if (!whitelist.contains(stg)) {
-			BungeeCord.getInstance().getBetterbungee().getAddblacklist().add(stg);
+			BungeeCord.getInstance().getBetterBungee().getAddwhitelist().add(stg);
 			this.whitelist.add(stg);
 		}
 	}
@@ -182,16 +197,29 @@ public class Blacklist {
 	}
 
 	public void clearWhitelist() {
-		BungeeCord.getInstance().getBetterbungee().getRemovewhitelist().addAll(getWhitelist());
+		BungeeCord.getInstance().getBetterBungee().getRemovewhitelist().addAll(getWhitelist());
 		this.whitelist.clear();
 	}
 
 	public void removeWhitelist(String stg) {
 		if (whitelist.contains(stg)) {
-			BungeeCord.getInstance().getBetterbungee().getRemovewhitelist().add(stg);
+			BungeeCord.getInstance().getBetterBungee().getRemovewhitelist().add(stg);
 			this.whitelist.remove(stg);
 		}
 	}
+
+	public int getConnectionratelimit() {
+		return connectionratelimit;
+	}
+
+	public void setConnectionratelimit(int globalratelimit) {
+		this.connectionratelimit = globalratelimit;
+	}
+
+	public void addConnectionratelimit(int add) {
+		this.connectionratelimit += add;
+	}
+
 
 	public int getGlobalratelimit() {
 		return globalratelimit;
@@ -217,6 +245,7 @@ public class Blacklist {
 	public void addPerIPratelimit(int add) {
 		this.peripratelimit += add;
 	}
+	
 
 	public String getRealAdress(ChannelHandlerContext ctx) {
 		final SocketAddress remote = ctx.channel().remoteAddress();

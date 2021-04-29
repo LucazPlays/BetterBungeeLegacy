@@ -13,10 +13,10 @@ public class CommandBungee extends Command
     @Override
     public void execute(final CommandSender sender, final String[] args) {
     	String Version = "";
-    	if (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate()) {
-    		Version = "§7Snapshot§8(§c"+ BungeeCord.getInstance().getBetterbungee().Version+"§8)";
+    	if (BungeeCord.getInstance().getBetterBungee().isSnapshotupdate()) {
+    		Version = "§7Snapshot§8(§c"+ BungeeCord.getInstance().getBetterBungee().Version+"§8)";
     	} else {
-    		Version ="§7Stable§8(§a"+ BungeeCord.getInstance().getBetterbungee().Version+"§8)";
+    		Version ="§7Stable§8(§a"+ BungeeCord.getInstance().getBetterBungee().Version+"§8)";
     	}
         sender.sendMessage("§7This server is running §eBetterBungee§7 version §a" + Version + "§7 by §bLuca_zPlays");
         sender.sendMessage("§7Infos at §bhttp://betterbungee.tk");

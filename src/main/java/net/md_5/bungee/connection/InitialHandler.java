@@ -158,7 +158,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private void cancelcrash(String cause) {
-		if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+		if (Blacklist.getInstance().isProtection()) {
 			list.addBlacklist(list.getRealAdress(ch));
 			NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
 			ch.close();
@@ -184,8 +184,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		this.legacy = true;
 		final boolean v1_5 = ping.isV1_5();
 
-		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a")
-				+ BungeeCord.getInstance().getBetterbungee().Version;
+		String Version = (BungeeCord.getInstance().getBetterBungee().isSnapshotupdate() ? "§c" : "§a")
+				+ BungeeCord.getInstance().getBetterBungee().Version;
 
 		ServerPing legacy = new ServerPing(
 				new ServerPing.Protocol("§eBetterBungee" + " §8- " + Version, bungee.getProtocolVersion()),
@@ -226,8 +226,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private ServerPing getPingInfo(String motd, int protocol) {
-		String Version = (BungeeCord.getInstance().getBetterbungee().isSnapshotupdate() ? "§c" : "§a")
-				+ BungeeCord.getInstance().getBetterbungee().Version;
+		String Version = (BungeeCord.getInstance().getBetterBungee().isSnapshotupdate() ? "§c" : "§a")
+				+ BungeeCord.getInstance().getBetterBungee().Version;
 
 		return new ServerPing(new ServerPing.Protocol("§eBetterBungee §8- " + Version, protocol),
 				new ServerPing.Players(listener.getMaxPlayers(), bungee.getOnlineCount(), null), motd,
@@ -439,7 +439,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							finish();
 							return;
 						}
-						if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+						if (BungeeCord.getInstance().getBetterBungee().isProtection()) {
 							if (!list.containswhitelist(list.getRealAdress(ch))) {
 								list.addlimit(list.getRealAdress(ch), 60);
 							}
@@ -449,7 +449,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 						disconnect(bungee.getTranslation("mojang_fail"));
 						bungee.getLogger().log(Level.SEVERE,
 								"Error authenticating " + getName() + " with minecraft.net", error);
-						if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+						if (BungeeCord.getInstance().getBetterBungee().isProtection()) {
 							if (!list.containswhitelist(list.getRealAdress(ch))) {
 								list.addlimit(list.getRealAdress(ch), 20);
 							}
@@ -543,20 +543,20 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 							String ip = list.getRealAdress(ch);
 
-							if (BungeeCord.getInstance().getBetterbungee().isProtection()) {
+							if (Blacklist.getInstance().isProtection()) {
 								if (!list.containswhitelist(ip)) {
 									list.addWhitelist(ip);
 									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 								}
 							}
 							
-							if (BungeeCord.getInstance().getBetterbungee().isDenyVPNonJoin()) {
+							if (BungeeCord.getInstance().getBetterBungee().isDenyVPNonJoin()) {
 								IPChecker.getInstance().start(() -> {
 									if (!IPChecker.getInstance().isipresidental(ip)) {
 										ProxiedPlayer player = userCon;
 										if (player != null) {
-											if (!player.hasPermission(BungeeCord.getInstance().getBetterbungee().getDenyVPNbypasspermission())) {
-												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterbungee().getDenyVPNkickmessage()));
+											if (!player.hasPermission(BungeeCord.getInstance().getBetterBungee().getDenyVPNbypasspermission())) {
+												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
 												NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
 											} else {
 												NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");

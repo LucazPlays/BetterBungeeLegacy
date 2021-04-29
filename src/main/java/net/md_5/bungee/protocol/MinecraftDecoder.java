@@ -60,8 +60,8 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 						return;
 					}
 				}
-				if (BungeeCord.getInstance().getBetterbungee().isPacketsizelimit()) {
-				if (slice.readableBytes() > BungeeCord.getInstance().getBetterbungee().getPacketsizelimitsize()) {
+				if (BungeeCord.getInstance().getBetterBungee().isPacketsizelimit()) {
+				if (slice.readableBytes() > BungeeCord.getInstance().getBetterBungee().getPacketsizelimitsize()) {
 					
 					ProxiedPlayer player = getPlayer(ctx.channel().remoteAddress());
 

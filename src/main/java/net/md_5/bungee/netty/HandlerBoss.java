@@ -46,7 +46,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		if (!BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+		if (!BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 			filter(ctx);
 		}
 		if (handler != null) {
@@ -61,7 +61,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	private void filter(ChannelHandlerContext ctx) {
 		String ip = null;
 		
-		if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+		if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 			ip = list.getRealAdress(channel);
 		} else {
 			ip = list.getRealAdress(ctx);
@@ -90,7 +90,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			}
 			
 			if (!list.containswhitelist(ip)) {
-				if (list.getGlobalratelimit() > list.getGlobalratelimit()) {
+				list.addConnectionratelimit(1);
+				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
 					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
 					ctx.close();
 					return;
@@ -132,7 +133,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 			channel.setRemoteAddress(newAddress);
 
-			if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+			if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 				filter(ctx);
 			}
 
@@ -174,7 +175,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					if (cause instanceof CorruptedFrameException) {
 						if (Blacklist.getInstance().isProtection()) {
 							String ip = null;
-							if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+							if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 								ip = list.getRealAdress(channel);
 							} else {
 								ip = list.getRealAdress(ctx);
@@ -196,7 +197,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					if (cause instanceof IllegalStateException) {
 						if (Blacklist.getInstance().isProtection()) {
 							String ip = null;
-							if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+							if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 								ip = list.getRealAdress(channel);
 							} else {
 								ip = list.getRealAdress(ctx);
@@ -209,7 +210,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 						}
 					}
 					if (cause instanceof NativeIoException) {
-						if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+						if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 							ctx.close();
 							return;
 						}
@@ -229,7 +230,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					handler.exception(cause);
 				} catch (Exception ex) {
 					if (ex instanceof NativeIoException) {
-						if (BungeeCord.getInstance().getBetterbungee().isProxyProtocol()) {
+						if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 							ctx.close();
 							return;
 						}
