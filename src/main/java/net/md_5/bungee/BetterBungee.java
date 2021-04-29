@@ -146,7 +146,7 @@ public class BetterBungee {
 											.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 								}
 								sleep(1000);
-								ProxyServer.getInstance().stop("§6Updated BetterCord");
+								ProxyServer.getInstance().stop(updatemessage);
 							}
 						}
 					} else if (lastupdatecheck < System.currentTimeMillis() - (1000 * 60 * updatecheckfrequency)) {
@@ -161,7 +161,7 @@ public class BetterBungee {
 											.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 								}
 								sleep(1000);
-								ProxyServer.getInstance().stop("§7Restarting §eProxy-Server§7 due to a §aUpdate§7 from §6BetterBungee");
+								ProxyServer.getInstance().stop(updatemessage);
 							}
 						}
 					}
@@ -177,10 +177,12 @@ public class BetterBungee {
 		betterbungeethread.setPriority(Thread.MIN_PRIORITY);
 		betterbungeethread.start();
 	}
-
+	
+	public static final String updatemessage = "§7Restarting §eProxy-Server§7 due to a §aUpdate§7 from §6BetterBungee";
+	
 	public void onStart() {
 		if (update()) {
-			ProxyServer.getInstance().stop("§6Updated BetterCord");
+			ProxyServer.getInstance().stop(updatemessage);
 		}
 		login();
 	}
