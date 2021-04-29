@@ -26,7 +26,7 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 public class BetterBungee {
 
-	String betterbungee = "http://betterbungee.skydb.de";
+	String betterbungee = "http://betterbungeeapi.skydb.de";
 
 	String uuid = "";
 
@@ -34,7 +34,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.85";
+	public String Version = "0.86";
 
 	long lastfirewallsync = 0;
 

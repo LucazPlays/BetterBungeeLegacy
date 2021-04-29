@@ -1,5 +1,6 @@
 package net.md_5.bungee.command;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import net.md_5.bungee.BungeeCord;
@@ -7,37 +8,36 @@ import net.md_5.bungee.api.*;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.*;
 
-public class CommandIP extends PlayerCommand
-{
-    public CommandIP() {
-        super("ip", "bungeecord.command.ip", new String[0]);
-    }
-    
-    @Override
-    public void execute(final CommandSender sender, final String[] args) {
-        if (args.length < 1) {
-            sender.sendMessage(ProxyServer.getInstance().getTranslation("username_needed", new Object[0]));
-            return;
-        }
-        
-        final ProxiedPlayer user = ProxyServer.getInstance().getPlayer(args[0]);
-        
-        if (user == null) {
-        	String ip = args[0];
-        	if (isValidInet4Address(ip)) {
-                IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
-                sendipmessage(sender, result);
-        	} else {
-        		sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
-        	}
-        } else {
-            IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
-            sendipmessage(sender, result);
-        }
-    }
+public class CommandIP extends PlayerCommand {
+	public CommandIP() {
+		super("ip", "bungeecord.command.ip", new String[] { "bip", "betterip" });
+	}
+
+	@Override
+	public void execute(final CommandSender sender, final String[] args) {
+		if (args.length < 1) {
+			sender.sendMessage(ProxyServer.getInstance().getTranslation("username_needed", new Object[0]));
+			return;
+		}
+
+		final ProxiedPlayer user = ProxyServer.getInstance().getPlayer(args[0]);
+
+		if (user == null) {
+			String ip = args[0];
+			if (isValidInet4Address(ip)) {
+				IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
+				sendipmessage(sender, result);
+			} else {
+				sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
+			}
+		} else {
+			IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
+			sendipmessage(sender, result);
+		}
+	}
 
 	public static void sendipmessage(final CommandSender sender, IPCheckerResult result) {
-		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "     §8[§6IPINFO§8]"));
+		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + result.getIP()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7City: §e" + result.getCity()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7Country: §e" + result.getCountry()));
@@ -50,10 +50,24 @@ public class CommandIP extends PlayerCommand
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7Proxy: §e" + result.isProxy()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7TOR: §e" + result.isTOR()));
 		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7Residental: §e" + result.isResidental()));
-		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "     §8[§6IPINFO§8]"));
+		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
 	}
-    
-    
+
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		ArrayList<String> sug = new ArrayList<String>();
+		String complete = "" + args[args.length - 1];
+		if (args.length == 1) {
+			if (sender.hasPermission("bungeecord.command.ip")) {
+				for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+					if (all.getName().toLowerCase().startsWith(complete.toLowerCase())) {
+						sug.add(all.getName());
+					}
+				}
+			}
+		}
+		return sug;
+	}
 
 	private static final String IPV4_REGEX = "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$";
 
