@@ -1,6 +1,8 @@
 package net.md_5.bungee.api;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.Getter;
@@ -26,13 +28,18 @@ public class NotifyManager {
 	
 	private ProxyServer server = ProxyServer.getInstance();
 
-	private CopyOnWriteArrayList<String> messages = new CopyOnWriteArrayList<String>();
+	private ConcurrentLinkedQueue<String> messages = new ConcurrentLinkedQueue<String>();
 
-	@Getter
-	private CopyOnWriteArrayList<String> discordmessages = new CopyOnWriteArrayList<String>();
+	
+	
+	
+	private ConcurrentLinkedQueue<String> discordmessages = new ConcurrentLinkedQueue<String>();;
 
-	public ConcurrentHashMap<String,ChatMessageType> players = new ConcurrentHashMap<String,ChatMessageType>();
+	
+	private ConcurrentHashMap<String,ChatMessageType> players = new ConcurrentHashMap<String,ChatMessageType>();
 
+	
+	
 	public NotifyManager() {
 		loop();
 	}
@@ -65,8 +72,7 @@ public class NotifyManager {
 		this.run(() -> {
 			if (messages.size() > 0) {
 				String message = "§cNone";
-				message = messages.get(0);
-				messages.remove(message);
+				message = messages.poll();
 				if (consoleoutput) {
 					System.out.println(message.replaceAll("§", ""));
 				}
@@ -93,23 +99,24 @@ public class NotifyManager {
 			while (true) {
 				send();
 				try {
-					if (messages.size() > 12500) {
+					if (messages.size() > 3000) {
+						
 					} else if (messages.size() > 1750) {
 						Thread.sleep(1);
-					} else if (messages.size() > 1000) {
-						Thread.sleep(5);
-					} else if (messages.size() > 500) {
-						Thread.sleep(10);
+					} else if (messages.size() > 350) {
+						Thread.sleep(3);
 					} else if (messages.size() > 250) {
+						Thread.sleep(5);
+					} else if (messages.size() > 125) {
+						Thread.sleep(10);
+					} else if (messages.size() > 50) {
 						Thread.sleep(25);
-					} else if (messages.size() > 100) {
-						Thread.sleep(75);
-					} else if (messages.size() > 35) {
-						Thread.sleep(250);
 					} else if (messages.size() > 10) {
-						Thread.sleep(350);
-					} else if (messages.size() <= 10) {
-						Thread.sleep(2000);
+						Thread.sleep(250);
+					} else if (messages.size() > 6) {
+						Thread.sleep(500);
+					} else if (messages.size() <= 3) {
+						Thread.sleep(1000);
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -135,7 +142,7 @@ public class NotifyManager {
 	
 	
 	
-	public CopyOnWriteArrayList<String> getMessages() {
+	public ConcurrentLinkedQueue<String> getMessages() {
 		return messages;
 	}
 	
@@ -176,5 +183,18 @@ public class NotifyManager {
 
 	public static NotifyManager getInstance() {
 		return Instance;
+	}
+
+	public ConcurrentLinkedQueue<String> getDiscordmessages() {
+		return discordmessages;
+	}
+
+
+	public void deleteDiscordmessages() {
+		discordmessages.clear();
+	}
+
+	public ConcurrentHashMap<String, ChatMessageType> getPlayers() {
+		return players;
 	}
 }

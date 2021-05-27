@@ -7,12 +7,16 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.*;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.*;
+import net.md_5.bungee.api.event.ChatEvent;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.event.EventHandler;
 
 public class CommandIP extends PlayerCommand {
+	
 	public CommandIP() {
 		super("ip", "bungeecord.command.ip", new String[] { "bip", "betterip" });
 	}
-
+	
 	@Override
 	public void execute(final CommandSender sender, final String[] args) {
 		if (args.length < 1) {

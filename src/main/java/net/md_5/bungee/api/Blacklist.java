@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -21,13 +23,19 @@ public class Blacklist {
 
 	private ConcurrentHashMap<String, Integer> ratelimit = new ConcurrentHashMap<String, Integer>();
 
+	
+	
+	private ConcurrentHashMap<String, Integer> auth = new ConcurrentHashMap<String, Integer>();
+
+	
+	
 	private int globalratelimit = 0;
+
+	private int globalfaviconlimit = 0;
 
 	private int connectionratelimit = 0;
 
 	private int peripratelimit = 0;
-
-	private CopyOnWriteArrayList<Integer> averagecpslist = new CopyOnWriteArrayList<Integer>();
 
 	@Getter
 	private int averagecps = 0;
@@ -39,22 +47,15 @@ public class Blacklist {
 	@Getter
 	private boolean protection = false;
 
-	private List<String> blacklist = Collections.synchronizedList(new ArrayList<String>());
 
-	private List<String> whitelist = Collections.synchronizedList(new ArrayList<String>());
 
-	
-	//gets removed if the new lists are good tested
-	private CopyOnWriteArrayList<String> oldblacklist = new CopyOnWriteArrayList<String>();
+	private Set<String> blacklist = ConcurrentHashMap.newKeySet();
+
+	private Set<String> whitelist = ConcurrentHashMap.newKeySet();
 
 	
 	
-	//gets removed if the new lists are good tested
-	private CopyOnWriteArrayList<String> oldwhitelist = new CopyOnWriteArrayList<String>();
-
-	
-	
-	public List<String> getBlacklist() {
+	public Set<String> getBlacklist() {
 		return blacklist;
 	}
 
@@ -69,7 +70,7 @@ public class Blacklist {
 		if (!protection) {
 			return;
 		}
-		BungeeCord.getInstance().getBetterBungee().getRemoveblacklist().add(stg);
+		StatisticsAPI.getInstance().addblockedConnection();
 		blacklist.add(stg);
 		return;
 	}
@@ -107,7 +108,7 @@ public class Blacklist {
 		return blacklist.remove(stg);
 	}
 
-	public void setBlacklist(List<String> blacklist) {
+	public void setBlacklist(Set<String> blacklist) {
 		this.blacklist = blacklist;
 	}
 
@@ -117,9 +118,11 @@ public class Blacklist {
 
 	public Blacklist() {
 		new Thread(() -> {
+			
+			List<Integer> averagecpslist = new ArrayList<Integer>();
+			
 			while (true) {
 				try {
-
 					for (Entry<String, Integer> es : ratelimit.entrySet()) {
 						if (es.getValue() > 0) {
 							ratelimit.put(es.getKey(), es.getValue() - 1);
@@ -127,9 +130,9 @@ public class Blacklist {
 							ratelimit.remove(es.getKey());
 						}
 					}
-
+					
 					int average = 0;
-
+					
 					averagecpslist.add(connectionratelimit);
 
 					if (averagecpslist.size() > 10) {
@@ -138,6 +141,7 @@ public class Blacklist {
 							average += integer;
 						}
 					}
+					
 					if (average == 0) {
 						averagecps = 0;
 					} else {
@@ -177,11 +181,11 @@ public class Blacklist {
 		ratelimit.put(ip, ratelimit.get(ip) - 1);
 	}
 
-	public List<String> getWhitelist() {
+	public Set<String> getWhitelist() {
 		return whitelist;
 	}
 
-	public void setWhitelist(List<String> whitelist) {
+	public void setWhitelist(Set<String> whitelist) {
 		this.whitelist = whitelist;
 	}
 
@@ -262,6 +266,14 @@ public class Blacklist {
 		final SocketAddress remote = channel.getRemoteAddress();
 		final String addr = remote != null ? remote.toString() : "";
 		return addr.split("/")[1].split(":")[0];
+	}
+
+	public int getGlobalfaviconlimit() {
+		return globalfaviconlimit;
+	}
+
+	public void setGlobalfaviconlimit(int globalfaviconlimit) {
+		this.globalfaviconlimit = globalfaviconlimit;
 	}
 
 }

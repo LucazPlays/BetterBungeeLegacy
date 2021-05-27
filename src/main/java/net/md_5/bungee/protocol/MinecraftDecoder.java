@@ -12,6 +12,7 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.StatisticsAPI;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants.Direction;
@@ -40,66 +41,82 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 		ByteBuf slice = in.copy(); // Can't slice this one due to EntityMap :(
 
 		try {
+
 			int packetId = DefinedPacket.readVarInt(in);
-			
+
 			if (prot.getDirection() == Direction.TO_SERVER) {
+
+				if (packetId == EnumPackets.HANDSHAKE.getId()) {
+					if (BungeeCord.getInstance().getBetterBungee().isDevdebugmode()) {
+						NotifyManager.getInstance().addmessage("§aDebug #122");
+					}
+				}
+
+				if (packetId == EnumPackets.SETTINGS.getId()) {
+					if (BungeeCord.getInstance().getBetterBungee().isDevdebugmode()) {
+						NotifyManager.getInstance().addmessage("§aDebug #323");
+					}
+				}
+
 				if (Blacklist.getInstance().isProtection()) {
 					if (packetId > Protocol.MAX_PACKET_ID) {
 						String ip = Blacklist.getInstance().getRealAdress(ctx);
 						Blacklist.getInstance().addBlacklist(ip);
 						NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cBadpacket");
-	
-						ctx.close();
-	
-						slice = null;
 						
+						ctx.close();
+
+						slice = null;
+
 						if (slice != null) {
 							slice.release();
 						}
-						
+						in.release();
 						return;
 					}
 				}
 				if (BungeeCord.getInstance().getBetterBungee().isPacketsizelimit()) {
-				if (slice.readableBytes() > BungeeCord.getInstance().getBetterBungee().getPacketsizelimitsize()) {
-					
-					ProxiedPlayer player = getPlayer(ctx.channel().remoteAddress());
+					if (slice.readableBytes() > BungeeCord.getInstance().getBetterBungee().getPacketsizelimitsize()) {
 
-					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + player.getName() + " §8- §dto big packet " + packetId);
-					
-					Blacklist.getInstance().addlimit(Blacklist.getInstance().getRealAdress(ctx), 30);
-					
-					ctx.close();
+						ProxiedPlayer player = getPlayer(ctx.channel().remoteAddress());
 
-					slice = null;
-					
-					if (slice != null) {
-						slice.release();
+						NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + player.getName() + " §8- §dto big packet " + packetId);
+
+						StatisticsAPI.getInstance().addBlockedCrashAttempts();
+
+						if (Blacklist.getInstance().isProtection()) {
+							Blacklist.getInstance().addlimit(Blacklist.getInstance().getRealAdress(ctx), 32);
+						}
+						
+						ctx.close();
+
+						if (slice != null) {
+							slice.release();
+						}
+						return;
 					}
-					
-					return;
-				}
 				}
 			}
 
 			DefinedPacket packet = prot.createPacket(packetId, protocolVersion);
-			
+
 			if (packet != null) {
-				
+
 				packet.read(in, prot.getDirection(), protocolVersion);
-				
+
 				if (in.isReadable()) {
-					throw new BadPacketException("Did not read all bytes from packet " + packet.getClass() + " " + packetId + " Protocol " + protocol + " Direction " + prot.getDirection());
+					throw new BadPacketException("Did not read all bytes from packet " + packet.getClass() + " "
+							+ packetId + " Protocol " + protocol + " Direction " + prot.getDirection());
 				}
-				
+
 			} else {
 				in.skipBytes(in.readableBytes());
 			}
 
 			out.add(new PacketWrapper(packet, slice));
-			
+
 			slice = null;
-			
+
 		} finally {
 			if (slice != null) {
 				slice.release();

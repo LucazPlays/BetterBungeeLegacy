@@ -18,6 +18,7 @@ import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.IPChecker;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.StatisticsAPI;
 import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.connection.PingHandler;
@@ -71,6 +72,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			if (list.isBlacklisted(ip)) {
 				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
 				ctx.close();
+				StatisticsAPI.getInstance().addblockedConnection();
 				return;
 			}
 			
@@ -86,6 +88,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				if (list.containswhitelist(ip)) {
 					list.removeWhitelist(ip);
 				}
+				StatisticsAPI.getInstance().addblockedConnection();;
 				return;
 			}
 			
@@ -94,6 +97,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
 					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
 					ctx.close();
+					StatisticsAPI.getInstance().addblockedConnection();
 					return;
 				}
 			}

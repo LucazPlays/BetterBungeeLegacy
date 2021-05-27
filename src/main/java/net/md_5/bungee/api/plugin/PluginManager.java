@@ -298,7 +298,9 @@ public class PluginManager {
 					listener);
 		}
 		this.eventBus.register(listener);
-		this.listenersByPlugin.put(plugin, listener);
+		if (plugin != null) {
+			this.listenersByPlugin.put(plugin, listener);
+		}
 	}
 
 	public void unregisterListener(final Listener listener) {

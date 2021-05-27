@@ -6,8 +6,17 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.io.FileUtils;
@@ -26,6 +35,134 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 public class BetterBungee {
 
+	public boolean isApiconnection() {
+		return apiconnection;
+	}
+
+	public void setApiconnection(boolean apiconnection) {
+		this.apiconnection = apiconnection;
+	}
+
+	public boolean isFirewallsync() {
+		return firewallsync;
+	}
+
+	public int getPacketsizelimitsize() {
+		return packetsizelimitsize;
+	}
+
+	public boolean isPacketsizelimit() {
+		return packetsizelimit;
+	}
+
+	public boolean isManuelupdates() {
+		return manuelupdates;
+	}
+
+	public ArrayList<DownloadablePlugin> getPluginlist() {
+		return pluginlist;
+	}
+
+	public ConcurrentLinkedQueue<String> getAddwhitelist() {
+		return addwhitelist;
+	}
+
+	public void setAddwhitelist(ConcurrentLinkedQueue<String> addwhitelist) {
+		this.addwhitelist = addwhitelist;
+	}
+
+	public ConcurrentLinkedQueue<String> getAddblacklist() {
+		return addblacklist;
+	}
+
+	public void setAddblacklist(ConcurrentLinkedQueue<String> addblacklist) {
+		this.addblacklist = addblacklist;
+	}
+
+	public ConcurrentLinkedQueue<String> getRemovewhitelist() {
+		return removewhitelist;
+	}
+
+	public void setRemovewhitelist(ConcurrentLinkedQueue<String> removewhitelist) {
+		this.removewhitelist = removewhitelist;
+	}
+
+	public ConcurrentLinkedQueue<String> getRemoveblacklist() {
+		return removeblacklist;
+	}
+
+	public void setRemoveblacklist(ConcurrentLinkedQueue<String> removeblacklist) {
+		this.removeblacklist = removeblacklist;
+	}
+
+	public boolean isDiscordintegration() {
+		return discordintegration;
+	}
+
+	public void setDiscordintegration(boolean discordintegration) {
+		this.discordintegration = discordintegration;
+	}
+
+	public String getDenyVPNbypasspermission() {
+		return denyVPNbypasspermission;
+	}
+
+	public void setDenyVPNbypasspermission(String denyVPNbypasspermission) {
+		this.denyVPNbypasspermission = denyVPNbypasspermission;
+	}
+
+	public String getDenyVPNkickmessage() {
+		return denyVPNkickmessage.replaceAll("&", "§");
+	}
+
+	public void setDenyVPNkickmessage(String denyVPNkickmessage) {
+		this.denyVPNkickmessage = denyVPNkickmessage;
+	}
+
+	public boolean isDenyVPNonJoin() {
+		return denyVPNonJoin;
+	}
+
+	public void setDenyVPNonJoin(boolean denyVPNonJoin) {
+		this.denyVPNonJoin = denyVPNonJoin;
+	}
+
+	public boolean isProxyProtocol() {
+		return ProxyProtocol;
+	}
+
+	public void setProxyProtocol(boolean proxyProtocol) {
+		ProxyProtocol = proxyProtocol;
+	}
+
+	public boolean isDisablebungeecommands() {
+		return disablebungeecommands;
+	}
+
+	public boolean isProtection() {
+		return protection;
+	}
+
+	public int getGloballimit() {
+		return globallimit;
+	}
+
+	public int getPeriplimit() {
+		return periplimit;
+	}
+
+	public int getSnapshotupdatecountdown() {
+		return snapshotupdatecountdown;
+	}
+
+	public boolean isRestartonupdate() {
+		return restartonupdate;
+	}
+
+	public boolean isSnapshotupdate() {
+		return snapshotupdate;
+	}
+
 	String betterbungee = "http://betterbungeeapi.skydb.de";
 
 	String uuid = "";
@@ -34,7 +171,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.87";
+	public String Version = "0.92";
 
 	long lastfirewallsync = 0;
 
@@ -42,90 +179,86 @@ public class BetterBungee {
 
 	int updatecheckfrequency = 0;
 
-	@Getter
 	boolean updated = false;
 
-	@Getter
 	boolean snapshotupdate = false;
 
-	@Getter
 	boolean restartonupdate = false;
 
-	@Getter
 	int snapshotupdatecountdown = 10;
 
-	@Getter
 	int periplimit = 2;
 
-	@Getter
 	int globallimit = 100;
 
-	@Getter
 	boolean protection = false;
 
-	@Getter
 	boolean disablebungeecommands = false;
 
-	@Getter
-	@Setter
 	boolean ProxyProtocol = false;
 
-	@Getter
-	@Setter
 	boolean denyVPNonJoin = false;
 
-	@Getter
-	@Setter
 	String denyVPNkickmessage = "Kicked by AntiVPN";
 
-	@Getter
-	@Setter
 	String denyVPNbypasspermission = "antivpn.bypass";
 
-	@Getter
-	@Setter
 	boolean discordintegration = false;
 
-	@Getter
-	@Setter
-	CopyOnWriteArrayList<String> serverlistusers = new CopyOnWriteArrayList<>();
+//	CopyOnWriteArrayList<String> serverlistusers = new CopyOnWriteArrayList<>();
 
-	@Getter
-	@Setter
-	CopyOnWriteArrayList<String> addwhitelist = new CopyOnWriteArrayList<>();
+//	CopyOnWriteArrayList<String> addwhitelist = new CopyOnWriteArrayList<>();
 
-	@Getter
-	@Setter
-	CopyOnWriteArrayList<String> addblacklist = new CopyOnWriteArrayList<>();
+//	CopyOnWriteArrayList<String> addblacklist = new CopyOnWriteArrayList<>();
 
-	@Getter
-	@Setter
-	CopyOnWriteArrayList<String> removewhitelist = new CopyOnWriteArrayList<>();
+//	CopyOnWriteArrayList<String> removewhitelist = new CopyOnWriteArrayList<>();
 
-	@Getter
-	@Setter
-	CopyOnWriteArrayList<String> removeblacklist = new CopyOnWriteArrayList<>();
+//	CopyOnWriteArrayList<String> removeblacklist = new CopyOnWriteArrayList<>();
 
-	@Getter
+	private ConcurrentLinkedQueue<String> removewhitelist = new ConcurrentLinkedQueue<String>();
+
+	private ConcurrentLinkedQueue<String> removeblacklist = new ConcurrentLinkedQueue<String>();
+
+	private ConcurrentLinkedQueue<String> addblacklist = new ConcurrentLinkedQueue<String>();
+
+	private ConcurrentLinkedQueue<String> addwhitelist = new ConcurrentLinkedQueue<String>();
+
 	ArrayList<DownloadablePlugin> pluginlist = new ArrayList<>();
 
-	@Getter
 	boolean manuelupdates = false;
 
-	@Getter
 	private boolean packetsizelimit = false;
-	
-	@Getter
+
 	private int packetsizelimitsize = 8000;
 
-	@Getter
 	private boolean firewallsync;
 
-	@Getter
-	@Setter
 	boolean apiconnection = false;
 
+	private int faviconlimit = 7;
+
+	private boolean devdebugmode = false;
+
+	private Set<String> hostnames = ConcurrentHashMap.newKeySet();
+
+	private boolean hostprotectionnames = false;
+
+	private Set<String> forcewhitelistedips = ConcurrentHashMap.newKeySet();
+
+	private boolean proxycheckonauth = false;
+
+	private Integer startdenyproxyauthlimit = 2;
+	
+
+	private boolean pingcheck = false;
+
+	private Integer pingcheckonconnectlimit = 20;
+	
+
+	private static BetterBungee instance;
+	
 	public BetterBungee() {
+		instance = this;
 		createConfigs();
 		Thread betterbungeethread = new Thread(() -> {
 			BungeeCordLauncher.crashed = false;
@@ -177,9 +310,9 @@ public class BetterBungee {
 		betterbungeethread.setPriority(Thread.MIN_PRIORITY);
 		betterbungeethread.start();
 	}
-	
+
 	public static final String updatemessage = "§7Restarting §eProxy-Server§7 due to a §aUpdate§7 from §6BetterBungee";
-	
+
 	public void onStart() {
 		if (update()) {
 			ProxyServer.getInstance().stop(updatemessage);
@@ -216,6 +349,8 @@ public class BetterBungee {
 
 			String firewallsync = "serversettings.firewallsync";
 
+			String firewall = "serversettings.firewallsync";
+
 			String denyvpns = "serversettings.denyvpnjoins";
 
 			String denyvpnkickmessage = "serversettings.denyvpnkickmessage";
@@ -228,6 +363,12 @@ public class BetterBungee {
 
 			String limitperip = "serversettings.limitcpsperip";
 
+			String faviconlimit = "serversettings.faviconspersecond";
+
+			String hostnameprotection = "serversettings.onlyhostname";
+			
+			String hostnames = "serversettings.hostnames";
+
 			String updatecheckfrequencysetting = "serversettings.updatecheckfrequencyinminutes";
 
 			String discordintegration = "serversettings.discordintegration";
@@ -238,6 +379,22 @@ public class BetterBungee {
 
 			String packetsizelimitsize = "serversettings.packetsizelimitsize";
 
+			String devdebugmode = "serversettings.devdebugmode";
+
+			String forcewhitelistedips = "serversettings.forcewhitelistedips";
+
+
+			String proxycheckonauth = "serversettings.denyproxyauths";
+
+			String startdenyproxyauthlimit = "serversettings.startdenyproxyauthlimit";
+
+			
+			
+			String pingcheck = "serversettings.checkifserverlistpinged";
+
+			String pingcheckonconnectlimit = "serversettings.denyifnotpingedlimit";
+			
+			
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
 			addDefault(config, snapshotupdater, "false");
@@ -252,16 +409,32 @@ public class BetterBungee {
 
 			addDefault(config, firewallsync, "true");
 
+			addDefault(config, hostnameprotection, "false");
+			
+			addDefault(config, hostnames, "play.domain.com,domain.com");
+
 			addDefault(config, denyvpns, "false");
 
-			addDefault(config, denyvpnkickmessage, "Kicked by AntiVPN");
+			addDefault(config, denyvpnkickmessage, "&cKicked by AntiVPN");
 
 			addDefault(config, denyvpnbypasspermission, "antivpn.bypass");
 
 			addDefault(config, globallimit, "100");
 
-			addDefault(config, limitperip, "3");
+			addDefault(config, faviconlimit, "7");
 
+			addDefault(config, limitperip, "3");
+			
+			addDefault(config, proxycheckonauth, "false");
+
+			addDefault(config, startdenyproxyauthlimit, "2");
+
+			
+			addDefault(config, pingcheck, "false");
+
+			addDefault(config, pingcheckonconnectlimit, "20");
+			
+			
 			addDefault(config, updatecheckfrequencysetting, "15");
 
 			addDefault(config, discordintegration, "false");
@@ -271,7 +444,11 @@ public class BetterBungee {
 			addDefault(config, packetsizelimit, "false");
 
 			addDefault(config, packetsizelimitsize, "8000");
+			
+			addDefault(config, devdebugmode, "false");
 
+			addDefault(config, forcewhitelistedips, "127.0.0.2,127.0.0.3");
+			
 			String configuuid = "serverdata.uuid";
 
 			String configkey = "serverdata.key";
@@ -289,7 +466,7 @@ public class BetterBungee {
 				}
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
-			
+
 			this.uuid = config.getString(configuuid);
 
 			this.password = config.getString(configkey);
@@ -314,9 +491,15 @@ public class BetterBungee {
 
 			this.periplimit = Integer.valueOf(config.getString(limitperip));
 
+			this.faviconlimit = Integer.valueOf(config.getString(faviconlimit));
+
 			this.disablebungeecommands = config.getString(disablebungeecommands).equalsIgnoreCase("true");
 
 			this.updatecheckfrequency = Integer.valueOf(config.getString(limitperip));
+			
+			this.proxycheckonauth = config.getString(proxycheckonauth).equalsIgnoreCase("true");
+			
+			this.startdenyproxyauthlimit = Integer.valueOf(config.getString(startdenyproxyauthlimit));
 
 			this.discordintegration = config.getString(discordintegration).equalsIgnoreCase("true");
 
@@ -326,6 +509,22 @@ public class BetterBungee {
 
 			this.packetsizelimitsize = Integer.valueOf(config.getString(packetsizelimitsize));
 
+			this.devdebugmode = config.getString(devdebugmode).equalsIgnoreCase("true");
+
+			this.hostprotectionnames = config.getString(hostnameprotection).equalsIgnoreCase("true");
+
+			this.hostnames.addAll(Arrays.asList(config.getString(hostnames).toLowerCase(Locale.ROOT).split(",")));
+
+			this.forcewhitelistedips.addAll(Arrays.asList(config.getString(forcewhitelistedips).split(",")));
+			
+			this.pingcheck = config.getString(pingcheck).equalsIgnoreCase("true");
+			
+			this.pingcheckonconnectlimit = Integer.valueOf(config.getString(pingcheckonconnectlimit));
+
+			
+			
+			
+
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
@@ -333,91 +532,113 @@ public class BetterBungee {
 			Blacklist.getInstance().setGlobalratelimit(this.globallimit);
 
 			Blacklist.getInstance().setPerIPratelimit(this.periplimit);
+			
+			Blacklist.getInstance().setGlobalfaviconlimit(this.faviconlimit);
 
 			if (snapshotupdate) {
-				Version = String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length());
+				Version = String.valueOf(
+						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+								.length());
 			}
 
 			if (this.discordintegration) {
 				NotifyManager.getInstance().setDiscord(this.discordintegration);
 				new Thread(() -> {
+					sleep(5500);
 					while (BungeeCord.getInstance().isRunning) {
 						if (apiconnection) {
 							if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
-								if (discord(NotifyManager.getInstance().getDiscordmessages())) {
-									NotifyManager.getInstance().getDiscordmessages().clear();
+
+								Set<String> set = ConcurrentHashMap.newKeySet();
+								
+								if (NotifyManager.getInstance().getDiscordmessages().size() > 15) {
+									for (int i = 0; i < 15; i++) {
+										set.add(NotifyManager.getInstance().getDiscordmessages().poll());
+									}
+								} else {
+									set.addAll(NotifyManager.getInstance().getDiscordmessages());
+									NotifyManager.getInstance().deleteDiscordmessages();
 								}
+								discord(set);
 							}
 						}
-						try {
-							Thread.sleep(1000);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						sleep(1000);
 					}
 				}).start();
 			}
 
 			if (this.firewallsync) {
-				NotifyManager.getInstance().setDiscord(this.discordintegration);
 				new Thread(() -> {
+					sleep(5500);
 					while (BungeeCord.getInstance().isRunning) {
 						if (apiconnection) {
-							if (this.firewallsync) {
-								if (lastfirewallsync < System.currentTimeMillis() - (1000 * 10)) {
-									lastfirewallsync = System.currentTimeMillis();
-
-									if (addwhitelist.size() > 0) {
-										addwhitelist(addwhitelist);
-										addwhitelist.clear();
-									}
-
-									if (addblacklist.size() > 0) {
-										addblacklist(addblacklist);
-										addblacklist.clear();
-									}
-
-									if (removewhitelist.size() > 0) {
-										removewhitelist(removewhitelist);
-										removewhitelist.clear();
-									}
-
-									if (removeblacklist.size() > 0) {
-										removeblacklist(removeblacklist);
-										removeblacklist.clear();
-									}
-								}
+							if (lastfirewallsync < System.currentTimeMillis() - (1000 * 5)) {
+								lastfirewallsync = System.currentTimeMillis();
+								syncfirewallwithrestapi();
+								sleep(2500);
 							}
 
 						}
-						try {
-							Thread.sleep(3000);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						sleep(3000);
 					}
 				}).start();
 			}
-
-//			if (this.firewallsync) {
-//				new Thread(() -> {
-//					while (BungeeCord.getInstance().isRunning) {
-//						if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
-//							if (discord(NotifyManager.getInstance().getDiscordmessages())) {
-//								NotifyManager.getInstance().getDiscordmessages().clear();
-//							}
-//						}
-//						try {
-//							Thread.sleep(60000);
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
-//					}
-//				}).start();
-//			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void syncfirewallwithrestapi() {
+		if (addwhitelist.size() > 0) {
+			Set<String> set = ConcurrentHashMap.newKeySet();
+			if (addwhitelist.size() > 20) {
+				for (int i = 0; i < 20; i++) {
+					set.add(addwhitelist.poll());
+				}
+			} else {
+				set.addAll(addwhitelist);
+				addwhitelist.clear();
+			}
+			addwhitelist(set);
+		}
+
+		if (addblacklist.size() > 0) {
+			Set<String> set = ConcurrentHashMap.newKeySet();
+			if (addblacklist.size() > 20) {
+				for (int i = 0; i < 20; i++) {
+					set.add(addblacklist.poll());
+				}
+			} else {
+				set.addAll(addblacklist);
+				addblacklist.clear();
+			}
+			addblacklist(set);
+		}
+
+		if (removewhitelist.size() > 0) {
+			Set<String> set = ConcurrentHashMap.newKeySet();
+			if (removewhitelist.size() > 20) {
+				for (int i = 0; i < 20; i++) {
+					set.add(removewhitelist.poll());
+				}
+			} else {
+				set.addAll(removewhitelist);
+				removewhitelist.clear();
+			}
+			removewhitelist(set);
+		}
+
+		if (removeblacklist.size() > 0) {
+			Set<String> set = ConcurrentHashMap.newKeySet();
+			if (removeblacklist.size() > 20) {
+				for (int i = 0; i < 20; i++) {
+					set.add(removeblacklist.poll());
+				}
+			} else {
+				set.addAll(removeblacklist);
+				removeblacklist.clear();
+			}
+			removeblacklist(set);
 		}
 	}
 
@@ -452,8 +673,6 @@ public class BetterBungee {
 			if (!response.getFailed()) {
 				try {
 					String newestnapshotid = response.getText().replaceAll("\n", "").split(":")[1];
-//					System.out.println("Newest-Snapshot ID: "+newestnapshotid);
-//					System.out.println("Snapshot ID: "+String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()));
 					if (!newestnapshotid.equals(String.valueOf(
 							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
 									.length()))) {
@@ -545,14 +764,14 @@ public class BetterBungee {
 		return false;
 	}
 
-	private boolean discord(CopyOnWriteArrayList<String> copyOnWriteArrayList) {
+	private boolean discord(Set<String> set) {
 		if (session == null) {
 			return false;
 		}
 
 		String messages = "";
 
-		for (String message : copyOnWriteArrayList) {
+		for (String message : set) {
 			if (message != null) {
 				messages += stringtobase64(message) + ",";
 			}
@@ -563,7 +782,7 @@ public class BetterBungee {
 		return !response.getFailed();
 	}
 
-	private boolean addblacklist(CopyOnWriteArrayList<String> blacklist) {
+	private boolean addblacklist(Set<String> blacklist) {
 		if (session == null) {
 			return false;
 		}
@@ -581,14 +800,14 @@ public class BetterBungee {
 		return !response.getFailed();
 	}
 
-	private boolean removeblacklist(CopyOnWriteArrayList<String> blacklist) {
+	private boolean removeblacklist(Set<String> removeblacklist2) {
 		if (session == null) {
 			return false;
 		}
 
 		String messages = "";
 
-		for (String message : blacklist) {
+		for (String message : removeblacklist2) {
 			if (message != null) {
 				messages += message + ",";
 			}
@@ -599,14 +818,14 @@ public class BetterBungee {
 		return !response.getFailed();
 	}
 
-	private boolean addwhitelist(CopyOnWriteArrayList<String> whitelist) {
+	private boolean addwhitelist(Set<String> addwhitelist2) {
 		if (session == null) {
 			return false;
 		}
 
 		String messages = "";
 
-		for (String message : whitelist) {
+		for (String message : addwhitelist2) {
 			if (message != null) {
 				messages += message + ",";
 			}
@@ -617,14 +836,14 @@ public class BetterBungee {
 		return !response.getFailed();
 	}
 
-	private boolean removewhitelist(CopyOnWriteArrayList<String> whitelist) {
+	private boolean removewhitelist(Set<String> removewhitelist2) {
 		if (session == null) {
 			return false;
 		}
 
 		String messages = "";
 
-		for (String message : whitelist) {
+		for (String message : removewhitelist2) {
 			if (message != null) {
 				messages += message + ",";
 			}
@@ -661,5 +880,73 @@ public class BetterBungee {
 
 	private String base64tostring(String stg) {
 		return new String(Base64.getDecoder().decode(stg.getBytes()));
+	}
+
+	public boolean isDevdebugmode() {
+		return devdebugmode;
+	}
+
+	public void setDevdebugmode(boolean devdebugmode) {
+		this.devdebugmode = devdebugmode;
+	}
+
+	public Set<String> getHostnames() {
+		return hostnames;
+	}
+
+	public void setHostnames(Set<String> hostnames) {
+		this.hostnames = hostnames;
+	}
+
+	public boolean isHostprotectionnames() {
+		return hostprotectionnames;
+	}
+
+	public void setHostprotectionnames(boolean hostprotectionnames) {
+		this.hostprotectionnames = hostprotectionnames;
+	}
+
+	public Set<String> getForcewhitelistedips() {
+		return forcewhitelistedips;
+	}
+
+	public void setForcewhitelistedips(Set<String> forcewhitelistedips) {
+		this.forcewhitelistedips = forcewhitelistedips;
+	}
+
+	public static BetterBungee getInstance() {
+		return instance;
+	}
+
+	public Integer getStartdenyproxyauthlimit() {
+		return startdenyproxyauthlimit;
+	}
+
+	public void setStartdenyproxyauthlimit(Integer startdenyproxyauthlimit) {
+		this.startdenyproxyauthlimit = startdenyproxyauthlimit;
+	}
+
+	public boolean isProxycheckonauth() {
+		return proxycheckonauth;
+	}
+
+	public void setProxycheckonauth(boolean proxycheckonauth) {
+		this.proxycheckonauth = proxycheckonauth;
+	}
+
+	public boolean isPingcheck() {
+		return pingcheck;
+	}
+
+	public void setPingcheck(boolean pingcheck) {
+		this.pingcheck = pingcheck;
+	}
+
+	public Integer getPingcheckonconnectlimit() {
+		return pingcheckonconnectlimit;
+	}
+
+	public void setPingcheckonconnectlimit(Integer pingcheckonconnectlimit) {
+		this.pingcheckonconnectlimit = pingcheckonconnectlimit;
 	}
 }

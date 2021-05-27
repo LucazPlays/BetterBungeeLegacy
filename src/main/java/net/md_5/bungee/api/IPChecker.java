@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -11,19 +12,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.google.gson.Gson;
 
-import io.netty.channel.ChannelHandlerContext;
-import lombok.Getter;
-import lombok.Setter;
-import net.md_5.bungee.netty.ChannelWrapper;
-
 public class IPChecker {
 	
-	@Getter
 	private static IPChecker Instance = new IPChecker();
 
 	private boolean serviceonline = false;
 	
-	CopyOnWriteArrayList<String> checklist = new CopyOnWriteArrayList<String>();
+	Set<String> badips = ConcurrentHashMap.newKeySet();
 	
 	ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 	
@@ -38,7 +33,6 @@ public class IPChecker {
 						serviceonline = true;
 					}
 					Thread.sleep(60000);
-//					checkthemall();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -47,11 +41,15 @@ public class IPChecker {
 	}
 
 	public boolean isipresidental(String ip) {
+		if (badips.contains(ip)) {
+			return true;
+		}
 		if (serviceonline) {
 			RestAPIResponse isipresidental = RestAPI.getInstance().get("http://ipcheck.skydb.de/residental?ip="+ip);
 			if (isipresidental.getFailed()) {
 				serviceonline = false;
 			} else {
+				badips.add(ip);
 				return isipresidental.getText().contains("true");
 			}
 			
@@ -78,29 +76,11 @@ public class IPChecker {
 		threads.execute(run);
 	}
 
-//	public void addtocheck(String ip) {
-//		if (!checklist.contains(ip)) {
-//			checklist.add(ip);
-//		}
-//	}
+	public static IPChecker getInstance() {
+		return Instance;
+	}
 
-//	public void checkthemall() {
-//		if (serviceonline) {
-//			if (checklist.size() > 0) {
-//				
-//				String ips = "";
-//				
-//				for (String ip : checklist) {
-//					ips += ip + ",";
-//				}
-//
-//				
-//				RestAPIResponse ipcheckeralive = RestAPI.getInstance().info("http://ipcheck.skydb.de/check?ips="+ips);
-//				
-//				checklist.clear();
-//			}
-//		}
-//	}
-	
-	
+	public static void setInstance(IPChecker instance) {
+		Instance = instance;
+	}
 }

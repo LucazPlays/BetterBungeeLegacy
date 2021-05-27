@@ -79,7 +79,7 @@ public class PipelineUtils {
 					new MinecraftEncoder(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion()));
 			ch.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, legacyKicker);
 			ch.pipeline().get(HandlerBoss.class).setHandler(new InitialHandler(BungeeCord.getInstance(), listener));
-
+			
 			if (listener.isProxyProtocol()) {
 				ch.pipeline().addFirst(new HAProxyMessageDecoder());
 			}
