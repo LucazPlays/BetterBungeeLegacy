@@ -70,8 +70,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket>
         }
 
         ByteBuf out = ctx.alloc().buffer();
-        @SuppressWarnings("rawtypes")
-		AddressedEnvelope response = new DatagramPacket( out, msg.sender() );
+        AddressedEnvelope response = new DatagramPacket( out, msg.sender() );
 
         byte type = in.readByte();
         int sessionId = in.readInt();

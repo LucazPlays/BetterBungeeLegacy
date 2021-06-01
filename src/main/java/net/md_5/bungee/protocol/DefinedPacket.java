@@ -214,14 +214,16 @@ public abstract class DefinedPacket
         return new UUID( input.readLong(), input.readLong() );
     }
 
-    public static Tag readTag(ByteBuf input)
+    @SuppressWarnings("resource")
+	public static Tag readTag(ByteBuf input)
     {
         Tag tag = NamedTag.read( new DataInputStream( new ByteBufInputStream( input ) ) );
         Preconditions.checkArgument( !tag.isError(), "Error reading tag: %s", tag.error() );
         return tag;
     }
 
-    public static void writeTag(Tag tag, ByteBuf output)
+    @SuppressWarnings("resource")
+	public static void writeTag(Tag tag, ByteBuf output)
     {
         try
         {

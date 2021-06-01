@@ -125,7 +125,7 @@ public class Commands extends DefinedPacket
         throw new IllegalStateException( "Did not finish building root node" );
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ })
 	@Override
     public void write(ByteBuf buf)
     {
@@ -236,14 +236,13 @@ public class Commands extends DefinedPacket
     private static class NetworkNode
     {
 
-        @SuppressWarnings("rawtypes")
-		private final ArgumentBuilder argumentBuilder;
+        private final ArgumentBuilder argumentBuilder;
         private final byte flags;
         private final int redirectNode;
         private final int[] children;
         private CommandNode command;
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
+        @SuppressWarnings({ })
 		private boolean buildSelf(NetworkNode[] otherNodes)
         {
             // First cycle

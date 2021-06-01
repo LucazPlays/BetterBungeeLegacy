@@ -328,18 +328,25 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			if (args[0].equalsIgnoreCase("notifications")) {
 				if (args.length == 2) {
 					if (args[1].equalsIgnoreCase("chat")) {
-						sender.sendMessage(TextComponent
-								.fromLegacyText(BungeeCord.PREFIX + "§9Notifications §7set to Chat!"));
+						sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§9Notifications §7set to Chat!"));
 						NotifyManager.getInstance().getPlayers().put(sender.getName(), ChatMessageType.CHAT);
 						return;
 					} else if (args[1].equalsIgnoreCase("actionbar")) {
-						sender.sendMessage(TextComponent.fromLegacyText(
-								BungeeCord.PREFIX + "§9Notifications §7set to ActionBar!"));
+						sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§9Notifications §7set to ActionBar!"));
 						NotifyManager.getInstance().getPlayers().put(sender.getName(), ChatMessageType.ACTION_BAR);
 						return;
+					} else if (args[1].equalsIgnoreCase("showcps")) {
+						if (NotifyManager.getInstance().getTitlePlayers().contains(sender.getName())) {
+							sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7removed CPS Title §9Notifications"));
+							NotifyManager.getInstance().getTitlePlayers().remove(sender.getName());
+							return;
+						} else {
+							sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7added CPS Title §9Notifications"));
+							NotifyManager.getInstance().getTitlePlayers().add(sender.getName());
+							return;
+						}
 					}
-					sender.sendMessage(TextComponent.fromLegacyText(
-							BungeeCord.PREFIX + "§7Use /" + bungeename + " notifications chat/actionbar"));
+					sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Use /" + bungeename + " notifications chat/actionbar/showcps"));
 					return;
 				}
 				if (NotifyManager.getInstance().getPlayers().containsKey(sender.getName())) {

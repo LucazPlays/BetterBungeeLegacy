@@ -38,7 +38,8 @@ public class NotifyManager {
 	
 	private ConcurrentHashMap<String,ChatMessageType> players = new ConcurrentHashMap<String,ChatMessageType>();
 
-	
+	private Set<String> titleplayer = ConcurrentHashMap.newKeySet();
+
 	
 	public NotifyManager() {
 		loop();
@@ -84,7 +85,7 @@ public class NotifyManager {
 			}
 			if (Blacklist.getInstance().isUnderattack()) {
 				for (ProxiedPlayer all : server.getPlayers()) {
-					if (players.containsKey(all.getName())) {
+					if (titleplayer.contains(all.getName())) {
 						ProxyServer.getInstance().createTitle().title(TextComponent.fromLegacyText("§cUnder Attack")).subTitle(TextComponent.fromLegacyText("§eCPS §8- §e"+Blacklist.getInstance().getAveragecps())).send(all);
 					}
 				}
@@ -196,5 +197,9 @@ public class NotifyManager {
 
 	public ConcurrentHashMap<String, ChatMessageType> getPlayers() {
 		return players;
+	}
+
+	public Set<String> getTitlePlayers() {
+		return titleplayer;
 	}
 }

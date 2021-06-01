@@ -112,7 +112,6 @@ public class YamlConfig implements ConfigurationAdapter
         return get( path, def, config );
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T get(String path, T def, Map submap)
     {
         int index = path.indexOf( '.' );
@@ -145,7 +144,6 @@ public class YamlConfig implements ConfigurationAdapter
         set( path, val, config );
     }
 
-    @SuppressWarnings("unchecked")
     private void set(String path, Object val, Map submap)
     {
         int index = path.indexOf( '.' );
@@ -304,7 +302,6 @@ public class YamlConfig implements ConfigurationAdapter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<String> getGroups(String player)
     {
         Collection<String> groups = get( "groups." + player, null );
@@ -320,7 +317,6 @@ public class YamlConfig implements ConfigurationAdapter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<String> getPermissions(String group)
     {
         Collection<String> permissions = get( "permissions." + group, null );

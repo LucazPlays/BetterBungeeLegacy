@@ -12,7 +12,8 @@ import net.md_5.bungee.Util;
 public class JenkinsModuleSource implements ModuleSource
 {
 
-    @Override
+    @SuppressWarnings("resource")
+	@Override
     public void retrieve(ModuleSpec module, ModuleVersion version)
     {
         System.out.println( "Attempting to Jenkins download module " + module.getName() + " v" + version.getBuild() );

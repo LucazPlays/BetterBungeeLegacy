@@ -65,8 +65,7 @@ public class Configuration implements ProxyConfig
     private boolean preventProxyConnections;
     private boolean forgeSupport;
 
-    @SuppressWarnings("unchecked")
-	public void load()
+    public void load()
     {
         ConfigurationAdapter adapter = ProxyServer.getInstance().getConfigurationAdapter();
         

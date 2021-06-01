@@ -70,7 +70,6 @@ public final class Configuration
     }
 
     /*------------------------------------------------------------------------*/
-    @SuppressWarnings("unchecked")
     public <T> T get(String path, T def)
     {
         Configuration section = getSectionFor( path );

@@ -87,7 +87,6 @@ public class YamlConfiguration extends ConfigurationProvider
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Configuration load(Reader reader, Configuration defaults)
     {
         Map<String, Object> map = yaml.get().loadAs( reader, LinkedHashMap.class );
@@ -105,7 +104,6 @@ public class YamlConfiguration extends ConfigurationProvider
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Configuration load(InputStream is, Configuration defaults)
     {
         Map<String, Object> map = yaml.get().loadAs( is, LinkedHashMap.class );
@@ -123,7 +121,6 @@ public class YamlConfiguration extends ConfigurationProvider
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Configuration load(String string, Configuration defaults)
     {
         Map<String, Object> map = yaml.get().loadAs( string, LinkedHashMap.class );

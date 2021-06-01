@@ -32,7 +32,6 @@ public class AsyncEvent<T> extends Event
     private final AtomicInteger latch = new AtomicInteger();
 
     @Override
-    @SuppressWarnings("unchecked")
     public void postCall()
     {
         if ( latch.get() == 0 )
@@ -72,7 +71,6 @@ public class AsyncEvent<T> extends Event
      *
      * @param plugin a plugin which has an intent registered for this event
      */
-    @SuppressWarnings("unchecked")
     public void completeIntent(Plugin plugin)
     {
         AtomicInteger intentCount = intents.get( plugin );

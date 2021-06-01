@@ -691,9 +691,7 @@ public class BetterBungee {
 			if (!response.getFailed()) {
 				try {
 					String newestupdateid = response.getText().replaceAll("\n", "").split(":")[1];
-					if (!newestupdateid.equals(String.valueOf(
-							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-									.length()))) {
+					if (!newestupdateid.equals(String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()))) {
 						return updatefromlink(betterbungee + "/downloadupdate");
 					}
 				} catch (URISyntaxException e) {

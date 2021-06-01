@@ -71,7 +71,6 @@ public class JsonConfiguration extends ConfigurationProvider
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Configuration load(Reader reader, Configuration defaults)
     {
         Map<String, Object> map = json.fromJson( reader, LinkedHashMap.class );
@@ -101,7 +100,6 @@ public class JsonConfiguration extends ConfigurationProvider
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Configuration load(String string, Configuration defaults)
     {
         Map<String, Object> map = json.fromJson( string, LinkedHashMap.class );

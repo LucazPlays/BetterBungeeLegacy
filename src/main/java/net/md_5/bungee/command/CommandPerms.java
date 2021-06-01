@@ -11,8 +11,7 @@ public class CommandPerms extends Command
         super("perms");
     }
     
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void execute(final CommandSender sender, final String[] args) {
         final Set<String> permissions = new HashSet<String>();
         for (final String group : sender.getGroups()) {

@@ -291,7 +291,8 @@ public abstract class EntityMap
         packet.readerIndex( readerIndex );
     }
 
-    private static void readSkipSlot(ByteBuf packet, int protocolVersion)
+    @SuppressWarnings("resource")
+	private static void readSkipSlot(ByteBuf packet, int protocolVersion)
     {
         if ( ( protocolVersion >= ProtocolConstants.MINECRAFT_1_13_2 ) ? packet.readBoolean() : packet.readShort() != -1 )
         {

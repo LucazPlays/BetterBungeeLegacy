@@ -148,6 +148,8 @@ public class Blacklist {
 						averagecps = average / averagecpslist.size();
 					}
 
+					underattack = averagecps > 10;
+					
 					connectionratelimit = 0;
 
 					Thread.sleep(1000);
