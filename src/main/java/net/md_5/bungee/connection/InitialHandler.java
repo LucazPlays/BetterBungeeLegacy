@@ -171,7 +171,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			Blacklist.getInstance().addConnectionratelimit(-1);
 			StatisticsAPI.getInstance().addblockedConnection();
 			list.addBlacklist(list.getRealAdress(ch));
-			NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+			if (BetterBungee.getInstance().isDevdebugmode()) {
+				NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+			}
 			ch.close();
 		}
 	}
@@ -359,8 +361,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			if (!BetterBungee.getInstance().getHostnames().contains(handshake.getHost().toLowerCase(Locale.ROOT))) {
 				Blacklist.getInstance().addConnectionratelimit(-1);
 				StatisticsAPI.getInstance().addblockedConnection();
-				NotifyManager.getInstance()
-						.addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §9Invalid Host");
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §9Invalid Host");
+				}
 				ch.close();
 				return;
 			}
@@ -385,7 +388,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 						if (!ServerListAPI.getInstance().pingedbefore(ip)) {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
-							NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
+							if (BetterBungee.getInstance().isDevdebugmode()) {
+								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
+							}
 							ch.close();
 							return;
 						}

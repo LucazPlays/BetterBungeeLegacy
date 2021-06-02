@@ -83,10 +83,14 @@ public class NotifyManager {
 					}
 				}
 			}
+			
 			if (Blacklist.getInstance().isUnderattack()) {
+				Title title = ProxyServer.getInstance().createTitle().title(TextComponent.fromLegacyText("§cUnder Attack")).subTitle(TextComponent.fromLegacyText("§eCPS §8- §c"+Blacklist.getInstance().getAveragecps()));
+				title.fadeIn(0);
+				title.fadeOut(0);
 				for (ProxiedPlayer all : server.getPlayers()) {
 					if (titleplayer.contains(all.getName())) {
-						ProxyServer.getInstance().createTitle().title(TextComponent.fromLegacyText("§cUnder Attack")).subTitle(TextComponent.fromLegacyText("§eCPS §8- §e"+Blacklist.getInstance().getAveragecps())).send(all);
+						title.send(all);
 					}
 				}
 			}

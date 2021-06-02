@@ -61,7 +61,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 	private void filter(ChannelHandlerContext ctx) {
 		String ip = null;
-		
+		list.addConnectionspersecond(1);
 		if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 			ip = list.getRealAdress(channel);
 		} else {
@@ -70,7 +70,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 		
 		if (list.isProtection()) {
 			if (list.isBlacklisted(ip)) {
-				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
+				}
 				ctx.close();
 				StatisticsAPI.getInstance().addblockedConnection();
 				return;
@@ -83,7 +85,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			int rate = list.ratelimit(ip);
 			
 			if (rate > list.getPerIPratelimit()) {
-				notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
+				}
 				ctx.close();
 				if (list.containswhitelist(ip)) {
 					list.removeWhitelist(ip);
@@ -95,7 +99,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			if (!list.containswhitelist(ip)) {
 				list.addConnectionratelimit(1);
 				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
-					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
+					if (BetterBungee.getInstance().isDevdebugmode()) {
+						notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
+					}
 					ctx.close();
 					StatisticsAPI.getInstance().addblockedConnection();
 					return;
@@ -186,7 +192,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 							}
 							
 							Blacklist.getInstance().addBlacklist(ip);
-							NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cCorruptedFrame");
+							if (BetterBungee.getInstance().isDevdebugmode()) {
+								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cCorruptedFrame");
+							}
 							ctx.close();
 							return;
 						}
@@ -208,7 +216,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 							}
 							
 							Blacklist.getInstance().addBlacklist(ip);
-							NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cIllegalState");
+							if (BetterBungee.getInstance().isDevdebugmode()) {
+								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cIllegalState");
+							}
 							ctx.close();
 							return;
 						}

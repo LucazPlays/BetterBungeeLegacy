@@ -35,6 +35,8 @@ public class Blacklist {
 
 	private int connectionratelimit = 0;
 
+	private int connectionspersecond = 0;
+
 	private int peripratelimit = 0;
 
 	@Getter
@@ -133,7 +135,7 @@ public class Blacklist {
 					
 					int average = 0;
 					
-					averagecpslist.add(connectionratelimit);
+					averagecpslist.add(connectionspersecond);
 
 					if (averagecpslist.size() > 10) {
 						averagecpslist.remove(0);
@@ -149,8 +151,10 @@ public class Blacklist {
 					}
 
 					underattack = averagecps > 10;
-					
+
 					connectionratelimit = 0;
+					
+					connectionspersecond = 0;
 
 					Thread.sleep(1000);
 
@@ -224,6 +228,11 @@ public class Blacklist {
 
 	public void addConnectionratelimit(int add) {
 		this.connectionratelimit += add;
+	}
+
+	
+	public void addConnectionspersecond(int add) {
+		this.connectionspersecond += add;
 	}
 
 
