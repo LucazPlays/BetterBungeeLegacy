@@ -491,6 +491,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 				if (sender.hasPermission("bungeecord.command." + bungeename + ".notifications")) {
 					sug.add("chat");
 					sug.add("actionbar");
+					sug.add("showcps");
 				}
 			}
 			if (args[0].equalsIgnoreCase("firewall")) {
