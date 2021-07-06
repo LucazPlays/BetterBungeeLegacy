@@ -422,6 +422,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		Preconditions.checkState(thisState == State.USERNAME, "Not expecting USERNAME");
 		this.loginRequest = loginRequest;
 
+        if (getName().contains(" ")) {
+			disconnect(bungee.getTranslation("name_invalid"));
+			return;
+        }
+		
 		if (getName().contains(".")) {
 			disconnect(bungee.getTranslation("name_invalid"));
 			return;

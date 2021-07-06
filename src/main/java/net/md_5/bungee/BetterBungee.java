@@ -205,16 +205,6 @@ public class BetterBungee {
 
 	boolean discordintegration = false;
 
-//	CopyOnWriteArrayList<String> serverlistusers = new CopyOnWriteArrayList<>();
-
-//	CopyOnWriteArrayList<String> addwhitelist = new CopyOnWriteArrayList<>();
-
-//	CopyOnWriteArrayList<String> addblacklist = new CopyOnWriteArrayList<>();
-
-//	CopyOnWriteArrayList<String> removewhitelist = new CopyOnWriteArrayList<>();
-
-//	CopyOnWriteArrayList<String> removeblacklist = new CopyOnWriteArrayList<>();
-
 	private ConcurrentLinkedQueue<String> removewhitelist = new ConcurrentLinkedQueue<String>();
 
 	private ConcurrentLinkedQueue<String> removeblacklist = new ConcurrentLinkedQueue<String>();

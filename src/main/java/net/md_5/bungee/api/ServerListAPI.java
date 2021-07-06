@@ -4,8 +4,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Getter;
-import net.md_5.bungee.BetterBungee;
-import net.md_5.bungee.BungeeCord;
 
 public class ServerListAPI {
 	
