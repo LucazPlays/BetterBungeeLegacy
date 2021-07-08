@@ -171,7 +171,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.92";
+	public String Version = "0.97";
 
 	long lastfirewallsync = 0;
 

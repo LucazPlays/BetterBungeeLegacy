@@ -38,7 +38,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 			}
 			sender.sendMessage(TextComponent.fromLegacyText(
 					"§7This server is running §eBetterBungee§7 version §a" + Version + "§7 by §bLuca_zPlays"));
-			sender.sendMessage(TextComponent.fromLegacyText("§7Infos at §bhttp://betterbungee.tk"));
+			sender.sendMessage(TextComponent.fromLegacyText("§7Infos at §dhttps://discord.gg/EUVYjafMC8"));
 			return;
 		}
 		if (args.length >= 1) {

@@ -23,6 +23,7 @@ public class CommandIP extends PlayerCommand {
 			sender.sendMessage(ProxyServer.getInstance().getTranslation("username_needed", new Object[0]));
 			return;
 		}
+		
 
 		final ProxiedPlayer user = ProxyServer.getInstance().getPlayer(args[0]);
 
@@ -36,6 +37,12 @@ public class CommandIP extends PlayerCommand {
 			}
 		} else {
 			IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
+			
+			if (!IPChecker.getInstance().isServiceonline()) {
+				sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + user.getAddress().getAddress().getHostAddress()));
+				return;
+			}
+			
 			sendipmessage(sender, result,sender.hasPermission("bungeecord.command.ip.uncensored"));
 		}
 	}

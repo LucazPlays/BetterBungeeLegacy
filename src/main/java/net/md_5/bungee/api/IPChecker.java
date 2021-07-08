@@ -12,10 +12,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.google.gson.Gson;
 
+import lombok.Getter;
+
 public class IPChecker {
 	
 	private static IPChecker Instance = new IPChecker();
 
+	@Getter
 	private boolean serviceonline = false;
 	
 	Set<String> badips = ConcurrentHashMap.newKeySet();
