@@ -15,9 +15,8 @@ public class CommandEnd extends Command
     public void execute(final CommandSender sender, final String[] args) {
         if (args.length == 0) {
             BungeeCord.getInstance().stop();
-        }
-        else {
-            BungeeCord.getInstance().stop(Joiner.on(' ').join(args));
+        } else {
+            BungeeCord.getInstance().stop( ChatColor.translateAlternateColorCodes( '&', Joiner.on( ' ' ).join( args ) ) );
         }
     }
 }

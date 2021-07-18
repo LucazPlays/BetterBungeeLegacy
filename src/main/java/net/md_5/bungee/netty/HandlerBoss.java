@@ -135,21 +135,23 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 			HAProxyMessage proxy = (HAProxyMessage) msg;
 
-			channel.setProxyAddress(list.getRealAdress(ctx.channel().remoteAddress()));
 
 			try {
+				if (proxy.sourceAddress() != null) {
+					channel.setProxyAddress(list.getRealAdress(ctx.channel().remoteAddress()));
+					
+					
+					InetSocketAddress newAddress = new InetSocketAddress(proxy.sourceAddress(), proxy.sourcePort());
 
-				InetSocketAddress newAddress = new InetSocketAddress(proxy.sourceAddress(), proxy.sourcePort());
+					ProxyServer.getInstance().getLogger().log(Level.FINE, "Set remote address via PROXY {0} -> {1}", new Object[] { channel.getRemoteAddress(), newAddress });
 
-				ProxyServer.getInstance().getLogger().log(Level.FINE, "Set remote address via PROXY {0} -> {1}",
-						new Object[] { channel.getRemoteAddress(), newAddress });
+					channel.setRemoteAddress(newAddress);
 
-				channel.setRemoteAddress(newAddress);
-				
-				if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
-					filter(ctx);
+					if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
+						filter(ctx);
+					}
+
 				}
-				
 			} finally {
 				proxy.release();
 			}
