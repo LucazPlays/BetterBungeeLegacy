@@ -59,10 +59,6 @@ public class BetterBungee {
 		return manuelupdates;
 	}
 
-	public ArrayList<DownloadablePlugin> getPluginlist() {
-		return pluginlist;
-	}
-
 	public ConcurrentLinkedQueue<String> getAddwhitelist() {
 		return addwhitelist;
 	}
@@ -171,7 +167,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.97";
+	public String Version = "0.98";
 
 	public String BungeeCordVersion = "a283aaf724d4c9a815540cd32f3aafaa72df9e05";
 
@@ -215,7 +211,7 @@ public class BetterBungee {
 
 	private ConcurrentLinkedQueue<String> addwhitelist = new ConcurrentLinkedQueue<String>();
 
-	ArrayList<DownloadablePlugin> pluginlist = new ArrayList<>();
+	ArrayList<String> pluginlist = new ArrayList<>();
 
 	boolean manuelupdates = false;
 
