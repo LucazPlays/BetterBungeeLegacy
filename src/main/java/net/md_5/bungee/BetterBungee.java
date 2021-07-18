@@ -173,6 +173,8 @@ public class BetterBungee {
 
 	public String Version = "0.97";
 
+	public String BungeeCordVersion = "a283aaf724d4c9a815540cd32f3aafaa72df9e05";
+
 	long lastfirewallsync = 0;
 
 	long lastupdatecheck = 0;
@@ -936,5 +938,9 @@ public class BetterBungee {
 
 	public void setPingcheckonconnectlimit(Integer pingcheckonconnectlimit) {
 		this.pingcheckonconnectlimit = pingcheckonconnectlimit;
+	}
+
+	public String getBungeeCordVersion() {
+		return BungeeCordVersion;
 	}
 }
