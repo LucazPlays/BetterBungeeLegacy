@@ -23,23 +23,26 @@ public class CommandBungee extends Command
 		} else {
 			Version = "§7Stable§8(§a" + BungeeCord.getInstance().getBetterBungee().Version + "§8)";
 		}
-        TextComponent text1 = new TextComponent("§7This server is running §eBetterBungee§7 version §a" + Version + "§7 by §bLuca_zPlays");
-
+        TextComponent text1 = new TextComponent();
+        
+        text1.addExtra("§7This server is running §eBetterBungee§7 version §a" + Version);
+        text1.addExtra("§7 by §bLuca_zPlays");
         text1.setClickEvent(new ClickEvent(Action.OPEN_URL, "https://github.com/LucazPlays/BetterBungee/"));
         text1.setHoverEvent(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("Link to Github")));
 
         sender.sendMessage(text1);
         
-        TextComponent text2 = new TextComponent("§7More Infos at §dhttps://dsc.gg/betterbungee");
-        
+        TextComponent text2 = new TextComponent();
+        text2.addExtra("§7More Infos at §dhttps://dsc.gg/betterbungee");
         text2.setClickEvent(new ClickEvent(Action.OPEN_URL, "https://dsc.gg/betterbungee"));
         text2.setHoverEvent(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("Link to Discord")));
 
         sender.sendMessage(text2);
 
         
-        TextComponent text3 = new TextComponent("§7The BungeeCord §aVersion This Version of §7BetterBungee is based on §f#" + BetterBungee.getInstance().getBungeeCordVersion().substring(0, 7));
-		
+        TextComponent text3 = new TextComponent();
+       
+        text3.addExtra("§7BungeeCord Version §f#" + BetterBungee.getInstance().getBungeeCordVersion().substring(0, 7));
         text3.setClickEvent(new ClickEvent(Action.OPEN_URL, "https://github.com/SpigotMC/BungeeCord/tree/"+BetterBungee.getInstance().getBungeeCordVersion()));
         text3.setHoverEvent(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("Link to Github")));
         
