@@ -23,6 +23,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/luca/Dokumente/Programming/Java/Dependencies/BungeeCord.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Luca/Documents/Dependecies/BungeeCord.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
