@@ -265,8 +265,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 							return;
 						}
 					}
-					ProxyServer.getInstance().getLogger().log(Level.SEVERE,
-							handler + " - exception processing exception", ex);
+					ProxyServer.getInstance().getLogger().log(Level.SEVERE, handler + " - exception processing exception", ex);
 				}
 			}
 

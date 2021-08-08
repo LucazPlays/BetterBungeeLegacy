@@ -7,6 +7,8 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 
+import net.md_5.bungee.BetterBungee;
+
 public class RestAPI {
 
 	private static RestAPI instance = new RestAPI();
@@ -42,7 +44,9 @@ public class RestAPI {
 	        }
 	        in.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (BetterBungee.getInstance().isDevdebugmode()) {
+				e.printStackTrace();
+			}
 			return new RestAPIResponse("Error", true, urlstring);
 		}
         return new RestAPIResponse(response, false, urlstring);

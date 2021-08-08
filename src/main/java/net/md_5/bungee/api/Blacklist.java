@@ -1,5 +1,7 @@
 package net.md_5.bungee.api;
 
+import java.awt.Color;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -9,12 +11,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.DiscordWebhook.EmbedObject;
 import net.md_5.bungee.netty.ChannelWrapper;
 
 public class Blacklist {
@@ -23,12 +28,8 @@ public class Blacklist {
 
 	private ConcurrentHashMap<String, Integer> ratelimit = new ConcurrentHashMap<String, Integer>();
 
-	
-	
 	private ConcurrentHashMap<String, Integer> auth = new ConcurrentHashMap<String, Integer>();
 
-	
-	
 	private int globalratelimit = 0;
 
 	private int globalfaviconlimit = 0;
@@ -38,6 +39,10 @@ public class Blacklist {
 	private int connectionspersecond = 0;
 
 	private int peripratelimit = 0;
+
+	private int blockedipadresses = 0;
+
+	private int blockedconnections = 0;
 
 	@Getter
 	private int averagecps = 0;
@@ -49,14 +54,10 @@ public class Blacklist {
 	@Getter
 	private boolean protection = false;
 
-
-
 	private Set<String> blacklist = ConcurrentHashMap.newKeySet();
 
 	private Set<String> whitelist = ConcurrentHashMap.newKeySet();
 
-	
-	
 	public Set<String> getBlacklist() {
 		return blacklist;
 	}
@@ -120,9 +121,9 @@ public class Blacklist {
 
 	public Blacklist() {
 		new Thread(() -> {
-			
+
 			List<Integer> averagecpslist = new ArrayList<Integer>();
-			
+
 			while (true) {
 				try {
 					for (Entry<String, Integer> es : ratelimit.entrySet()) {
@@ -132,9 +133,9 @@ public class Blacklist {
 							ratelimit.remove(es.getKey());
 						}
 					}
-					
+
 					int average = 0;
-					
+
 					averagecpslist.add(connectionspersecond);
 
 					if (averagecpslist.size() > 10) {
@@ -143,17 +144,70 @@ public class Blacklist {
 							average += integer;
 						}
 					}
-					
+
 					if (average == 0) {
 						averagecps = 0;
 					} else {
 						averagecps = average / averagecpslist.size();
 					}
+					if (!BetterBungee.getInstance().discordwebhook.equals("none")) {
+						if (underattack) {
+							if (averagecps < 12) {
 
-					underattack = averagecps > 10;
+
+								DiscordWebhook webhook = new DiscordWebhook(BetterBungee.getInstance().discordwebhook);
+
+								EmbedObject object2 = new EmbedObject();
+
+								object2.setColor(Color.GREEN);
+								object2.addField("Attack Stopped", "BetterBungee", true);
+								object2.addField("Connections Blocked", "" + (Blacklist.getInstance().getBlacklist().size()-blockedconnections), true);
+								object2.addField("IPAdresses Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()-blockedipadresses), true);
+								object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+
+								blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+								blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
+								webhook.addEmbed(object2);
+
+								try {
+									webhook.execute();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+
+						if (!underattack) {
+							if (averagecps > 12) {
+
+								blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+								blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
+
+								DiscordWebhook webhook = new DiscordWebhook(BetterBungee.getInstance().discordwebhook);
+
+								EmbedObject object2 = new EmbedObject();
+
+								object2.setColor(Color.RED);
+								object2.addField("Attack Detected", "BetterBungee", true);
+								object2.addField("Connections Per Second", "" + Blacklist.getInstance().getAveragecps(),
+										true);
+								object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+
+								webhook.addEmbed(object2);
+
+								try {
+									webhook.execute();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+
+							}
+						}
+					}
+					underattack = averagecps > 12;
 
 					connectionratelimit = 0;
-					
+
 					connectionspersecond = 0;
 
 					Thread.sleep(1000);
@@ -230,11 +284,9 @@ public class Blacklist {
 		this.connectionratelimit += add;
 	}
 
-	
 	public void addConnectionspersecond(int add) {
 		this.connectionspersecond += add;
 	}
-
 
 	public int getGlobalratelimit() {
 		return globalratelimit;
@@ -248,7 +300,6 @@ public class Blacklist {
 		this.globalratelimit += add;
 	}
 
-
 	public int getPerIPratelimit() {
 		return peripratelimit;
 	}
@@ -260,7 +311,6 @@ public class Blacklist {
 	public void addPerIPratelimit(int add) {
 		this.peripratelimit += add;
 	}
-	
 
 	public String getRealAdress(ChannelHandlerContext ctx) {
 		final SocketAddress remote = ctx.channel().remoteAddress();

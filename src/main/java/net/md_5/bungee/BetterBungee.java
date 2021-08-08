@@ -241,6 +241,8 @@ public class BetterBungee {
 	private boolean pingcheck = false;
 
 	private Integer pingcheckonconnectlimit = 20;
+
+	public String discordwebhook = "none";
 	
 
 	private static BetterBungee instance;
@@ -359,7 +361,7 @@ public class BetterBungee {
 
 			String updatecheckfrequencysetting = "serversettings.updatecheckfrequencyinminutes";
 
-			String discordintegration = "serversettings.discordintegration";
+			String discordwebhook = "serversettings.discordwebhook";
 
 			String manuelupdates = "serversettings.manuelupdates";
 
@@ -425,7 +427,7 @@ public class BetterBungee {
 			
 			addDefault(config, updatecheckfrequencysetting, "15");
 
-			addDefault(config, discordintegration, "false");
+			addDefault(config, discordwebhook, "none");
 
 			addDefault(config, manuelupdates, "false");
 
@@ -489,7 +491,7 @@ public class BetterBungee {
 			
 			this.startdenyproxyauthlimit = Integer.valueOf(config.getString(startdenyproxyauthlimit));
 
-			this.discordintegration = config.getString(discordintegration).equalsIgnoreCase("true");
+			this.discordwebhook = config.getString(discordwebhook);
 
 			this.manuelupdates = config.getString(manuelupdates).equalsIgnoreCase("true");
 
@@ -529,31 +531,31 @@ public class BetterBungee {
 								.length());
 			}
 
-			if (this.discordintegration) {
-				NotifyManager.getInstance().setDiscord(this.discordintegration);
-				new Thread(() -> {
-					sleep(5500);
-					while (BungeeCord.getInstance().isRunning) {
-						if (apiconnection) {
-							if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
-
-								Set<String> set = ConcurrentHashMap.newKeySet();
-								
-								if (NotifyManager.getInstance().getDiscordmessages().size() > 15) {
-									for (int i = 0; i < 15; i++) {
-										set.add(NotifyManager.getInstance().getDiscordmessages().poll());
-									}
-								} else {
-									set.addAll(NotifyManager.getInstance().getDiscordmessages());
-									NotifyManager.getInstance().deleteDiscordmessages();
-								}
-								discord(set);
-							}
-						}
-						sleep(1000);
-					}
-				}).start();
-			}
+//			if (this.discordintegration) {
+//				NotifyManager.getInstance().setDiscord(this.discordintegration);
+//				new Thread(() -> {
+//					sleep(5500);
+//					while (BungeeCord.getInstance().isRunning) {
+//						if (apiconnection) {
+//							if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
+//
+//								Set<String> set = ConcurrentHashMap.newKeySet();
+//								
+//								if (NotifyManager.getInstance().getDiscordmessages().size() > 15) {
+//									for (int i = 0; i < 15; i++) {
+//										set.add(NotifyManager.getInstance().getDiscordmessages().poll());
+//									}
+//								} else {
+//									set.addAll(NotifyManager.getInstance().getDiscordmessages());
+//									NotifyManager.getInstance().deleteDiscordmessages();
+//								}
+//								discord(set);
+//							}
+//						}
+//						sleep(1000);
+//					}
+//				}).start();
+//			}
 
 			if (this.firewallsync) {
 				new Thread(() -> {

@@ -105,8 +105,7 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 				packet.read(in, prot.getDirection(), protocolVersion);
 
 				if (in.isReadable()) {
-					throw new BadPacketException("Did not read all bytes from packet " + packet.getClass() + " "
-							+ packetId + " Protocol " + protocol + " Direction " + prot.getDirection());
+					throw new BadPacketException("Did not read all bytes from packet " + packet.getClass() + " " + packetId + " Protocol " + protocol + " Direction " + prot.getDirection());
 				}
 
 			} else {

@@ -155,10 +155,16 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	@Override
 	public void handle(PacketWrapper packet) throws Exception {
-		if (packet.packet == null) {
-			cancelcrash("QuietException");
-			throw new QuietException(
-					"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+		try {
+			if (packet.packet == null) {
+				cancelcrash("QuietException");
+				throw new QuietException(
+						"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+			}
+		} catch (Throwable e) {
+			if (BetterBungee.getInstance().isDevdebugmode()) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -167,14 +173,21 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	}
 
 	private void cancelcrash(String cause) {
-		if (Blacklist.getInstance().isProtection()) {
-			Blacklist.getInstance().addConnectionratelimit(-1);
-			StatisticsAPI.getInstance().addblockedConnection();
-			list.addBlacklist(list.getRealAdress(ch));
-			if (BetterBungee.getInstance().isDevdebugmode()) {
-				NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+		try {
+			if (Blacklist.getInstance().isProtection()) {
+				Blacklist.getInstance().addConnectionratelimit(-1);
+				StatisticsAPI.getInstance().addblockedConnection();
+				list.addBlacklist(list.getRealAdress(ch));
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					NotifyManager.getInstance()
+							.addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+				}
+				ch.close();
 			}
-			ch.close();
+		} catch (Throwable e) {
+			if (BetterBungee.getInstance().isDevdebugmode()) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -309,7 +322,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		this.handshake = handshake;
 
 		boolean hostprotection = BetterBungee.getInstance().isHostprotectionnames();
-		
+
 		boolean pingprotection = BetterBungee.getInstance().isHostprotectionnames();
 
 		startedhandshake = System.currentTimeMillis();
@@ -362,7 +375,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				Blacklist.getInstance().addConnectionratelimit(-1);
 				StatisticsAPI.getInstance().addblockedConnection();
 				if (BetterBungee.getInstance().isDevdebugmode()) {
-					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §9Invalid Host");
+					NotifyManager.getInstance()
+							.addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §9Invalid Host");
 				}
 				ch.close();
 				return;
@@ -380,16 +394,22 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			ch.setProtocol(Protocol.STATUS);
 			break;
 		case 2:
-			System.out.println(BetterBungee.getInstance().isPingcheck());
+			if (BetterBungee.getInstance().isDevdebugmode()) {
+				System.out.println(BetterBungee.getInstance().isPingcheck());
+			}
 			if (BetterBungee.getInstance().isPingcheck()) {
-				System.out.println(BetterBungee.getInstance().getPingcheckonconnectlimit());
-				if (Blacklist.getInstance().getConnectionratelimit() > BetterBungee.getInstance().getPingcheckonconnectlimit()) {
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					System.out.println(BetterBungee.getInstance().getPingcheckonconnectlimit());
+				}
+				if (Blacklist.getInstance().getConnectionratelimit() > BetterBungee.getInstance()
+						.getPingcheckonconnectlimit()) {
 					if (!Blacklist.getInstance().containswhitelist(ip)) {
 						if (!ServerListAPI.getInstance().pingedbefore(ip)) {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
 							if (BetterBungee.getInstance().isDevdebugmode()) {
-								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
+								NotifyManager.getInstance().addmessage(
+										"§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
 							}
 							ch.close();
 							return;
@@ -422,11 +442,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		Preconditions.checkState(thisState == State.USERNAME, "Not expecting USERNAME");
 		this.loginRequest = loginRequest;
 
-        if (getName().contains(" ")) {
+		if (getName().contains(" ")) {
 			disconnect(bungee.getTranslation("name_invalid"));
 			return;
-        }
-		
+		}
+
 		if (getName().contains(".")) {
 			disconnect(bungee.getTranslation("name_invalid"));
 			return;
@@ -522,37 +542,49 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			Callback<String> handler = new Callback<String>() {
 				@Override
 				public void done(String result, Throwable error) {
-					if (error == null) {
-						LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
-						if (obj != null && obj.getId() != null) {
-							loginProfile = obj;
-							name = obj.getName();
-							uniqueId = Util.getUUID(obj.getId());
-							finish();
-							return;
-						}
-						if (BetterBungee.getInstance().isProtection()) {
-							if (!list.containswhitelist(list.getRealAdress(ch))) {
-								list.addlimit(list.getRealAdress(ch), 60);
+					try {
+						if (error == null) {
+							LoginResult obj = BungeeCord.getInstance().gson.fromJson(result, LoginResult.class);
+							if (obj != null && obj.getId() != null) {
+								loginProfile = obj;
+								name = obj.getName();
+								uniqueId = Util.getUUID(obj.getId());
+								finish();
+								return;
+							}
+							if (BetterBungee.getInstance().isProtection()) {
+								if (!list.containswhitelist(list.getRealAdress(ch))) {
+									list.addlimit(list.getRealAdress(ch), 60);
+								}
+							}
+							disconnect(bungee.getTranslation("offline_mode_player"));
+						} else {
+							disconnect(bungee.getTranslation("mojang_fail"));
+
+							bungee.getLogger().log(Level.SEVERE,
+									"Error authenticating " + getName() + " with minecraft.net", error);
+
+							if (BetterBungee.getInstance().isProtection()) {
+								if (!list.containswhitelist(list.getRealAdress(ch))) {
+									list.addlimit(list.getRealAdress(ch), 20);
+								}
 							}
 						}
-						disconnect(bungee.getTranslation("offline_mode_player"));
-					} else {
-						disconnect(bungee.getTranslation("mojang_fail"));
-						bungee.getLogger().log(Level.SEVERE,
-								"Error authenticating " + getName() + " with minecraft.net", error);
-						if (BetterBungee.getInstance().isProtection()) {
-							if (!list.containswhitelist(list.getRealAdress(ch))) {
-								list.addlimit(list.getRealAdress(ch), 20);
-							}
+
+					} catch (Throwable e) {
+						if (BetterBungee.getInstance().isDevdebugmode()) {
+							e.printStackTrace();
 						}
 					}
 				}
 			};
 			HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
 
-		} catch (Exception ex) {
+		} catch (Throwable e) {
 			cancelcrash("Crypto Crasher? xD");
+			if (BetterBungee.getInstance().isDevdebugmode()) {
+				e.printStackTrace();
+			}
 			return;
 		}
 	}
@@ -647,8 +679,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 									if (!IPChecker.getInstance().isipresidental(ip)) {
 										ProxiedPlayer player = userCon;
 										if (player != null) {
-											if (!player.hasPermission(
-													BetterBungee.getInstance().getDenyVPNbypasspermission())) {
+											if (!player.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
 												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance()
 														.getBetterBungee().getDenyVPNkickmessage()));
 												NotifyManager.getInstance().addmessage(

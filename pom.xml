@@ -6,7 +6,10 @@
 	<artifactId>BetterBungee</artifactId>
 	<version>0.98-SNAPSHOT</version>
 
-
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
 
 
 	<repositories>
@@ -189,8 +192,5 @@
 			<version>8.1.2.v20120308</version>
 			<scope>compile</scope>
 		</dependency>
-
-
-
 	</dependencies>
 </project>

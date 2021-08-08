@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import com.google.gson.Gson;
 
 import lombok.Getter;
+import net.md_5.bungee.BetterBungee;
 
 public class IPChecker {
 	
@@ -37,7 +38,9 @@ public class IPChecker {
 					}
 					Thread.sleep(60000);
 				} catch (Exception e) {
-					e.printStackTrace();
+					if (BetterBungee.getInstance().isDevdebugmode()) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}).start();
