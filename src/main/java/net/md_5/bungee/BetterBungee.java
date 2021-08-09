@@ -517,7 +517,7 @@ public class BetterBungee {
 			
 			this.pingcheckonconnectlimit = Integer.valueOf(config.getString(pingcheckonconnectlimit));
 
-			this.pathtotemplatejar = config.getString(pingcheckonconnectlimit);
+			this.pathtotemplatejar = config.getString(pathtotemplatejar);
 
 			
 			
