@@ -4,12 +4,17 @@ import com.google.common.base.Preconditions;
 import gnu.trove.map.TMap;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
+
 import lombok.Getter;
 import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.ProxyConfig;
@@ -24,138 +29,136 @@ import net.md_5.bungee.util.CaseInsensitiveSet;
  * Core configuration for the proxy.
  */
 @Getter
-public class Configuration implements ProxyConfig
-{
+public class Configuration implements ProxyConfig {
 
-    /**
-     * Time before users are disconnected due to no network activity.
-     */
-    private int timeout = 30000;
-    /**
-     * UUID used for metrics.
-     */
-    private String uuid = UUID.randomUUID().toString();
-    /**
-     * Set of all listeners.
-     */
-    private Collection<ListenerInfo> listeners;
-    /**
-     * Set of all servers.
-     */
-    private TMap<String, ServerInfo> servers;
-    /**
-     * Should we check minecraft.net auth.
-     */
-    private boolean onlineMode = true;
-    /**
-     * Whether we log proxy commands to the proxy log
-     */
-    private boolean logCommands;
-    private boolean logPings = true;
-    private int remotePingCache = -1;
-    private int playerLimit = -1;
-    private Collection<String> disabledCommands;
-    private int serverConnectTimeout = 5000;
-    private int remotePingTimeout = 5000;
-    private int throttle = 4000;
-    private int throttleLimit = 3;
-    private boolean ipForward;
-    private Favicon favicon;
-    private int compressionThreshold = 256;
-    private boolean preventProxyConnections;
-    private boolean forgeSupport;
+	/**
+	 * Time before users are disconnected due to no network activity.
+	 */
+	private int timeout = 30000;
+	/**
+	 * UUID used for metrics.
+	 */
+	private String uuid = UUID.randomUUID().toString();
+	/**
+	 * Set of all listeners.
+	 */
+	private Collection<ListenerInfo> listeners;
+	/**
+	 * Set of all servers.
+	 */
+	private TMap<String, ServerInfo> servers;
+	/**
+	 * Should we check minecraft.net auth.
+	 */
+	private boolean onlineMode = true;
+	/**
+	 * Whether we log proxy commands to the proxy log
+	 */
+	private boolean logCommands;
+	private boolean logPings = true;
+	private int remotePingCache = -1;
+	private int playerLimit = -1;
+	private Collection<String> disabledCommands;
+	private int serverConnectTimeout = 5000;
+	private int remotePingTimeout = 5000;
+	private int throttle = 4000;
+	private int throttleLimit = 3;
+	private boolean ipForward;
+	private Favicon favicon;
+	private int compressionThreshold = 256;
+	private boolean preventProxyConnections;
+	private boolean forgeSupport;
 
-    public void load()
-    {
-        ConfigurationAdapter adapter = ProxyServer.getInstance().getConfigurationAdapter();
-        
-        adapter.load();
+	public void load() {
+		ConfigurationAdapter adapter = ProxyServer.getInstance().getConfigurationAdapter();
 
-        File fav = new File( "server-icon.png" );
-        
-        if ( fav.exists() )
-        {
-            try
-            {
-                favicon = Favicon.create( ImageIO.read( fav ) );
-            } catch ( IOException | IllegalArgumentException ex )
-            {
-                ProxyServer.getInstance().getLogger().log( Level.WARNING, "Could not load server icon", ex );
-            }
-        }
+		adapter.load();
 
-        listeners = adapter.getListeners();
-        timeout = adapter.getInt( "timeout", timeout );
-        uuid = adapter.getString( "stats", uuid );
-        onlineMode = adapter.getBoolean( "online_mode", onlineMode );
-        logCommands = adapter.getBoolean( "log_commands", logCommands );
-        logPings = adapter.getBoolean( "log_pings", logPings );
-        remotePingCache = adapter.getInt( "remote_ping_cache", remotePingCache );
-        playerLimit = adapter.getInt( "player_limit", playerLimit );
-        serverConnectTimeout = adapter.getInt( "server_connect_timeout", serverConnectTimeout );
-        remotePingTimeout = adapter.getInt( "remote_ping_timeout", remotePingTimeout );
-        throttle = adapter.getInt( "connection_throttle", throttle );
-        throttleLimit = adapter.getInt( "connection_throttle_limit", throttleLimit );
-        ipForward = adapter.getBoolean( "ip_forward", ipForward );
-        compressionThreshold = adapter.getInt( "network_compression_threshold", compressionThreshold );
-        preventProxyConnections = adapter.getBoolean( "prevent_proxy_connections", preventProxyConnections );
-        forgeSupport = adapter.getBoolean( "forge_support", forgeSupport );
+		File fav = new File("server-icon.png");
 
-        disabledCommands = new CaseInsensitiveSet( (Collection<String>) adapter.getList( "disabled_commands", Arrays.asList( "disabledcommandhere" ) ) );
+		if (fav.exists()) {
+			try {
+				favicon = Favicon.create(ImageIO.read(fav));
+			} catch (IOException | IllegalArgumentException ex) {
+				ProxyServer.getInstance().getLogger().log(Level.WARNING, "Could not load server icon", ex);
+			}
+		} else {
+			try {
+				FileUtils.copyURLToFile(new URL("https://s20.directupload.net/images/210809/sb4bcrhi.png"), fav, 30000,
+						30000);
+				favicon = Favicon.create(ImageIO.read(fav));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-        Preconditions.checkArgument( listeners != null && !listeners.isEmpty(), "No listeners defined." );
+		listeners = adapter.getListeners();
+		timeout = adapter.getInt("timeout", timeout);
+		uuid = adapter.getString("stats", uuid);
+		onlineMode = adapter.getBoolean("online_mode", onlineMode);
+		logCommands = adapter.getBoolean("log_commands", logCommands);
+		logPings = adapter.getBoolean("log_pings", logPings);
+		remotePingCache = adapter.getInt("remote_ping_cache", remotePingCache);
+		playerLimit = adapter.getInt("player_limit", playerLimit);
+		serverConnectTimeout = adapter.getInt("server_connect_timeout", serverConnectTimeout);
+		remotePingTimeout = adapter.getInt("remote_ping_timeout", remotePingTimeout);
+		throttle = adapter.getInt("connection_throttle", throttle);
+		throttleLimit = adapter.getInt("connection_throttle_limit", throttleLimit);
+		ipForward = adapter.getBoolean("ip_forward", ipForward);
+		compressionThreshold = adapter.getInt("network_compression_threshold", compressionThreshold);
+		preventProxyConnections = adapter.getBoolean("prevent_proxy_connections", preventProxyConnections);
+		forgeSupport = adapter.getBoolean("forge_support", forgeSupport);
 
-        Map<String, ServerInfo> newServers = adapter.getServers();
-        Preconditions.checkArgument( newServers != null && !newServers.isEmpty(), "No servers defined" );
+		disabledCommands = new CaseInsensitiveSet(
+				(Collection<String>) adapter.getList("disabled_commands", Arrays.asList("disabledcommandhere")));
 
-        if ( servers == null )
-        {
-            servers = new CaseInsensitiveMap<>( newServers );
-        } else
-        {
-            for ( ServerInfo oldServer : servers.values() )
-            {
-                // Don't allow servers to be removed
-                Preconditions.checkArgument( newServers.containsKey( oldServer.getName() ), "Server %s removed on reload!", oldServer.getName() );
-            }
+		Preconditions.checkArgument(listeners != null && !listeners.isEmpty(), "No listeners defined.");
 
-            // Add new servers
-            for ( Map.Entry<String, ServerInfo> newServer : newServers.entrySet() )
-            {
-                if ( !servers.containsValue( newServer.getValue() ) )
-                {
-                    servers.put( newServer.getKey(), newServer.getValue() );
-                }
-            }
-        }
+		Map<String, ServerInfo> newServers = adapter.getServers();
+		Preconditions.checkArgument(newServers != null && !newServers.isEmpty(), "No servers defined");
 
-        for ( ListenerInfo listener : listeners )
-        {
-            for ( int i = 0; i < listener.getServerPriority().size(); i++ )
-            {
-                String server = listener.getServerPriority().get( i );
-                Preconditions.checkArgument( servers.containsKey( server ), "Server %s (priority %s) is not defined", server, i );
-            }
-            for ( String server : listener.getForcedHosts().values() )
-            {
-                if ( !servers.containsKey( server ) )
-                {
-                    ProxyServer.getInstance().getLogger().log( Level.WARNING, "Forced host server {0} is not defined", server );
-                }
-            }
-        }
-    }
+		if (servers == null) {
+			servers = new CaseInsensitiveMap<>(newServers);
+		} else {
+			for (ServerInfo oldServer : servers.values()) {
+				// Don't allow servers to be removed
+				Preconditions.checkArgument(newServers.containsKey(oldServer.getName()), "Server %s removed on reload!",
+						oldServer.getName());
+			}
 
-    @Override
-    @Deprecated
-    public String getFavicon()
-    {
-        return getFaviconObject().getEncoded();
-    }
+			// Add new servers
+			for (Map.Entry<String, ServerInfo> newServer : newServers.entrySet()) {
+				if (!servers.containsValue(newServer.getValue())) {
+					servers.put(newServer.getKey(), newServer.getValue());
+				}
+			}
+		}
 
-    @Override
-    public Favicon getFaviconObject()
-    {
-        return favicon;
-    }
+		for (ListenerInfo listener : listeners) {
+			for (int i = 0; i < listener.getServerPriority().size(); i++) {
+				String server = listener.getServerPriority().get(i);
+				Preconditions.checkArgument(servers.containsKey(server), "Server %s (priority %s) is not defined",
+						server, i);
+			}
+			for (String server : listener.getForcedHosts().values()) {
+				if (!servers.containsKey(server)) {
+					ProxyServer.getInstance().getLogger().log(Level.WARNING, "Forced host server {0} is not defined",
+							server);
+				}
+			}
+		}
+	}
+
+	@Override
+	@Deprecated
+	public String getFavicon() {
+		return getFaviconObject().getEncoded();
+	}
+
+	@Override
+	public Favicon getFaviconObject() {
+		return favicon;
+	}
 }
