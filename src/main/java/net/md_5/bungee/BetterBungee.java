@@ -244,6 +244,8 @@ public class BetterBungee {
 
 	public String discordwebhook = "none";
 	
+	public String pathtotemplatejar = "none";
+	
 
 	private static BetterBungee instance;
 	
@@ -365,6 +367,8 @@ public class BetterBungee {
 
 			String manuelupdates = "serversettings.manuelupdates";
 
+			String pathtotemplatejar = "serversettings.pathtotemplatejar";
+
 			String packetsizelimit = "serversettings.packetsizelimit";
 
 			String packetsizelimitsize = "serversettings.packetsizelimitsize";
@@ -430,6 +434,8 @@ public class BetterBungee {
 			addDefault(config, discordwebhook, "none");
 
 			addDefault(config, manuelupdates, "false");
+			
+			addDefault(config, pathtotemplatejar, "none");
 
 			addDefault(config, packetsizelimit, "false");
 
@@ -510,6 +516,8 @@ public class BetterBungee {
 			this.pingcheck = config.getString(pingcheck).equalsIgnoreCase("true");
 			
 			this.pingcheckonconnectlimit = Integer.valueOf(config.getString(pingcheckonconnectlimit));
+
+			this.pathtotemplatejar = config.getString(pingcheckonconnectlimit);
 
 			
 			
@@ -655,7 +663,7 @@ public class BetterBungee {
 	}
 
 	private boolean update() {
-		if (this.manuelupdates) {
+		if (this.manuelupdates && !snapshotupdate) {
 			return false;
 		}
 		if (snapshotupdate) {
@@ -697,9 +705,13 @@ public class BetterBungee {
 	private boolean updatefromlink(String link) {
 		if (download(link)) {
 			try {
-				new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-				new File("UpdatedBungeeCord.jar").renameTo(
-						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				if (pathtotemplatejar.equalsIgnoreCase("none")) {
+					new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
+					new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+				} else {
+					new File(pathtotemplatejar).delete();
+					new File("UpdatedBungeeCord.jar").renameTo(new File(pathtotemplatejar));
+				}
 				return true;
 			} catch (URISyntaxException e) {
 			}

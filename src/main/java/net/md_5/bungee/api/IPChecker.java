@@ -16,16 +16,16 @@ import lombok.Getter;
 import net.md_5.bungee.BetterBungee;
 
 public class IPChecker {
-	
+
 	private static IPChecker Instance = new IPChecker();
 
 	@Getter
 	private boolean serviceonline = false;
-	
+
 	Set<String> badips = ConcurrentHashMap.newKeySet();
-	
+
 	ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-	
+
 	public IPChecker() {
 		new Thread(() -> {
 			while (true) {
@@ -48,32 +48,34 @@ public class IPChecker {
 
 	public boolean isipresidental(String ip) {
 		if (badips.contains(ip)) {
-			return true;
+			return false;
 		}
 		if (serviceonline) {
-			RestAPIResponse isipresidental = RestAPI.getInstance().get("http://ipcheck.skydb.de/residental?ip="+ip);
+			RestAPIResponse isipresidental = RestAPI.getInstance().get("http://ipcheck.skydb.de/residental?ip=" + ip);
 			if (isipresidental.getFailed()) {
 				serviceonline = false;
 			} else {
-				badips.add(ip);
-				return isipresidental.getText().contains("true");
+				if (isipresidental.getText().contains("false")) {
+					badips.add(ip);
+					return false;
+				} else {
+					return true;
+				}
 			}
-			
 		}
 		return true;
 	}
 
-
 	public IPCheckerResult getIPInfo(String ip) {
 		if (serviceonline) {
-			RestAPIResponse getIPInfo = RestAPI.getInstance().get("http://ipcheck.skydb.de/getinfo?ip="+ip);
+			RestAPIResponse getIPInfo = RestAPI.getInstance().get("http://ipcheck.skydb.de/getinfo?ip=" + ip);
 			if (getIPInfo.getFailed()) {
 				serviceonline = false;
 			} else {
 				Gson gson = new Gson();
 				return gson.fromJson(getIPInfo.getText(), IPCheckerResult.class);
 			}
-			
+
 		}
 		return null;
 	}
