@@ -161,8 +161,8 @@ public class Blacklist {
 
 								object2.setColor(Color.GREEN);
 								object2.addField("Attack Stopped", "BetterBungee", true);
-								object2.addField("Connections Blocked", "" + (Blacklist.getInstance().getBlacklist().size()-blockedconnections), true);
-								object2.addField("IPAdresses Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()-blockedipadresses), true);
+								object2.addField("Connections Blocked", "" + (Blacklist.getInstance().getBlacklist().size()-blockedipadresses), true);
+								object2.addField("IPAdresses Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()-blockedconnections), true);
 								object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
 
 								blockedipadresses = Blacklist.getInstance().getBlacklist().size();
