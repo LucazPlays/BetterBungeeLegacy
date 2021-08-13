@@ -182,7 +182,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	}
 
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+		try {
 		if (ctx.channel().isActive()) {
 			boolean logExceptions = !(handler instanceof PingHandler);
 
@@ -201,14 +202,12 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 							Blacklist.getInstance().addBlacklist(ip);
 							if (BetterBungee.getInstance().isDevdebugmode()) {
-								NotifyManager.getInstance()
-										.addmessage("§cBlocked §8- §e" + ip + " §8- §cCorruptedFrame");
+								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cCorruptedFrame");
 							}
 							ctx.close();
 							return;
 						}
-						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}",
-								new Object[] { handler, cause.getMessage() });
+						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}",new Object[] { handler, cause.getMessage() });
 					} else if (cause.getCause() instanceof BadPacketException) {
 						ProxyServer.getInstance().getLogger().log(Level.WARNING,
 								"{0} - bad packet ID, are mods in use!? {1}",
@@ -244,8 +243,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 						}
 					}
 
-					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - {1}: {2}",
-							new Object[] { handler, cause.getClass().getSimpleName(), cause.getMessage() + "" });
+					ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - {1}: {2}", new Object[] { handler, cause.getClass().getSimpleName(), cause.getMessage() + "" });
 				} else if (cause instanceof QuietException) {
 					ProxyServer.getInstance().getLogger().log(Level.SEVERE, "{0} - encountered exception: {1}",
 							new Object[] { handler, cause });
@@ -268,7 +266,21 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					ProxyServer.getInstance().getLogger().log(Level.SEVERE, handler + " - exception processing exception", ex);
 				}
 			}
+			ctx.close();
+		}
+		} catch (Throwable ex) {
+			ex.printStackTrace();
+			String ip = null;
+			if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
+				ip = list.getRealAdress(channel);
+			} else {
+				ip = list.getRealAdress(ctx);
+			}
 
+//			Blacklist.getInstance().addBlacklist(ip);
+//			if (BetterBungee.getInstance().isDevdebugmode()) {
+				NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cUnknownCrasher");
+//			}
 			ctx.close();
 		}
 	}

@@ -167,7 +167,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.98";
+	public String Version = "0.99";
 
 	public String BungeeCordVersion = "bda160562792a913cba3a65ba4996de60d0d6d68";
 

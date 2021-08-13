@@ -153,54 +153,75 @@ public class Blacklist {
 					if (!BetterBungee.getInstance().discordwebhook.equals("none")) {
 						if (underattack) {
 							if (averagecps < 12) {
+								new Thread(() -> {
+									try {
+										DiscordWebhook webhook = new DiscordWebhook(
+												BetterBungee.getInstance().discordwebhook);
 
+										EmbedObject object2 = new EmbedObject();
 
-								DiscordWebhook webhook = new DiscordWebhook(BetterBungee.getInstance().discordwebhook);
+										object2.setColor(Color.GREEN);
+										
+										object2.addField("Attack Stopped", "BetterBungee", true);
+										
+										object2.addField("IPAdresses Blocked", "" + (Blacklist.getInstance().getBlacklist().size() - blockedipadresses),
+												true);
+										object2.addField("Connections Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()
+														- blockedconnections),
+												true);
+										
+										object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
 
-								EmbedObject object2 = new EmbedObject();
+										blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+										blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
 
-								object2.setColor(Color.GREEN);
-								object2.addField("Attack Stopped", "BetterBungee", true);
-								object2.addField("Connections Blocked", "" + (Blacklist.getInstance().getBlacklist().size()-blockedipadresses), true);
-								object2.addField("IPAdresses Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()-blockedconnections), true);
-								object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+										webhook.addEmbed(object2);
 
-								blockedipadresses = Blacklist.getInstance().getBlacklist().size();
-								blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
-								webhook.addEmbed(object2);
+										try {
+											webhook.execute();
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
 
-								try {
-									webhook.execute();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
+									} catch (Throwable e) {
+										e.printStackTrace();
+									}
+								}).start();
 							}
 						}
 
 						if (!underattack) {
 							if (averagecps > 12) {
+								new Thread(() -> {
+									try {
 
-								blockedipadresses = Blacklist.getInstance().getBlacklist().size();
-								blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
+										blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+										blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
 
-								DiscordWebhook webhook = new DiscordWebhook(BetterBungee.getInstance().discordwebhook);
+										DiscordWebhook webhook = new DiscordWebhook(
+												BetterBungee.getInstance().discordwebhook);
 
-								EmbedObject object2 = new EmbedObject();
+										EmbedObject object2 = new EmbedObject();
 
-								object2.setColor(Color.RED);
-								object2.addField("Attack Detected", "BetterBungee", true);
-								object2.addField("Connections Per Second", "" + Blacklist.getInstance().getAveragecps(),
-										true);
-								object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+										object2.setColor(Color.RED);
+										object2.addField("Attack Detected", "BetterBungee", true);
+										object2.addField("Connections Per Second",
+												"" + Blacklist.getInstance().getAveragecps(), true);
+										object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
 
-								webhook.addEmbed(object2);
+										webhook.addEmbed(object2);
 
-								try {
-									webhook.execute();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
+										try {
+											webhook.execute();
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
 
+									} catch (Throwable e) {
+										e.printStackTrace();
+									}
+
+								}).start();
 							}
 						}
 					}
