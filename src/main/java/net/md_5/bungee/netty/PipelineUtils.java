@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -30,11 +31,16 @@ import java.net.SocketAddress;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.BungeeServerInfo;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
+import net.md_5.bungee.api.Blacklist;
+import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.StatisticsAPI;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.event.ClientConnectEvent;
 import net.md_5.bungee.connection.InitialHandler;
@@ -54,6 +60,9 @@ public class PipelineUtils {
 	public static final ChannelInitializer<Channel> SERVER_CHILD = new ChannelInitializer<Channel>() {
 		@Override
 		protected void initChannel(Channel ch) throws Exception {
+
+			Blacklist.getInstance().addConnectionspersecond(1);
+
 			SocketAddress remoteAddress = (ch.remoteAddress() == null) ? ch.parent().localAddress()
 					: ch.remoteAddress();
 
@@ -65,8 +74,21 @@ public class PipelineUtils {
 
 			ListenerInfo listener = ch.attr(LISTENER).get();
 
-			if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener))
-					.isCancelled()) {
+			if (!listener.isProxyProtocol()) {
+				if (Blacklist.getInstance().isBlacklisted(Blacklist.getInstance().getRealAdress(remoteAddress))) {
+					ch.close();
+					StatisticsAPI.getInstance().addblockedConnection();
+					if (BetterBungee.getInstance().isDevdebugmode()) {
+						System.out.println("blocked " + remoteAddress);
+					}
+					return;
+				}
+				if (filter(ch)) {
+					return;
+				}
+			}
+
+			if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener)).isCancelled()) {
 				ch.close();
 				return;
 			}
@@ -79,7 +101,7 @@ public class PipelineUtils {
 					new MinecraftEncoder(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion()));
 			ch.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, legacyKicker);
 			ch.pipeline().get(HandlerBoss.class).setHandler(new InitialHandler(BungeeCord.getInstance(), listener));
-			
+
 			if (listener.isProxyProtocol()) {
 				ch.pipeline().addFirst(new HAProxyMessageDecoder());
 			}
@@ -159,10 +181,63 @@ public class PipelineUtils {
 			ch.config().setWriteBufferWaterMark(MARK);
 
 			ch.pipeline().addLast(FRAME_DECODER, new Varint21FrameDecoder());
-			ch.pipeline().addLast(TIMEOUT_HANDLER, new ReadTimeoutHandler(BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
+			ch.pipeline().addLast(TIMEOUT_HANDLER,
+					new ReadTimeoutHandler(BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
 			ch.pipeline().addLast(FRAME_PREPENDER, framePrepender);
 
 			ch.pipeline().addLast(BOSS_HANDLER, new HandlerBoss());
 		}
 	}
+
+	public static Blacklist list = Blacklist.getInstance();
+	public static NotifyManager notify = NotifyManager.getInstance();
+
+	public static boolean filter(Channel ch) {
+		String ip = null;
+		ip = list.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
+
+		if (list.isProtection()) {
+			if (list.isBlacklisted(ip)) {
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
+				}
+				ch.close();
+				StatisticsAPI.getInstance().addblockedConnection();
+				return true;
+			}
+
+			list.createlimit(ip);
+
+			list.addlimit(ip);
+
+			int rate = list.ratelimit(ip);
+
+			if (rate > list.getPerIPratelimit()) {
+				if (BetterBungee.getInstance().isDevdebugmode()) {
+					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
+				}
+				ch.close();
+				if (list.containswhitelist(ip)) {
+					list.removeWhitelist(ip);
+				}
+				StatisticsAPI.getInstance().addblockedConnection();
+				;
+				return true;
+			}
+
+			if (!list.containswhitelist(ip)) {
+				list.addConnectionratelimit(1);
+				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
+					if (BetterBungee.getInstance().isDevdebugmode()) {
+						notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
+					}
+					ch.close();
+					StatisticsAPI.getInstance().addblockedConnection();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 }

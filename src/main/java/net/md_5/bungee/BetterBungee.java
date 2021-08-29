@@ -1,5 +1,6 @@
 package net.md_5.bungee;
 
+import java.awt.desktop.ScreenSleepEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -167,7 +168,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "0.99";
+	public String Version = "1.02";
 
 	public String BungeeCordVersion = "bda160562792a913cba3a65ba4996de60d0d6d68";
 
@@ -236,19 +237,17 @@ public class BetterBungee {
 	private boolean proxycheckonauth = false;
 
 	private Integer startdenyproxyauthlimit = 2;
-	
 
 	private boolean pingcheck = false;
 
 	private Integer pingcheckonconnectlimit = 20;
 
 	public String discordwebhook = "none";
-	
+
 	public String pathtotemplatejar = "none";
-	
 
 	private static BetterBungee instance;
-	
+
 	public BetterBungee() {
 		instance = this;
 		createConfigs();
@@ -258,6 +257,7 @@ public class BetterBungee {
 			NotifyManager.Instance = new NotifyManager();
 			onStart();
 			while (BungeeCord.getInstance().isRunning) {
+				sleep(3500);
 				if (alive()) {
 					apiconnection = true;
 					if (snapshotupdate) {
@@ -358,7 +358,7 @@ public class BetterBungee {
 			String faviconlimit = "serversettings.faviconspersecond";
 
 			String hostnameprotection = "serversettings.onlyhostname";
-			
+
 			String hostnames = "serversettings.hostnames";
 
 			String updatecheckfrequencysetting = "serversettings.updatecheckfrequencyinminutes";
@@ -377,18 +377,14 @@ public class BetterBungee {
 
 			String forcewhitelistedips = "serversettings.forcewhitelistedips";
 
-
 			String proxycheckonauth = "serversettings.denyproxyauths";
 
 			String startdenyproxyauthlimit = "serversettings.startdenyproxyauthlimit";
 
-			
-			
 			String pingcheck = "serversettings.checkifserverlistpinged";
 
 			String pingcheckonconnectlimit = "serversettings.denyifnotpingedlimit";
-			
-			
+
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
 			addDefault(config, snapshotupdater, "false");
@@ -404,7 +400,7 @@ public class BetterBungee {
 			addDefault(config, firewallsync, "true");
 
 			addDefault(config, hostnameprotection, "false");
-			
+
 			addDefault(config, hostnames, "play.domain.com,domain.com");
 
 			addDefault(config, denyvpns, "false");
@@ -418,33 +414,31 @@ public class BetterBungee {
 			addDefault(config, faviconlimit, "7");
 
 			addDefault(config, limitperip, "3");
-			
+
 			addDefault(config, proxycheckonauth, "false");
 
 			addDefault(config, startdenyproxyauthlimit, "2");
 
-			
 			addDefault(config, pingcheck, "false");
 
 			addDefault(config, pingcheckonconnectlimit, "20");
-			
-			
+
 			addDefault(config, updatecheckfrequencysetting, "15");
 
 			addDefault(config, discordwebhook, "none");
 
 			addDefault(config, manuelupdates, "false");
-			
+
 			addDefault(config, pathtotemplatejar, "none");
 
 			addDefault(config, packetsizelimit, "false");
 
 			addDefault(config, packetsizelimitsize, "8000");
-			
+
 			addDefault(config, devdebugmode, "false");
 
 			addDefault(config, forcewhitelistedips, "127.0.0.2,127.0.0.3");
-			
+
 			String configuuid = "serverdata.uuid";
 
 			String configkey = "serverdata.key";
@@ -492,9 +486,9 @@ public class BetterBungee {
 			this.disablebungeecommands = config.getString(disablebungeecommands).equalsIgnoreCase("true");
 
 			this.updatecheckfrequency = Integer.valueOf(config.getString(limitperip));
-			
+
 			this.proxycheckonauth = config.getString(proxycheckonauth).equalsIgnoreCase("true");
-			
+
 			this.startdenyproxyauthlimit = Integer.valueOf(config.getString(startdenyproxyauthlimit));
 
 			this.discordwebhook = config.getString(discordwebhook);
@@ -512,16 +506,12 @@ public class BetterBungee {
 			this.hostnames.addAll(Arrays.asList(config.getString(hostnames).toLowerCase(Locale.ROOT).split(",")));
 
 			this.forcewhitelistedips.addAll(Arrays.asList(config.getString(forcewhitelistedips).split(",")));
-			
+
 			this.pingcheck = config.getString(pingcheck).equalsIgnoreCase("true");
-			
+
 			this.pingcheckonconnectlimit = Integer.valueOf(config.getString(pingcheckonconnectlimit));
 
 			this.pathtotemplatejar = config.getString(pathtotemplatejar);
-
-			
-			
-			
 
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
@@ -530,7 +520,7 @@ public class BetterBungee {
 			Blacklist.getInstance().setGlobalratelimit(this.globallimit);
 
 			Blacklist.getInstance().setPerIPratelimit(this.periplimit);
-			
+
 			Blacklist.getInstance().setGlobalfaviconlimit(this.faviconlimit);
 
 			if (snapshotupdate) {
@@ -566,14 +556,26 @@ public class BetterBungee {
 //			}
 
 			if (this.firewallsync) {
+
 				new Thread(() -> {
+					
 					sleep(5500);
+
+
+					while (!apiconnection) {
+						sleep(3000);
+					}
+					
+					getAPIBlacklist();
+
+					getAPIWhitelist();
+
 					while (BungeeCord.getInstance().isRunning) {
 						if (apiconnection) {
-							if (lastfirewallsync < System.currentTimeMillis() - (1000 * 5)) {
+							if (lastfirewallsync < System.currentTimeMillis() - (1000 * 2)) {
 								lastfirewallsync = System.currentTimeMillis();
 								syncfirewallwithrestapi();
-								sleep(2500);
+								sleep(500);
 							}
 
 						}
@@ -586,57 +588,97 @@ public class BetterBungee {
 		}
 	}
 
+	private void getAPIBlacklist() {
+		RestAPIResponse response = RestAPI.getInstance().get(betterbungee+"/getblacklist?session=" + session);
+		if (!response.getFailed()) {
+			String message = response.getText();
+			if (message.contains(" ")) {
+				return;
+			}
+			if (message.contains(",")) {
+				for (String msg : message.split(",")) {
+					Blacklist.getInstance().getBlacklist().add(msg);
+				}
+			} else {
+				Blacklist.getInstance().getBlacklist().add(message);
+			}
+		}
+	}
+
+	private void getAPIWhitelist() {
+		RestAPIResponse response = RestAPI.getInstance()
+				.get(betterbungee+"/getwhitelist?session=" + session);
+
+		if (!response.getFailed()) {
+			String message = response.getText();
+			if (message.contains(" ")) {
+				return;
+			}
+			if (message.contains(",")) {
+				for (String msg : message.split(",")) {
+					Blacklist.getInstance().getWhitelist().add(msg);
+				}
+			} else {
+				Blacklist.getInstance().getWhitelist().add(message);
+			}
+		}
+	}
+
 	public void syncfirewallwithrestapi() {
-		if (addwhitelist.size() > 0) {
-			Set<String> set = ConcurrentHashMap.newKeySet();
-			if (addwhitelist.size() > 20) {
-				for (int i = 0; i < 20; i++) {
-					set.add(addwhitelist.poll());
+		for (int i2 = 0; i2 < 2; i2++) {
+			if (addwhitelist.size() > 0) {
+				sleep(500);
+				i2 -= 1;
+				Set<String> set = ConcurrentHashMap.newKeySet();
+				if (addwhitelist.size() > 20) {
+					for (int i = 0; i < 20; i++) {
+						set.add(addwhitelist.poll());
+					}
+				} else {
+					set.addAll(addwhitelist);
+					addwhitelist.clear();
 				}
-			} else {
-				set.addAll(addwhitelist);
-				addwhitelist.clear();
-			}
-			addwhitelist(set);
-		}
-
-		if (addblacklist.size() > 0) {
-			Set<String> set = ConcurrentHashMap.newKeySet();
-			if (addblacklist.size() > 20) {
-				for (int i = 0; i < 20; i++) {
-					set.add(addblacklist.poll());
+				addwhitelist(set);
+			} else if (addblacklist.size() > 0) {
+				sleep(500);
+				i2 -= 1;
+				Set<String> set = ConcurrentHashMap.newKeySet();
+				if (addblacklist.size() > 20) {
+					for (int i = 0; i < 20; i++) {
+						set.add(addblacklist.poll());
+					}
+				} else {
+					set.addAll(addblacklist);
+					addblacklist.clear();
 				}
-			} else {
-				set.addAll(addblacklist);
-				addblacklist.clear();
-			}
-			addblacklist(set);
-		}
-
-		if (removewhitelist.size() > 0) {
-			Set<String> set = ConcurrentHashMap.newKeySet();
-			if (removewhitelist.size() > 20) {
-				for (int i = 0; i < 20; i++) {
-					set.add(removewhitelist.poll());
+				addblacklist(set);
+			} else if (removewhitelist.size() > 0) {
+				sleep(500);
+				i2 -= 1;
+				Set<String> set = ConcurrentHashMap.newKeySet();
+				if (removewhitelist.size() > 20) {
+					for (int i = 0; i < 20; i++) {
+						set.add(removewhitelist.poll());
+					}
+				} else {
+					set.addAll(removewhitelist);
+					removewhitelist.clear();
 				}
-			} else {
-				set.addAll(removewhitelist);
-				removewhitelist.clear();
-			}
-			removewhitelist(set);
-		}
-
-		if (removeblacklist.size() > 0) {
-			Set<String> set = ConcurrentHashMap.newKeySet();
-			if (removeblacklist.size() > 20) {
-				for (int i = 0; i < 20; i++) {
-					set.add(removeblacklist.poll());
+				removewhitelist(set);
+			} else if (removeblacklist.size() > 0) {
+				sleep(500);
+				i2 -= 1;
+				Set<String> set = ConcurrentHashMap.newKeySet();
+				if (removeblacklist.size() > 20) {
+					for (int i = 0; i < 20; i++) {
+						set.add(removeblacklist.poll());
+					}
+				} else {
+					set.addAll(removeblacklist);
+					removeblacklist.clear();
 				}
-			} else {
-				set.addAll(removeblacklist);
-				removeblacklist.clear();
+				removeblacklist(set);
 			}
-			removeblacklist(set);
 		}
 	}
 
@@ -689,7 +731,9 @@ public class BetterBungee {
 			if (!response.getFailed()) {
 				try {
 					String newestupdateid = response.getText().replaceAll("\n", "").split(":")[1];
-					if (!newestupdateid.equals(String.valueOf(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).length()))) {
+					if (!newestupdateid.equals(String.valueOf(
+							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+									.length()))) {
 						return updatefromlink(betterbungee + "/downloadupdate");
 					}
 				} catch (URISyntaxException e) {
@@ -707,7 +751,8 @@ public class BetterBungee {
 			try {
 				if (pathtotemplatejar.equalsIgnoreCase("none")) {
 					new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-					new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+					new File("UpdatedBungeeCord.jar").renameTo(
+							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
 				} else {
 					new File(pathtotemplatejar).delete();
 					new File("UpdatedBungeeCord.jar").renameTo(new File(pathtotemplatejar));

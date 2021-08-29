@@ -47,9 +47,9 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		if (!BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
-			filter(ctx);
-		}
+//		if (!BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
+//			filter(ctx);
+//		}
 		if (handler != null) {
 			channel = new ChannelWrapper(ctx);
 			handler.connected(channel);
@@ -61,7 +61,6 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 	private void filter(ChannelHandlerContext ctx) {
 		String ip = null;
-		list.addConnectionspersecond(1);
 		if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
 			ip = list.getRealAdress(channel);
 		} else {
@@ -135,15 +134,14 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 			HAProxyMessage proxy = (HAProxyMessage) msg;
 
-
 			try {
 				if (proxy.sourceAddress() != null) {
 					channel.setProxyAddress(list.getRealAdress(ctx.channel().remoteAddress()));
-					
-					
+
 					InetSocketAddress newAddress = new InetSocketAddress(proxy.sourceAddress(), proxy.sourcePort());
 
-					ProxyServer.getInstance().getLogger().log(Level.FINE, "Set remote address via PROXY {0} -> {1}", new Object[] { channel.getRemoteAddress(), newAddress });
+					ProxyServer.getInstance().getLogger().log(Level.FINE, "Set remote address via PROXY {0} -> {1}",
+							new Object[] { channel.getRemoteAddress(), newAddress });
 
 					channel.setRemoteAddress(newAddress);
 
@@ -209,13 +207,24 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 						}
 						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}",new Object[] { handler, cause.getMessage() });
 					} else if (cause.getCause() instanceof BadPacketException) {
-						ProxyServer.getInstance().getLogger().log(Level.WARNING,
-								"{0} - bad packet ID, are mods in use!? {1}",
-								new Object[] { handler, cause.getCause().getMessage() });
+						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - bad packet ID, are mods in use!? {1}", new Object[] { handler, cause.getCause().getMessage() });
 					} else if (cause.getCause() instanceof OverflowPacketException) {
-						ProxyServer.getInstance().getLogger().log(Level.WARNING,
-								"{0} - overflow in packet detected! {1}",
-								new Object[] { handler, cause.getCause().getMessage() });
+						ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - overflow in packet detected! {1}", new Object[] { handler, cause.getCause().getMessage() });
+						if (Blacklist.getInstance().isProtection()) {
+							String ip = null;
+							if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
+								ip = list.getRealAdress(channel);
+							} else {
+								ip = list.getRealAdress(ctx);
+							}
+
+							Blacklist.getInstance().addBlacklist(ip);
+							if (BetterBungee.getInstance().isDevdebugmode()) {
+								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cPacket Overflow");
+							}
+							ctx.close();
+							return;
+						}
 					}
 				} else if (cause instanceof IOException
 						|| (cause instanceof IllegalStateException && handler instanceof InitialHandler)) {
@@ -276,11 +285,11 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 			} else {
 				ip = list.getRealAdress(ctx);
 			}
-
+			System.out.println("Crasher");
 //			Blacklist.getInstance().addBlacklist(ip);
-//			if (BetterBungee.getInstance().isDevdebugmode()) {
+			if (BetterBungee.getInstance().isDevdebugmode()) {
 				NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cUnknownCrasher");
-//			}
+			}
 			ctx.close();
 		}
 	}

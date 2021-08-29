@@ -50,6 +50,8 @@ public class Blacklist {
 	@Getter
 	private boolean underattack = false;
 
+	private boolean sendeddiscord = false;
+
 	@Setter
 	@Getter
 	private boolean protection = false;
@@ -74,6 +76,9 @@ public class Blacklist {
 			return;
 		}
 		StatisticsAPI.getInstance().addblockedConnection();
+		if (BetterBungee.getInstance().isFirewallsync()) {
+			BetterBungee.getInstance().getAddblacklist().add(stg);
+		}
 		blacklist.add(stg);
 		return;
 	}
@@ -91,7 +96,9 @@ public class Blacklist {
 			return false;
 		}
 		String ip = inet.toString();
-		BungeeCord.getInstance().getBetterBungee().getAddblacklist().add(ip);
+		if (BetterBungee.getInstance().isFirewallsync()) {
+			BetterBungee.getInstance().getAddblacklist().add(ip);
+		}
 		return blacklist.add(ip);
 	}
 
@@ -99,7 +106,9 @@ public class Blacklist {
 		if (!protection) {
 			return;
 		}
-		BungeeCord.getInstance().getBetterBungee().getRemoveblacklist().addAll(getBlacklist());
+		if (BetterBungee.getInstance().isFirewallsync()) {
+			BetterBungee.getInstance().getRemoveblacklist().addAll(getBlacklist());
+		}
 		blacklist.clear();
 	}
 
@@ -107,7 +116,9 @@ public class Blacklist {
 		if (!protection) {
 			return false;
 		}
-		BungeeCord.getInstance().getBetterBungee().getRemoveblacklist().add(stg);
+		if (BetterBungee.getInstance().isFirewallsync()) {
+			BetterBungee.getInstance().getRemoveblacklist().add(stg);
+		}
 		return blacklist.remove(stg);
 	}
 
@@ -150,82 +161,80 @@ public class Blacklist {
 					} else {
 						averagecps = average / averagecpslist.size();
 					}
-					if (!BetterBungee.getInstance().discordwebhook.equals("none")) {
-						if (underattack) {
-							if (averagecps < 12) {
-								new Thread(() -> {
-									try {
-										DiscordWebhook webhook = new DiscordWebhook(
-												BetterBungee.getInstance().discordwebhook);
-
-										EmbedObject object2 = new EmbedObject();
-
-										object2.setColor(Color.GREEN);
-										
-										object2.addField("Attack Stopped", "BetterBungee", true);
-										
-										object2.addField("IPAdresses Blocked", "" + (Blacklist.getInstance().getBlacklist().size() - blockedipadresses),
-												true);
-										object2.addField("Connections Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()
-														- blockedconnections),
-												true);
-										
-										object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
-
-										blockedipadresses = Blacklist.getInstance().getBlacklist().size();
-										blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
-
-										webhook.addEmbed(object2);
-
-										try {
-											webhook.execute();
-										} catch (IOException e) {
-											e.printStackTrace();
-										}
-
-									} catch (Throwable e) {
-										e.printStackTrace();
-									}
-								}).start();
-							}
-						}
-
+					
+					if (averagecps > 12) {
 						if (!underattack) {
-							if (averagecps > 12) {
-								new Thread(() -> {
+							underattack = true;
+							int cps = connectionspersecond;
+							new Thread(() -> {
+								try {
+
+									blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+									blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
+
+									DiscordWebhook webhook = new DiscordWebhook(
+											BetterBungee.getInstance().discordwebhook);
+
+									EmbedObject object2 = new EmbedObject();
+
+									object2.setColor(Color.RED);
+									object2.addField("Attack Detected", "BetterBungee", true);
+									object2.addField("Connections Per Second", "" + cps, true);
+									object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+
+									webhook.addEmbed(object2);
+
 									try {
-
-										blockedipadresses = Blacklist.getInstance().getBlacklist().size();
-										blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
-
-										DiscordWebhook webhook = new DiscordWebhook(
-												BetterBungee.getInstance().discordwebhook);
-
-										EmbedObject object2 = new EmbedObject();
-
-										object2.setColor(Color.RED);
-										object2.addField("Attack Detected", "BetterBungee", true);
-										object2.addField("Connections Per Second",
-												"" + Blacklist.getInstance().getAveragecps(), true);
-										object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
-
-										webhook.addEmbed(object2);
-
-										try {
-											webhook.execute();
-										} catch (IOException e) {
-											e.printStackTrace();
-										}
-
-									} catch (Throwable e) {
+										webhook.execute();
+									} catch (IOException e) {
 										e.printStackTrace();
 									}
 
-								}).start();
-							}
+								} catch (Throwable e) {
+									e.printStackTrace();
+								}
+
+							}).start();
+						}
+					} else {
+						if (underattack) {
+							underattack = false;
+							new Thread(() -> {
+								try {
+									DiscordWebhook webhook = new DiscordWebhook(
+											BetterBungee.getInstance().discordwebhook);
+
+									EmbedObject object2 = new EmbedObject();
+
+									object2.setColor(Color.GREEN);
+									
+									object2.addField("Attack Stopped", "BetterBungee", true);
+									
+									object2.addField("IPAdresses Blocked", "" + (Blacklist.getInstance().getBlacklist().size() - blockedipadresses),
+											true);
+									object2.addField("Connections Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()
+													- blockedconnections),
+											true);
+									
+									object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+
+									blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+									blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
+
+									webhook.addEmbed(object2);
+
+									try {
+										webhook.execute();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+
+								} catch (Throwable e) {
+									e.printStackTrace();
+								}
+							}).start();
 						}
 					}
-					underattack = averagecps > 12;
 
 					connectionratelimit = 0;
 
@@ -272,7 +281,9 @@ public class Blacklist {
 
 	public void addWhitelist(String stg) {
 		if (!whitelist.contains(stg)) {
-			BungeeCord.getInstance().getBetterBungee().getAddwhitelist().add(stg);
+			if (BetterBungee.getInstance().isFirewallsync()) {
+				BetterBungee.getInstance().getAddwhitelist().add(stg);
+			}
 			this.whitelist.add(stg);
 		}
 	}
@@ -282,13 +293,17 @@ public class Blacklist {
 	}
 
 	public void clearWhitelist() {
-		BungeeCord.getInstance().getBetterBungee().getRemovewhitelist().addAll(getWhitelist());
+		if (BetterBungee.getInstance().isFirewallsync()) {
+			BetterBungee.getInstance().getRemovewhitelist().addAll(getWhitelist());
+		}
 		this.whitelist.clear();
 	}
 
 	public void removeWhitelist(String stg) {
 		if (whitelist.contains(stg)) {
-			BungeeCord.getInstance().getBetterBungee().getRemovewhitelist().add(stg);
+			if (BetterBungee.getInstance().isFirewallsync()) {
+				BetterBungee.getInstance().getRemovewhitelist().add(stg);
+			}
 			this.whitelist.remove(stg);
 		}
 	}
