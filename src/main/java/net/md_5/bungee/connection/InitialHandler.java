@@ -323,7 +323,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		boolean hostprotection = BetterBungee.getInstance().isHostprotectionnames();
 
-		boolean pingprotection = BetterBungee.getInstance().isHostprotectionnames();
+		boolean pingprotection = BetterBungee.getInstance().isPingcheck();
 
 		startedhandshake = System.currentTimeMillis();
 
@@ -408,8 +408,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
 							if (BetterBungee.getInstance().isDevdebugmode()) {
-								NotifyManager.getInstance().addmessage(
-										"§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
+								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
 							}
 							ch.close();
 							return;
@@ -454,6 +453,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		if (getName().length() > 16) {
 			disconnect(bungee.getTranslation("name_too_long"));
+			cancelcrash("to long name");
 			return;
 		}
 
@@ -612,7 +612,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				disconnect(bungee.getTranslation("already_connected_proxy"));
 				return;
 			}
-
 		}
 
 		offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getName()).getBytes(Charsets.UTF_8));
@@ -637,7 +636,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					@Override
 					public void run() {
 						if (!ch.isClosing()) {
+							String ip = list.getRealAdress(ch);
+
 							UserConnection userCon = new UserConnection(bungee, ch, getName(), InitialHandler.this);
+
 							userCon.setCompressionThreshold(BungeeCord.getInstance().config.getCompressionThreshold());
 							userCon.init();
 
@@ -664,43 +666,100 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
 
 							thisState = State.FINISHED;
-
-							String ip = list.getRealAdress(ch);
-
+							
 							if (Blacklist.getInstance().isProtection()) {
-								if (!list.containswhitelist(ip)) {
-									list.addWhitelist(ip);
-									NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
+								if (!list.getJoinedlist().contains(ip)) {
+									list.getJoinedlist().add(ip);
 								}
 							}
+//							if (isOnlineMode()) {
+//								if (Blacklist.getInstance().isProtection()) {
+//									if (!list.containswhitelist(ip)) {
+//										list.addWhitelist(ip);
+//										NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
+//									}
+//								}
+//							}
+//							
+//							userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
+//
+//							thisState = State.FINISHED;
+//						
 
-							if (BetterBungee.getInstance().isDenyVPNonJoin()) {
-								IPChecker.getInstance().start(() -> {
+							IPChecker.getInstance().start(() -> {
+
+								try {
+									Thread.sleep(1250);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+
+								if (Blacklist.getInstance().isUnderattack()) {
+									try {
+										Thread.sleep(2250);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+								
+								if (Blacklist.getInstance().isProtection()) {
+									if (list.getJoinedlist().contains(ip)) {
+										list.getJoinedlist().remove(ip);
+										ch.close();
+										Blacklist.getInstance().addBlacklist(ip);
+										list.removeWhitelist(ip);
+										return;
+									} else {
+										if (!list.containswhitelist(ip)) {
+											list.addWhitelist(ip);
+											NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
+										}
+									}
+								}
+								
+								if (BetterBungee.getInstance().isDenyVPNonJoin()) {
 									if (!IPChecker.getInstance().isipresidental(ip)) {
 										ProxiedPlayer player = userCon;
 										if (player != null) {
 											if (!player.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
-												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance()
-														.getBetterBungee().getDenyVPNkickmessage()));
-												NotifyManager.getInstance().addmessage(
-														"§6Detected §8- §e" + player.getName() + " §8- §6VPN");
+												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
+												NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
 											} else {
-												NotifyManager.getInstance().addmessage("§aDetected §8- §e"
-														+ player.getName() + " §8- §2VPN (bypassed)");
+												NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
 											}
 										}
 										return;
 									}
-								});
-							}
+								}
+							});
+
+//							if (BetterBungee.getInstance().isDenyVPNonJoin()) {
+//								IPChecker.getInstance().start(() -> {
+//									if (!IPChecker.getInstance().isipresidental(ip)) {
+//										ProxiedPlayer player = userCon;
+//										if (player != null) {
+//											if (!player.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
+//												player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
+//												NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
+//											} else {
+//												NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
+//											}
+//										}
+//										return;
+//									}
+//								});
+//							}
 						}
 					}
+
 				});
+
 			}
 		};
 
 		// fire login event
 		bungee.getPluginManager().callEvent(new LoginEvent(InitialHandler.this, complete));
+
 	}
 
 	private ProxiedPlayer getPlayer(SocketAddress socket) {

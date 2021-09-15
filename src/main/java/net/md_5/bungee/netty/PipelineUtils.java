@@ -63,11 +63,9 @@ public class PipelineUtils {
 
 			Blacklist.getInstance().addConnectionspersecond(1);
 
-			SocketAddress remoteAddress = (ch.remoteAddress() == null) ? ch.parent().localAddress()
-					: ch.remoteAddress();
+			SocketAddress remoteAddress = (ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress();
 
-			if (BungeeCord.getInstance().getConnectionThrottle() != null
-					&& BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
+			if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
 				ch.close();
 				return;
 			}
@@ -75,17 +73,11 @@ public class PipelineUtils {
 			ListenerInfo listener = ch.attr(LISTENER).get();
 
 			if (!listener.isProxyProtocol()) {
-				if (Blacklist.getInstance().isBlacklisted(Blacklist.getInstance().getRealAdress(remoteAddress))) {
-					ch.close();
-					StatisticsAPI.getInstance().addblockedConnection();
-					if (BetterBungee.getInstance().isDevdebugmode()) {
-						System.out.println("blocked " + remoteAddress);
-					}
-					return;
-				}
+
 				if (filter(ch)) {
 					return;
 				}
+
 			}
 
 			if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener)).isCancelled()) {
@@ -190,7 +182,7 @@ public class PipelineUtils {
 	}
 
 	public static Blacklist list = Blacklist.getInstance();
-	public static NotifyManager notify = NotifyManager.getInstance();
+//	public static NotifyManager notify = NotifyManager.getInstance();
 
 	public static boolean filter(Channel ch) {
 		String ip = null;
@@ -199,7 +191,7 @@ public class PipelineUtils {
 		if (list.isProtection()) {
 			if (list.isBlacklisted(ip)) {
 				if (BetterBungee.getInstance().isDevdebugmode()) {
-					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
+					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
 				}
 				ch.close();
 				StatisticsAPI.getInstance().addblockedConnection();
@@ -214,7 +206,7 @@ public class PipelineUtils {
 
 			if (rate > list.getPerIPratelimit()) {
 				if (BetterBungee.getInstance().isDevdebugmode()) {
-					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
+					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
 				}
 				ch.close();
 				if (list.containswhitelist(ip)) {
@@ -229,7 +221,7 @@ public class PipelineUtils {
 				list.addConnectionratelimit(1);
 				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
 					if (BetterBungee.getInstance().isDevdebugmode()) {
-						notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
+						NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
 					}
 					ch.close();
 					StatisticsAPI.getInstance().addblockedConnection();

@@ -58,6 +58,9 @@ public class Blacklist {
 
 	private Set<String> blacklist = ConcurrentHashMap.newKeySet();
 
+	@Getter
+	private Set<String> joinedlist = ConcurrentHashMap.newKeySet();
+
 	private Set<String> whitelist = ConcurrentHashMap.newKeySet();
 
 	public Set<String> getBlacklist() {

@@ -157,7 +157,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 							if (args[2].equalsIgnoreCase("true")) {
 								Blacklist.getInstance().setProtection(true);
 								sender.sendMessage(TextComponent.fromLegacyText(
-										BungeeCord.PREFIX + "§eBasic Protection§7 setto §a" + true + "§7!"));
+										BungeeCord.PREFIX + "§eBasic Protection§7 set to §a" + true + "§7!"));
 							} else if (args[2].equalsIgnoreCase("false")) {
 								Blacklist.getInstance().setProtection(false);
 								sender.sendMessage(TextComponent.fromLegacyText(
@@ -193,7 +193,7 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 							} else if (args[2].equalsIgnoreCase("false")) {
 								BetterBungee.getInstance().setProxycheckonauth(false);
 								sender.sendMessage(TextComponent.fromLegacyText(
-										BungeeCord.PREFIX + "§eProxyAuth Protection§7 set to §a" + false + "§7!"));
+										BungeeCord.PREFIX + "§eProxyAuth Protection §7 set to §a" + false + "§7!"));
 							} else {
 								sender.sendMessage(TextComponent
 										.fromLegacyText(BungeeCord.PREFIX + "§7Please write true or false"));

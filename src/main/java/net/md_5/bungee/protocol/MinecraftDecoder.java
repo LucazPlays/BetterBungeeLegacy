@@ -68,6 +68,7 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 				}
 
 				if (packetId == EnumPackets.SETTINGS.getId()) {
+					Blacklist.getInstance().getJoinedlist().remove(ip);
 					if (BungeeCord.getInstance().getBetterBungee().isDevdebugmode()) {
 						NotifyManager.getInstance().addmessage("§aDebug #323");
 						System.out.println("Settings Packet");
