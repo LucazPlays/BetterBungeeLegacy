@@ -357,7 +357,7 @@ public class BungeeCord extends ProxyServer {
 
 				if (connectionThrottle != null) {
 					connectionThrottle = null;
-					getLogger().log(Level.SEVERE, "Since PROXY protocol is in use, internal connection throttle has been disabled.");
+					getLogger().log(Level.INFO, "Since PROXY protocol is in use, internal connection throttle has been disabled.");
 				}
 			}
 
@@ -366,7 +366,7 @@ public class BungeeCord extends ProxyServer {
 				public void operationComplete(ChannelFuture future) throws Exception {
 					if (future.isSuccess()) {
 						listeners.add(future.channel());
-						getLogger().log(Level.SEVERE, "Listening on {0}", info.getSocketAddress());
+						getLogger().log(Level.INFO, "Listening on {0}", info.getSocketAddress());
 					} else {
 						getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(), future.cause());
 					}
@@ -385,7 +385,7 @@ public class BungeeCord extends ProxyServer {
 					public void operationComplete(ChannelFuture future) throws Exception {
 						if (future.isSuccess()) {
 							listeners.add(future.channel());
-							getLogger().log(Level.SEVERE, "Started query on {0}", future.channel().localAddress());
+							getLogger().log(Level.INFO, "Started query on {0}", future.channel().localAddress());
 						} else {
 							getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(),
 									future.cause());
@@ -399,7 +399,7 @@ public class BungeeCord extends ProxyServer {
 
 	public void stopListeners() {
 		for (Channel listener : listeners) {
-			getLogger().log(Level.SEVERE, "Closing listener {0}", listener);
+			getLogger().log(Level.INFO, "Closing listener {0}", listener);
 			try {
 				listener.close().syncUninterruptibly();
 			} catch (ChannelException ex) {
@@ -446,7 +446,7 @@ public class BungeeCord extends ProxyServer {
 
 		connectionLock.readLock().lock();
 		try {
-			getLogger().log(Level.SEVERE, "Disconnecting {0} connections", connections.size());
+			getLogger().log(Level.INFO, "Disconnecting {0} connections", connections.size());
 			for (UserConnection user : connections.values()) {
 				user.disconnect(reason);
 			}
@@ -475,7 +475,7 @@ public class BungeeCord extends ProxyServer {
 					handler.close();
 				}
 			} catch (Throwable t) {
-				getLogger().log(Level.SEVERE, "Exception disabling plugin " + plugin.getDescription().getName(), t);
+				getLogger().log(Level.INFO, "Exception disabling plugin " + plugin.getDescription().getName(), t);
 			}
 			getScheduler().cancel(plugin);
 			plugin.getExecutorService().shutdownNow();

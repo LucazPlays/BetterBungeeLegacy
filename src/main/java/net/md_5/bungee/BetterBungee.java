@@ -3,6 +3,7 @@ package net.md_5.bungee;
 import java.awt.desktop.ScreenSleepEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,11 +32,45 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
 public class BetterBungee {
+
+	public ServerInfo getLimboserver() {
+		return limboserver;
+	}
+
+	public void setLimboserver(ServerInfo limboserver) {
+		this.limboserver = limboserver;
+	}
+
+	public boolean isSendafkstolimbo() {
+		return sendafkstolimbo;
+	}
+
+	public void setSendafkstolimbo(boolean sendafkstolimbo) {
+		this.sendafkstolimbo = sendafkstolimbo;
+	}
+
+	public void setLimbomode(boolean limbomode) {
+		this.limbomode = limbomode;
+	}
+
+	public boolean isBotchecks() {
+		return botchecks;
+	}
+
+	public void setBotchecks(boolean botchecks) {
+		this.botchecks = botchecks;
+	}
+
+	public boolean isLimbomode() {
+		return limbomode;
+	}
 
 	public boolean isApiconnection() {
 		return apiconnection;
@@ -160,6 +196,14 @@ public class BetterBungee {
 		return snapshotupdate;
 	}
 
+	public ConcurrentHashMap<UUID, Long> getAfkList() {
+		return afk;
+	}
+
+	public ConcurrentHashMap<UUID, ServerInfo> getReconnectServer() {
+		return reconnectserver;
+	}
+
 	String betterbungee = "http://betterbungeeapi.skydb.de";
 
 	String uuid = "";
@@ -245,6 +289,20 @@ public class BetterBungee {
 	public String discordwebhook = "none";
 
 	public String pathtotemplatejar = "none";
+
+	private boolean allowselfconnect = false;
+
+	private boolean limbomode = false;
+
+	private boolean sendafkstolimbo = false;
+
+	private boolean botchecks = false;
+
+	private ConcurrentHashMap<UUID, Long> afk = new ConcurrentHashMap<UUID, Long>();
+
+	private ConcurrentHashMap<UUID, ServerInfo> reconnectserver = new ConcurrentHashMap<UUID, ServerInfo>();
+
+	private ServerInfo limboserver;
 
 	private static BetterBungee instance;
 
@@ -385,6 +443,14 @@ public class BetterBungee {
 
 			String pingcheckonconnectlimit = "serversettings.denyifnotpingedlimit";
 
+			String allowselfconnect = "serversettings.allowselfconnect";
+
+			String limbomode = "serversettings.limbomode";
+
+			String sendafkstolimbo = "serversettings.sendafkstolimbo";
+
+			String botchecks = "serversettings.botchecks";
+
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
 			addDefault(config, snapshotupdater, "false");
@@ -438,6 +504,14 @@ public class BetterBungee {
 			addDefault(config, devdebugmode, "false");
 
 			addDefault(config, forcewhitelistedips, "127.0.0.2,127.0.0.3");
+
+			addDefault(config, allowselfconnect, "false");
+
+			addDefault(config, limbomode, "false");
+
+			addDefault(config, sendafkstolimbo, "false");
+
+			addDefault(config, botchecks, "false");
 
 			String configuuid = "serverdata.uuid";
 
@@ -513,6 +587,14 @@ public class BetterBungee {
 
 			this.pathtotemplatejar = config.getString(pathtotemplatejar);
 
+			this.allowselfconnect = config.getString(allowselfconnect).equalsIgnoreCase("true");
+
+			this.limbomode = config.getString(limbomode).equalsIgnoreCase("true");
+
+			this.sendafkstolimbo = config.getString(sendafkstolimbo).equalsIgnoreCase("true");
+
+			this.botchecks = config.getString(botchecks).equalsIgnoreCase("true");
+
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
@@ -558,14 +640,13 @@ public class BetterBungee {
 			if (this.firewallsync) {
 
 				new Thread(() -> {
-					
-					sleep(5500);
 
+					sleep(5500);
 
 					while (!apiconnection) {
 						sleep(3000);
 					}
-					
+
 					getAPIBlacklist();
 
 					getAPIWhitelist();
@@ -583,13 +664,51 @@ public class BetterBungee {
 					}
 				}).start();
 			}
+			new Thread(() -> {
+				while (ProxyServer.getInstance() == null) {
+					sleep(500);
+				}
+				limboserver = ProxyServer.getInstance().constructServerInfo("betterbungee-limbo", new InetSocketAddress("51.195.101.127", 25565), "", false);
+			}).start();
+
+			if (this.limbomode && this.sendafkstolimbo) {
+				new Thread(() -> {
+
+					sleep(5500);
+					while (BungeeCord.getInstance().isRunning) {
+						sleep(5000);
+						for (Entry<UUID, Long> entry : afk.entrySet()) {
+							UUID uuid = entry.getKey();
+							ProxiedPlayer player = null;
+							for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+								if (all.equals(uuid)) {
+									player = all;
+								}
+							}
+							if (player == null) {
+								afk.remove(entry.getKey());
+								reconnectserver.remove(uuid);
+							} else {
+
+								if (entry.getValue().longValue() < System.currentTimeMillis() - 300000) {
+									if (!player.getServer().getInfo().getName().equals(limboserver.getName())) {
+										reconnectserver.put(uuid, player.getServer().getInfo());
+										player.connect(BetterBungee.getInstance().getLimboserver());
+									}
+								}
+
+							}
+						}
+					}
+				}).start();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void getAPIBlacklist() {
-		RestAPIResponse response = RestAPI.getInstance().get(betterbungee+"/getblacklist?session=" + session);
+		RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/getblacklist?session=" + session);
 		if (!response.getFailed()) {
 			String message = response.getText();
 			if (message.contains(" ")) {
@@ -606,8 +725,7 @@ public class BetterBungee {
 	}
 
 	private void getAPIWhitelist() {
-		RestAPIResponse response = RestAPI.getInstance()
-				.get(betterbungee+"/getwhitelist?session=" + session);
+		RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/getwhitelist?session=" + session);
 
 		if (!response.getFailed()) {
 			String message = response.getText();
@@ -997,5 +1115,9 @@ public class BetterBungee {
 
 	public String getBungeeCordVersion() {
 		return BungeeCordVersion;
+	}
+
+	public boolean isAllowSelfConnect() {
+		return allowselfconnect;
 	}
 }

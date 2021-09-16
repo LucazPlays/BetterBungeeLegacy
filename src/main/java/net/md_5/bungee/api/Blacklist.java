@@ -60,6 +60,9 @@ public class Blacklist {
 
 	@Getter
 	private Set<String> joinedlist = ConcurrentHashMap.newKeySet();
+	
+	@Getter
+	private Set<String> movementlist = ConcurrentHashMap.newKeySet();
 
 	private Set<String> whitelist = ConcurrentHashMap.newKeySet();
 
