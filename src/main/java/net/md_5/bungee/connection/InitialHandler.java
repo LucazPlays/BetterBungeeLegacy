@@ -132,11 +132,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	private enum State {
 
-		HANDSHAKE, STATUS, PING, USERNAME, ENCRYPT, FINISHED;
+		HANDSHAKE, STATUS, PING, USERNAME, ENCRYPT, FINISHING;
 	}
 
 	private boolean canSendKickMessage() {
-		return thisState == State.USERNAME || thisState == State.ENCRYPT || thisState == State.FINISHED;
+		return thisState == State.USERNAME || thisState == State.ENCRYPT || thisState == State.FINISHING;
 	}
 
 	@Override
@@ -484,15 +484,12 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					return;
 				}
 				if (onlineMode) {
+					thisState = State.ENCRYPT;
 					unsafe().sendPacket(request = EncryptionUtil.encryptRequest());
-					if (BungeeCord.getInstance().getBetterBungee().isDevdebugmode()) {
-						NotifyManager.getInstance()
-								.addmessage("§b" + (System.currentTimeMillis() - startedhandshake) + "ms");
-					}
 				} else {
+					thisState = State.FINISHING;
 					finish();
 				}
-				thisState = State.ENCRYPT;
 			}
 		};
 
@@ -579,6 +576,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					}
 				}
 			};
+	        thisState = State.FINISHING;
 			HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
 
 		} catch (Throwable e) {
@@ -671,8 +669,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								server = BetterBungee.getInstance().getLimboserver();
 								userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
 							}
-
-							thisState = State.FINISHED;
 
 							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks()) {
 								if (!list.getJoinedlist().contains(ip)) {

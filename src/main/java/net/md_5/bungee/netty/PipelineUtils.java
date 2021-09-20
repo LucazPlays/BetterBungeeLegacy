@@ -80,6 +80,8 @@ public class PipelineUtils {
 
 			}
 
+			ch.config().setOption( ChannelOption.TCP_NODELAY, true );
+
 			if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener)).isCancelled()) {
 				ch.close();
 				return;
@@ -213,7 +215,7 @@ public class PipelineUtils {
 					list.removeWhitelist(ip);
 				}
 				StatisticsAPI.getInstance().addblockedConnection();
-				;
+				
 				return true;
 			}
 

@@ -17,10 +17,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.io.FileUtils;
 
@@ -212,9 +216,9 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.02";
+	public String Version = "1.03";
 
-	public String BungeeCordVersion = "bda160562792a913cba3a65ba4996de60d0d6d68";
+	public String BungeeCordVersion = "1823f86dbb84022c7eaf541c5a62b36c7b47a5e1";
 
 	long lastfirewallsync = 0;
 
@@ -306,14 +310,23 @@ public class BetterBungee {
 
 	private static BetterBungee instance;
 
+	
+	private ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+	
+	
 	public BetterBungee() {
 		instance = this;
+		
 		createConfigs();
-		Thread betterbungeethread = new Thread(() -> {
+		
+		threads.execute(() -> {
+			
 			BungeeCordLauncher.crashed = false;
+			
 			sleep(1500);
 			NotifyManager.Instance = new NotifyManager();
 			onStart();
+			
 			while (BungeeCord.getInstance().isRunning) {
 				sleep(3500);
 				if (alive()) {
@@ -325,8 +338,7 @@ public class BetterBungee {
 										TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
 								for (int i = snapshotupdatecountdown; i > 0; i--) {
 									sleep(1000);
-									ProxyServer.getInstance().broadcast(TextComponent
-											.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
+									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
 								}
 								sleep(1000);
 								ProxyServer.getInstance().stop(updatemessage);
@@ -357,8 +369,6 @@ public class BetterBungee {
 				}
 			}
 		});
-		betterbungeethread.setPriority(Thread.MIN_PRIORITY);
-		betterbungeethread.start();
 	}
 
 	public static final String updatemessage = "§7Restarting §eProxy-Server§7 due to a §aUpdate§7 from §6BetterBungee";
@@ -370,9 +380,9 @@ public class BetterBungee {
 		login();
 	}
 
-	private void addDefault(Configuration conf, String test, String test1) {
-		if (!conf.contains(test)) {
-			conf.set(test, test1);
+	private void addDefault(Configuration conf, String path, String value) {
+		if (!conf.contains(path)) {
+			conf.set(path, value);
 		}
 	}
 
@@ -385,6 +395,8 @@ public class BetterBungee {
 				System.out.println("Created Config File");
 			}
 
+			ProxyServer.getInstance().getScheduler().schedule(null, null, faviconlimit, null);
+			
 			Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
 
 			String prefix = "serversettings.prefix";
@@ -451,6 +463,10 @@ public class BetterBungee {
 
 			String botchecks = "serversettings.botchecks";
 
+			String impossibelnamecheck = "serversettings.impossibelnamecheck";
+
+			String whitelistedcharacters = "serversettings.whitelistedcharacters";
+
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
 			addDefault(config, snapshotupdater, "false");
@@ -467,15 +483,21 @@ public class BetterBungee {
 
 			addDefault(config, hostnameprotection, "false");
 
+			addDefault(config, impossibelnamecheck, "true");
+
+			addDefault(config, whitelistedcharacters, "*");
+
+			addDefault(config, hostnameprotection, "false");
+
 			addDefault(config, hostnames, "play.domain.com,domain.com");
 
-			addDefault(config, denyvpns, "false");
+			addDefault(config, denyvpns, "true");
 
 			addDefault(config, denyvpnkickmessage, "&cKicked by AntiVPN");
 
 			addDefault(config, denyvpnbypasspermission, "antivpn.bypass");
 
-			addDefault(config, globallimit, "100");
+			addDefault(config, globallimit, "300");
 
 			addDefault(config, faviconlimit, "7");
 
@@ -483,11 +505,11 @@ public class BetterBungee {
 
 			addDefault(config, proxycheckonauth, "false");
 
-			addDefault(config, startdenyproxyauthlimit, "2");
+			addDefault(config, startdenyproxyauthlimit, "6");
 
-			addDefault(config, pingcheck, "false");
+			addDefault(config, pingcheck, "true");
 
-			addDefault(config, pingcheckonconnectlimit, "20");
+			addDefault(config, pingcheckonconnectlimit, "75");
 
 			addDefault(config, updatecheckfrequencysetting, "15");
 
@@ -512,6 +534,7 @@ public class BetterBungee {
 			addDefault(config, sendafkstolimbo, "false");
 
 			addDefault(config, botchecks, "false");
+
 
 			String configuuid = "serverdata.uuid";
 
@@ -637,9 +660,10 @@ public class BetterBungee {
 //				}).start();
 //			}
 
+	        
 			if (this.firewallsync) {
 
-				new Thread(() -> {
+				threads.execute(() -> {
 
 					sleep(5500);
 
@@ -662,18 +686,18 @@ public class BetterBungee {
 						}
 						sleep(3000);
 					}
-				}).start();
+				});
 			}
-			new Thread(() -> {
+			
+			threads.execute(() -> {
 				while (ProxyServer.getInstance() == null) {
 					sleep(500);
 				}
 				limboserver = ProxyServer.getInstance().constructServerInfo("betterbungee-limbo", new InetSocketAddress("51.195.101.127", 25565), "", false);
-			}).start();
+			});
 
-			if (this.limbomode && this.sendafkstolimbo) {
-				new Thread(() -> {
-
+			if (this.sendafkstolimbo) {
+				threads.execute(() -> {
 					sleep(5500);
 					while (BungeeCord.getInstance().isRunning) {
 						sleep(5000);
@@ -687,7 +711,9 @@ public class BetterBungee {
 							}
 							if (player == null) {
 								afk.remove(entry.getKey());
-								reconnectserver.remove(uuid);
+								if (reconnectserver.containsKey(uuid)) {
+									reconnectserver.remove(uuid);
+								}
 							} else {
 
 								if (entry.getValue().longValue() < System.currentTimeMillis() - 300000) {
@@ -700,7 +726,7 @@ public class BetterBungee {
 							}
 						}
 					}
-				}).start();
+				});
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
