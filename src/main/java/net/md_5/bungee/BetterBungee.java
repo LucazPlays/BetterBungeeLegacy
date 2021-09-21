@@ -334,8 +334,7 @@ public class BetterBungee {
 					if (snapshotupdate) {
 						if (update()) {
 							if (restartonupdate) {
-								ProxyServer.getInstance().broadcast(
-										TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
+								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
 								for (int i = snapshotupdatecountdown; i > 0; i--) {
 									sleep(1000);
 									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §c" + i + "§7 seconds"));
@@ -394,8 +393,6 @@ public class BetterBungee {
 				file.createNewFile();
 				System.out.println("Created Config File");
 			}
-
-			ProxyServer.getInstance().getScheduler().schedule(null, null, faviconlimit, null);
 			
 			Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
 
@@ -922,8 +919,7 @@ public class BetterBungee {
 
 	private boolean login() {
 		System.out.println("Login to API");
-		RestAPIResponse response = RestAPI.getInstance()
-				.get(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
+		RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/login?uuid=" + uuid + "&password=" + password);
 		if (!response.getFailed()) {
 			if (!response.getText().contains("Invalid")) {
 				session = response.getText();
