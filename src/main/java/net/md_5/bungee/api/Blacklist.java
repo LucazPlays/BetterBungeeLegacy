@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,59 @@ import net.md_5.bungee.netty.ChannelWrapper;
 
 public class Blacklist {
 
+	
+	
+	
+
+	public boolean filter(Channel ch) {
+		String ip = null;
+		ip = this.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
+
+		if (this.isProtection()) {
+			if (this.isBlacklisted(ip)) {
+				ch.close();
+				StatisticsAPI.getInstance().addblockedConnection();
+				return true;
+			}
+
+			this.createlimit(ip);
+
+			this.addlimit(ip);
+
+			int rate = this.ratelimit(ip);
+
+			if (rate > this.getPerIPratelimit()) {
+				ch.close();
+				if (this.containswhitelist(ip)) {
+					this.removeWhitelist(ip);
+				}
+				StatisticsAPI.getInstance().addblockedConnection();
+				
+				return true;
+			}
+
+			if (!this.containswhitelist(ip)) {
+				this.addConnectionratelimit(1);
+				if (this.getGlobalratelimit() < this.getConnectionratelimit()) {
+					ch.close();
+					StatisticsAPI.getInstance().addblockedConnection();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	private static Blacklist Instance = new Blacklist();
 
 	private ConcurrentHashMap<String, Integer> ratelimit = new ConcurrentHashMap<String, Integer>();

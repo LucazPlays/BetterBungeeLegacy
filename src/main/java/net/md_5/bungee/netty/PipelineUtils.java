@@ -64,7 +64,7 @@ public class PipelineUtils {
 			Blacklist.getInstance().addConnectionspersecond(1);
 
 			SocketAddress remoteAddress = (ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress();
-
+			
 			if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
 				ch.close();
 				return;
@@ -74,7 +74,7 @@ public class PipelineUtils {
 
 			if (!listener.isProxyProtocol()) {
 
-				if (filter(ch)) {
+				if (Blacklist.getInstance().filter(ch)) {
 					return;
 				}
 
@@ -183,55 +183,45 @@ public class PipelineUtils {
 		}
 	}
 
-	public static Blacklist list = Blacklist.getInstance();
 //	public static NotifyManager notify = NotifyManager.getInstance();
 
-	public static boolean filter(Channel ch) {
-		String ip = null;
-		ip = list.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
-
-		if (list.isProtection()) {
-			if (list.isBlacklisted(ip)) {
-				if (BetterBungee.getInstance().isDevdebugmode()) {
-					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
-				}
-				ch.close();
-				StatisticsAPI.getInstance().addblockedConnection();
-				return true;
-			}
-
-			list.createlimit(ip);
-
-			list.addlimit(ip);
-
-			int rate = list.ratelimit(ip);
-
-			if (rate > list.getPerIPratelimit()) {
-				if (BetterBungee.getInstance().isDevdebugmode()) {
-					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
-				}
-				ch.close();
-				if (list.containswhitelist(ip)) {
-					list.removeWhitelist(ip);
-				}
-				StatisticsAPI.getInstance().addblockedConnection();
-				
-				return true;
-			}
-
-			if (!list.containswhitelist(ip)) {
-				list.addConnectionratelimit(1);
-				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
-					if (BetterBungee.getInstance().isDevdebugmode()) {
-						NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
-					}
-					ch.close();
-					StatisticsAPI.getInstance().addblockedConnection();
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+//	public static boolean filter(Channel ch) {
+//		String ip = null;
+//		ip = list.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
+//
+//		if (list.isProtection()) {
+//			if (list.isBlacklisted(ip)) {
+//				ch.close();
+//				StatisticsAPI.getInstance().addblockedConnection();
+//				return true;
+//			}
+//
+//			list.createlimit(ip);
+//
+//			list.addlimit(ip);
+//
+//			int rate = list.ratelimit(ip);
+//
+//			if (rate > list.getPerIPratelimit()) {
+//				ch.close();
+//				if (list.containswhitelist(ip)) {
+//					list.removeWhitelist(ip);
+//				}
+//				StatisticsAPI.getInstance().addblockedConnection();
+//				
+//				return true;
+//			}
+//
+//			if (!list.containswhitelist(ip)) {
+//				list.addConnectionratelimit(1);
+//				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
+//					ch.close();
+//					StatisticsAPI.getInstance().addblockedConnection();
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
 
 }

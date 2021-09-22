@@ -47,65 +47,11 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//		if (!BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
-//			filter(ctx);
-//		}
 		if (handler != null) {
 			channel = new ChannelWrapper(ctx);
 			handler.connected(channel);
 			if (!(handler instanceof InitialHandler || handler instanceof PingHandler)) {
 				ProxyServer.getInstance().getLogger().log(Level.INFO, "{0} has connected", handler);
-			}
-		}
-	}
-
-	private void filter(ChannelHandlerContext ctx) {
-		String ip = null;
-		if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
-			ip = list.getRealAdress(channel);
-		} else {
-			ip = list.getRealAdress(ctx);
-		}
-
-		if (list.isProtection()) {
-			if (list.isBlacklisted(ip)) {
-				if (BetterBungee.getInstance().isDevdebugmode()) {
-					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §4Blacklisted");
-				}
-				ctx.close();
-				StatisticsAPI.getInstance().addblockedConnection();
-				return;
-			}
-
-			list.createlimit(ip);
-
-			list.addlimit(ip);
-
-			int rate = list.ratelimit(ip);
-
-			if (rate > list.getPerIPratelimit()) {
-				if (BetterBungee.getInstance().isDevdebugmode()) {
-					notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cPerIPRate Limit");
-				}
-				ctx.close();
-				if (list.containswhitelist(ip)) {
-					list.removeWhitelist(ip);
-				}
-				StatisticsAPI.getInstance().addblockedConnection();
-				;
-				return;
-			}
-
-			if (!list.containswhitelist(ip)) {
-				list.addConnectionratelimit(1);
-				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
-					if (BetterBungee.getInstance().isDevdebugmode()) {
-						notify.addmessage("§cBlocked §8- §e" + ip + " §8- §cGlobal Ratelimit");
-					}
-					ctx.close();
-					StatisticsAPI.getInstance().addblockedConnection();
-					return;
-				}
 			}
 		}
 	}
@@ -146,7 +92,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 					channel.setRemoteAddress(newAddress);
 
 					if (BungeeCord.getInstance().getBetterBungee().isProxyProtocol()) {
-						filter(ctx);
+						list.filter(ctx.channel());
 					}
 
 				}
@@ -202,6 +148,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 							if (BetterBungee.getInstance().isDevdebugmode()) {
 								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cCorruptedFrame");
 							}
+							StatisticsAPI.getInstance().addblockedConnection();
 							ctx.close();
 							return;
 						}
@@ -223,6 +170,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cPacket Overflow");
 							}
 							ctx.close();
+							StatisticsAPI.getInstance().addblockedConnection();
 							return;
 						}
 					}
@@ -238,10 +186,8 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 							}
 
 							Blacklist.getInstance().addBlacklist(ip);
-							if (BetterBungee.getInstance().isDevdebugmode()) {
-								NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cIllegalState");
-							}
 							ctx.close();
+							StatisticsAPI.getInstance().addblockedConnection();
 							return;
 						}
 					}
@@ -286,6 +232,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 				ip = list.getRealAdress(ctx);
 			}
 			System.out.println("Crasher");
+			StatisticsAPI.getInstance().addblockedConnection();
 //			Blacklist.getInstance().addBlacklist(ip);
 			if (BetterBungee.getInstance().isDevdebugmode()) {
 				NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cUnknownCrasher");
