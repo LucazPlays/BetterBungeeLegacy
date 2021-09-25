@@ -164,13 +164,13 @@ public class BetterBungee {
 		this.denyVPNonJoin = denyVPNonJoin;
 	}
 
-	public boolean isProxyProtocol() {
-		return ProxyProtocol;
-	}
-
-	public void setProxyProtocol(boolean proxyProtocol) {
-		ProxyProtocol = proxyProtocol;
-	}
+//	public boolean isProxyProtocol() {
+//		return ProxyProtocol;
+//	}
+//
+//	public void setProxyProtocol(boolean proxyProtocol) {
+//		ProxyProtocol = proxyProtocol;
+//	}
 
 	public boolean isDisablebungeecommands() {
 		return disablebungeecommands;
@@ -242,7 +242,7 @@ public class BetterBungee {
 
 	boolean disablebungeecommands = false;
 
-	boolean ProxyProtocol = false;
+//	boolean ProxyProtocol = false;
 
 	boolean denyVPNonJoin = false;
 

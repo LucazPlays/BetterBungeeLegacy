@@ -225,7 +225,7 @@ public class YamlConfig implements ConfigurationAdapter {
 			new Thread(() -> {
 				try {
 					Thread.sleep(5000);
-					BungeeCord.getInstance().getBetterBungee().setProxyProtocol(proxyProtocol);
+//					BungeeCord.getInstance().getBetterBungee().setProxyProtocol(proxyProtocol);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
