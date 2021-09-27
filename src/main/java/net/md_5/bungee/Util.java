@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -67,6 +68,19 @@ public class Util
     {
         return String.format( "0x%02X", i );
     }
+
+
+    /**
+     * Formats an char as a unicode value.
+     *
+     * @param c the character to format
+     * @return the unicode representation of the character
+     */
+    public static String unicode(char c)
+    {
+        return "\\u" + String.format( "%04x", (int) c ).toUpperCase( Locale.ROOT );
+    }
+
 
     /**
      * Constructs a pretty one line version of a {@link Throwable}. Useful for

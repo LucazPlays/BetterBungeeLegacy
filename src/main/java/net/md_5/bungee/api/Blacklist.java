@@ -32,8 +32,12 @@ public class Blacklist {
 	public boolean filter(Channel ch) {
 		String ip = null;
 		ip = this.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
-
+		
 		if (this.isProtection()) {
+			if (isforcewhitelistedip(ip)) {
+				return false;
+			}
+			
 			if (this.isBlacklisted(ip)) {
 				ch.close();
 				StatisticsAPI.getInstance().addblockedConnection();
@@ -52,7 +56,6 @@ public class Blacklist {
 					this.removeWhitelist(ip);
 				}
 				StatisticsAPI.getInstance().addblockedConnection();
-				
 				return true;
 			}
 
@@ -120,6 +123,15 @@ public class Blacklist {
 
 	private Set<String> whitelist = ConcurrentHashMap.newKeySet();
 
+	@Setter
+	@Getter
+	private Set<String> forcewhitelistedips = ConcurrentHashMap.newKeySet();
+
+	public boolean isforcewhitelistedip(String stg) {
+		return forcewhitelistedips.contains(stg);
+	}
+	
+	
 	public Set<String> getBlacklist() {
 		return blacklist;
 	}

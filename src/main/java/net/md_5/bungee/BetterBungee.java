@@ -216,9 +216,9 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.03";
+	public String Version = "1.04";
 
-	public String BungeeCordVersion = "1823f86dbb84022c7eaf541c5a62b36c7b47a5e1";
+	public String BungeeCordVersion = "c5a90475afba676c96d33fc3c7a3c06490b5d13b";
 
 	long lastfirewallsync = 0;
 
@@ -279,8 +279,6 @@ public class BetterBungee {
 	private Set<String> hostnames = ConcurrentHashMap.newKeySet();
 
 	private boolean hostprotectionnames = false;
-
-	private Set<String> forcewhitelistedips = ConcurrentHashMap.newKeySet();
 
 	private boolean proxycheckonauth = false;
 
@@ -599,7 +597,7 @@ public class BetterBungee {
 
 			this.hostnames.addAll(Arrays.asList(config.getString(hostnames).toLowerCase(Locale.ROOT).split(",")));
 
-			this.forcewhitelistedips.addAll(Arrays.asList(config.getString(forcewhitelistedips).split(",")));
+			Blacklist.getInstance().getForcewhitelistedips().addAll(Arrays.asList(config.getString(forcewhitelistedips).split(",")));
 
 			this.pingcheck = config.getString(pingcheck).equalsIgnoreCase("true");
 
@@ -1089,14 +1087,6 @@ public class BetterBungee {
 
 	public void setHostprotectionnames(boolean hostprotectionnames) {
 		this.hostprotectionnames = hostprotectionnames;
-	}
-
-	public Set<String> getForcewhitelistedips() {
-		return forcewhitelistedips;
-	}
-
-	public void setForcewhitelistedips(Set<String> forcewhitelistedips) {
-		this.forcewhitelistedips = forcewhitelistedips;
 	}
 
 	public static BetterBungee getInstance() {

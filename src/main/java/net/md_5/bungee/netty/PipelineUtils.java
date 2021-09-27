@@ -73,11 +73,9 @@ public class PipelineUtils {
 			ListenerInfo listener = ch.attr(LISTENER).get();
 
 			if (!listener.isProxyProtocol()) {
-
 				if (Blacklist.getInstance().filter(ch)) {
 					return;
 				}
-
 			}
 
 			ch.config().setOption( ChannelOption.TCP_NODELAY, true );

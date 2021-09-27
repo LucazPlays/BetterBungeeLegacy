@@ -71,6 +71,7 @@ import net.md_5.bungee.protocol.packet.PingPacket;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.StatusRequest;
 import net.md_5.bungee.protocol.packet.StatusResponse;
+import net.md_5.bungee.util.AllowedCharacters;
 import net.md_5.bungee.util.BoundedArrayList;
 import net.md_5.bungee.util.BufUtil;
 import net.md_5.bungee.util.QuietException;
@@ -179,8 +180,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				StatisticsAPI.getInstance().addblockedConnection();
 				list.addBlacklist(list.getRealAdress(ch));
 				if (BetterBungee.getInstance().isDevdebugmode()) {
-					NotifyManager.getInstance()
-							.addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
 				}
 				ch.close();
 			}
@@ -327,11 +327,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		startedhandshake = System.currentTimeMillis();
 
-		if (BetterBungee.getInstance().isDevdebugmode()) {
-			NotifyManager.getInstance().addmessage("§dTest §8- §e" + list.getRealAdress(ch));
-		}
-
-		if (BetterBungee.getInstance().getForcewhitelistedips().contains(list.getRealAdress(ch))) {
+		if (Blacklist.getInstance().getForcewhitelistedips().contains(list.getRealAdress(ch))) {
 			hostprotection = false;
 			pingprotection = false;
 		}
@@ -366,7 +362,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		String ip = list.getRealAdress(ch);
 
 		if (BetterBungee.getInstance().isDevdebugmode()) {
-			NotifyManager.getInstance().addmessage("§bTest2 §8- §e" + ip);
 			bungee.getLogger().log(Level.INFO, "{0} Hostname: " + handshake.getHost(), this);
 		}
 
@@ -374,10 +369,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			if (!BetterBungee.getInstance().getHostnames().contains(handshake.getHost().toLowerCase(Locale.ROOT))) {
 				Blacklist.getInstance().addConnectionratelimit(-1);
 				StatisticsAPI.getInstance().addblockedConnection();
-				if (BetterBungee.getInstance().isDevdebugmode()) {
-					NotifyManager.getInstance()
-							.addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §9Invalid Host");
-				}
 				ch.close();
 				return;
 			}
@@ -407,10 +398,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 						if (!ServerListAPI.getInstance().pingedbefore(ip)) {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
-							if (BetterBungee.getInstance().isDevdebugmode()) {
-								NotifyManager.getInstance().addmessage(
-										"§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §2Not Pinged Before");
-							}
 							ch.close();
 							return;
 						}
@@ -440,23 +427,21 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	@Override
 	public void handle(LoginRequest loginRequest) throws Exception {
 		Preconditions.checkState(thisState == State.USERNAME, "Not expecting USERNAME");
-		this.loginRequest = loginRequest;
 
-		if (getName().contains(" ")) {
-			disconnect(bungee.getTranslation("name_invalid"));
-			return;
-		}
-
-		if (getName().contains(".")) {
-			disconnect(bungee.getTranslation("name_invalid"));
-			return;
-		}
+		
+		
+        if (!AllowedCharacters.isValidName( loginRequest.getData(), onlineMode)) {
+            disconnect( bungee.getTranslation( "name_invalid" ) );
+            return;
+        }
 
 		if (getName().length() > 16) {
 			disconnect(bungee.getTranslation("name_too_long"));
-			cancelcrash("to long name");
+			cancelcrash("Name To Long");
 			return;
 		}
+		
+		this.loginRequest = loginRequest;
 
 		int limit = BungeeCord.getInstance().config.getPlayerLimit();
 
