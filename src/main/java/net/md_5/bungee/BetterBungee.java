@@ -472,15 +472,13 @@ public class BetterBungee {
 
 			addDefault(config, disablebungeecommands, "false");
 
-			addDefault(config, protection, "false");
+			addDefault(config, protection, "true");
 
 			addDefault(config, firewallsync, "true");
 
-			addDefault(config, hostnameprotection, "false");
-
-			addDefault(config, impossibelnamecheck, "true");
-
-			addDefault(config, whitelistedcharacters, "*");
+//			addDefault(config, impossibelnamecheck, "false");
+//
+//			addDefault(config, whitelistedcharacters, "*");
 
 			addDefault(config, hostnameprotection, "false");
 
@@ -504,7 +502,7 @@ public class BetterBungee {
 
 			addDefault(config, pingcheck, "true");
 
-			addDefault(config, pingcheckonconnectlimit, "75");
+			addDefault(config, pingcheckonconnectlimit, "50");
 
 			addDefault(config, updatecheckfrequencysetting, "15");
 
