@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AllowedCharacters {
 
-	public static char[] allowedcharacters = {};
+	public static char[] allowedcharacters = {'_'};
 
 	public static boolean isChatAllowedCharacter(char character) {
 		// Section symbols, control sequences, and deletes are not allowed

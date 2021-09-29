@@ -429,19 +429,21 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		Preconditions.checkState(thisState == State.USERNAME, "Not expecting USERNAME");
 
 		
-		
+
         if (!AllowedCharacters.isValidName( loginRequest.getData(), onlineMode)) {
             disconnect( bungee.getTranslation( "name_invalid" ) );
             return;
         }
-
-		if (getName().length() > 16) {
-			disconnect(bungee.getTranslation("name_too_long"));
-			cancelcrash("Name To Long");
-			return;
-		}
-		
+        
+        
 		this.loginRequest = loginRequest;
+		
+//		if (getName().length() > 16) {
+//			disconnect(bungee.getTranslation("name_too_long"));
+//			cancelcrash("Name To Long");
+//			return;
+//		}
+		
 
 		int limit = BungeeCord.getInstance().config.getPlayerLimit();
 

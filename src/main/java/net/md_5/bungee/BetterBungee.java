@@ -458,9 +458,9 @@ public class BetterBungee {
 
 			String botchecks = "serversettings.botchecks";
 
-			String impossibelnamecheck = "serversettings.impossibelnamecheck";
-
-			String whitelistedcharacters = "serversettings.whitelistedcharacters";
+//			String impossibelnamecheck = "serversettings.impossibelnamecheck";
+//
+//			String whitelistedcharacters = "serversettings.whitelistedcharacters";
 
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
 
