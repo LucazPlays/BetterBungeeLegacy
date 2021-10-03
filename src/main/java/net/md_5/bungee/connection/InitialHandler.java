@@ -577,6 +577,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	private void finish() {
 		if (isOnlineMode()) {
+			
 			// Check for multiple connections
 			// We have to check for the old name first
 			ProxiedPlayer oldName = bungee.getPlayer(getName());
@@ -657,7 +658,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
 							}
 
-							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks()) {
+							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks() && !fastjoin) {
 								if (!list.getJoinedlist().contains(ip)) {
 									list.getJoinedlist().add(ip);
 								}
@@ -691,20 +692,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 											e.printStackTrace();
 										}
 									} else {
-										if (BetterBungee.getInstance().isDenyVPNonJoin()) {
-											if (!IPChecker.getInstance().isipresidental(ip)) {
-												ProxiedPlayer player = userCon;
-												if (player != null) {
-													if (!player.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
-														player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
-														NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
-													} else {
-														NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
-													}
-												}
-												return;
-											}
-										}
+										vpncheck(ip, userCon);
 									}
 
 									if (list.isBlacklisted(ip)) {
@@ -731,7 +719,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 									}
 									
 									if (BetterBungee.getInstance().isLimbomode()) {
-										if (!fastjoin) {
 											ServerInfo finalserver;
 											if (bungee.getReconnectHandler() != null) {
 												finalserver = bungee.getReconnectHandler().getServer(userCon);
@@ -743,7 +730,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 											}
 											userCon.connect(finalserver, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK);
 										}
-									}
+								} else {
+									vpncheck(ip, userCon);
 								}
 							});
 
@@ -763,6 +751,23 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 //									}
 //								});
 //							}
+						}
+					}
+
+					private void vpncheck(String ip, UserConnection userCon) {
+						if (BetterBungee.getInstance().isDenyVPNonJoin()) {
+							if (!IPChecker.getInstance().isipresidental(ip)) {
+								ProxiedPlayer player = userCon;
+								if (player != null) {
+									if (!player.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
+										player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
+										NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
+									} else {
+										NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
+									}
+								}
+								return;
+							}
 						}
 					}
 

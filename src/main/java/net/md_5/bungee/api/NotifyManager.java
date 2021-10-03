@@ -79,7 +79,7 @@ public class NotifyManager {
 				if (players.containsKey(all.getName()) || (all.hasPermission("betterbungee.testserver") && !all.hasPermission("betterbungee.testserver.notauto"))) {
 					all.sendMessage(ChatMessageType.ACTION_BAR,
 							TextComponent.fromLegacyText(prefix + "§7Attacked: §a" + Blacklist.getInstance().isUnderattack()
-									+ " §8/ §7CPS: §e" + Blacklist.getInstance().getConnectionratelimit()
+									+ " §8/ §7CPS: §e" + Blacklist.getInstance().getGetcps()
 									+ " §8/ §7Average: §e" + Blacklist.getInstance().getAveragecps()
 									+ " §8/ §7Blocked: §c" + Blacklist.getInstance().getBlacklist().size()+ " §8/ §7Whitelisted: §a" + Blacklist.getInstance().getWhitelist().size()));
 				}

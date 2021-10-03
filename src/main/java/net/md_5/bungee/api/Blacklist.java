@@ -105,6 +105,9 @@ public class Blacklist {
 	private int averagecps = 0;
 
 	@Getter
+	private int getcps = 0;
+
+	@Getter
 	private boolean underattack = false;
 
 	private boolean sendeddiscord = false;
@@ -218,6 +221,8 @@ public class Blacklist {
 					}
 
 					int average = 0;
+
+					getcps = connectionspersecond;
 
 					averagecpslist.add(connectionspersecond);
 
