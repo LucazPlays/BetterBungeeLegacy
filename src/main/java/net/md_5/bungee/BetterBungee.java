@@ -216,9 +216,9 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.04";
+	public String Version = "1.06";
 
-	public String BungeeCordVersion = "c5a90475afba676c96d33fc3c7a3c06490b5d13b";
+	public String BungeeCordVersion = "6613aaea95f4894ea19c31e0d564d45fcf43456f";
 
 	long lastfirewallsync = 0;
 
@@ -234,7 +234,11 @@ public class BetterBungee {
 
 	int snapshotupdatecountdown = 10;
 
-	int periplimit = 2;
+	int periplimit = 3;
+
+	boolean blacklistconnectionspam = false;
+	
+	int blacklistconnectionslimit = 30;
 
 	int globallimit = 100;
 
@@ -299,6 +303,8 @@ public class BetterBungee {
 	private boolean sendafkstolimbo = false;
 
 	private boolean botchecks = false;
+
+	private boolean preblacklistproxies = false;
 
 	private ConcurrentHashMap<UUID, Long> afk = new ConcurrentHashMap<UUID, Long>();
 
@@ -420,6 +426,10 @@ public class BetterBungee {
 
 			String limitperip = "serversettings.limitcpsperip";
 
+			String blacklistconnectionspam = "serversettings.blacklistconnectionspam";
+
+			String blacklistconnectionslimit = "serversettings.blacklistconnectionslimit";
+
 			String faviconlimit = "serversettings.faviconspersecond";
 
 			String hostnameprotection = "serversettings.onlyhostname";
@@ -457,6 +467,8 @@ public class BetterBungee {
 			String sendafkstolimbo = "serversettings.sendafkstolimbo";
 
 			String botchecks = "serversettings.botchecks";
+
+			String preblacklistproxies = "serversettings.preblacklistproxies";
 
 //			String impossibelnamecheck = "serversettings.impossibelnamecheck";
 //
@@ -496,6 +508,10 @@ public class BetterBungee {
 
 			addDefault(config, limitperip, "3");
 
+			addDefault(config, blacklistconnectionspam, "true");
+			
+			addDefault(config, blacklistconnectionslimit, "30");
+
 			addDefault(config, proxycheckonauth, "false");
 
 			addDefault(config, startdenyproxyauthlimit, "6");
@@ -527,6 +543,8 @@ public class BetterBungee {
 			addDefault(config, sendafkstolimbo, "false");
 
 			addDefault(config, botchecks, "false");
+
+			addDefault(config, preblacklistproxies, "true");
 
 
 			String configuuid = "serverdata.uuid";
@@ -571,6 +589,10 @@ public class BetterBungee {
 
 			this.periplimit = Integer.valueOf(config.getString(limitperip));
 
+			this.blacklistconnectionspam = config.getString(blacklistconnectionspam).equalsIgnoreCase("true");
+
+			this.blacklistconnectionslimit = Integer.valueOf(config.getString(blacklistconnectionslimit));
+
 			this.faviconlimit = Integer.valueOf(config.getString(faviconlimit));
 
 			this.disablebungeecommands = config.getString(disablebungeecommands).equalsIgnoreCase("true");
@@ -611,6 +633,8 @@ public class BetterBungee {
 
 			this.botchecks = config.getString(botchecks).equalsIgnoreCase("true");
 
+			this.preblacklistproxies = config.getString(preblacklistproxies).equalsIgnoreCase("true");
+
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
@@ -618,6 +642,10 @@ public class BetterBungee {
 			Blacklist.getInstance().setGlobalratelimit(this.globallimit);
 
 			Blacklist.getInstance().setPerIPratelimit(this.periplimit);
+
+			Blacklist.getInstance().setBlacklistonconnectionlimit(this.blacklistconnectionspam);
+			
+			Blacklist.getInstance().setMaxcpsperip(this.blacklistconnectionslimit);
 
 			Blacklist.getInstance().setGlobalfaviconlimit(this.faviconlimit);
 

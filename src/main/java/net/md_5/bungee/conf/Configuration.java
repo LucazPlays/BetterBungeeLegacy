@@ -84,14 +84,10 @@ public class Configuration implements ProxyConfig {
 			}
 		} else {
 			try {
-				FileUtils.copyURLToFile(new URL("https://s20.directupload.net/images/210809/sb4bcrhi.png"), fav, 30000,
-						30000);
+				FileUtils.copyURLToFile(new URL("https://betterbungee.tk/img/server-icon.png"), fav, 30000, 30000);
 				favicon = Favicon.create(ImageIO.read(fav));
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			} catch (IOException e) {}
 		}
 
 		listeners = adapter.getListeners();

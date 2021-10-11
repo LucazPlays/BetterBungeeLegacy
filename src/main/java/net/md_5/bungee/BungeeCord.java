@@ -213,7 +213,6 @@ public class BungeeCord extends ProxyServer {
 		Preconditions.checkState(new File(".").getAbsolutePath().indexOf('!') == -1,
 				"Cannot use BungeeCord in directory with ! in path.");
 
-		System.setSecurityManager(new BungeeSecurityManager());
 
 		try {
 			baseBundle = ResourceBundle.getBundle("messages");

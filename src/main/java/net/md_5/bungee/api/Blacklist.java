@@ -87,6 +87,13 @@ public class Blacklist {
 
 	private ConcurrentHashMap<String, Integer> auth = new ConcurrentHashMap<String, Integer>();
 
+	@Setter
+	@Getter
+	private boolean blacklistonconnectionlimit = false;
+	
+	@Setter
+	private int maxcpsperip = 30;
+	
 	private int globalratelimit = 0;
 
 	private int globalfaviconlimit = 0;
@@ -212,11 +219,19 @@ public class Blacklist {
 
 			while (true) {
 				try {
-					for (Entry<String, Integer> es : ratelimit.entrySet()) {
-						if (es.getValue() > 0) {
-							ratelimit.put(es.getKey(), es.getValue() - 1);
+					for (Entry<String, Integer> entry : ratelimit.entrySet()) {
+						if (entry.getValue() > 0) {
+							if (entry.getValue() > 10) {
+								if (!blacklistonconnectionlimit) {
+									if (entry.getValue() > 10+maxcpsperip) {
+										addBlacklist(entry.getKey());
+									}
+								}
+								ratelimit.put(entry.getKey(), entry.getValue() - 3);
+							}
+							ratelimit.put(entry.getKey(), entry.getValue() - 1);
 						} else {
-							ratelimit.remove(es.getKey());
+							ratelimit.remove(entry.getKey());
 						}
 					}
 
@@ -226,7 +241,7 @@ public class Blacklist {
 
 					averagecpslist.add(connectionspersecond);
 
-					if (averagecpslist.size() > 10) {
+					if (averagecpslist.size() > 3) {
 						averagecpslist.remove(0);
 						for (Integer integer : averagecpslist) {
 							average += integer;
