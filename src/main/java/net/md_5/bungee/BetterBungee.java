@@ -771,7 +771,7 @@ public class BetterBungee {
 		if (this.preblacklistproxies) {
 			ProxysResult result = IPChecker.getInstance().getProxyList();
 			for (String ip : result.IPs) {
-				if (Blacklist.getInstance().getBlacklist().contains(ip)) {
+				if (!Blacklist.getInstance().getBlacklist().contains(ip)) {
 					Blacklist.getInstance().addBlacklist(ip);
 				}
 			}
