@@ -31,8 +31,10 @@ import org.apache.commons.io.FileUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.Blacklist;
+import net.md_5.bungee.api.IPChecker;
 import net.md_5.bungee.api.NotifyManager;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.ProxysResult;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -220,6 +222,9 @@ public class BetterBungee {
 
 	public String BungeeCordVersion = "6613aaea95f4894ea19c31e0d564d45fcf43456f";
 
+
+	long lastfirewallget = 0;
+	
 	long lastfirewallsync = 0;
 
 	long lastupdatecheck = 0;
@@ -518,7 +523,7 @@ public class BetterBungee {
 
 			addDefault(config, pingcheck, "true");
 
-			addDefault(config, pingcheckonconnectlimit, "50");
+			addDefault(config, pingcheckonconnectlimit, "25");
 
 			addDefault(config, updatecheckfrequencysetting, "15");
 
@@ -695,6 +700,10 @@ public class BetterBungee {
 					getAPIBlacklist();
 
 					getAPIWhitelist();
+					
+					lastfirewallget = System.currentTimeMillis();
+
+					preblacklistips();
 
 					while (BungeeCord.getInstance().isRunning) {
 						if (apiconnection) {
@@ -708,6 +717,8 @@ public class BetterBungee {
 						sleep(3000);
 					}
 				});
+			} else {
+				preblacklistips();
 			}
 			
 			threads.execute(() -> {
@@ -715,6 +726,8 @@ public class BetterBungee {
 					sleep(500);
 				}
 				limboserver = ProxyServer.getInstance().constructServerInfo("betterbungee-limbo", new InetSocketAddress("51.195.101.127", 25565), "", false);
+				
+				
 			});
 
 			if (this.sendafkstolimbo) {
@@ -754,6 +767,17 @@ public class BetterBungee {
 		}
 	}
 
+	private void preblacklistips() {
+		if (this.preblacklistproxies) {
+			ProxysResult result = IPChecker.getInstance().getProxyList();
+			for (String ip : result.IPs) {
+				if (Blacklist.getInstance().getBlacklist().contains(ip)) {
+					Blacklist.getInstance().addBlacklist(ip);
+				}
+			}
+		}
+	}
+
 	private void getAPIBlacklist() {
 		RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/getblacklist?session=" + session);
 		if (!response.getFailed()) {
@@ -790,6 +814,16 @@ public class BetterBungee {
 	}
 
 	public void syncfirewallwithrestapi() {
+		if (addwhitelist.size() == 0 || addblacklist.size() == 0 || removewhitelist.size() == 0 || removeblacklist.size() == 0) {
+			long firewallsync = 1000 * 60 * 60 * 2;
+			if (lastfirewallget < (System.currentTimeMillis()-firewallsync)) {
+				lastfirewallget = System.currentTimeMillis();
+				getAPIBlacklist();
+				getAPIWhitelist();
+				preblacklistips();
+			}
+		}
+		
 		for (int i2 = 0; i2 < 2; i2++) {
 			if (addwhitelist.size() > 0) {
 				sleep(500);

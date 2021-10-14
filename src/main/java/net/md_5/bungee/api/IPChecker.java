@@ -80,6 +80,21 @@ public class IPChecker {
 		return null;
 	}
 
+
+	public ProxysResult getProxyList() {
+		if (serviceonline) {
+			RestAPIResponse getIPInfo = RestAPI.getInstance().get("http://ipinfo.skydb.de/getproxys");
+			if (getIPInfo.getFailed()) {
+				serviceonline = false;
+			} else {
+				Gson gson = new Gson();
+				return gson.fromJson(getIPInfo.getText(), ProxysResult.class);
+			}
+
+		}
+		return null;
+	}
+
 	public void start(Runnable run) {
 		threads.execute(run);
 	}

@@ -681,13 +681,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							IPChecker.getInstance().start(() -> {
 								if (!fastjoin) {
 									try {
-										Thread.sleep(1250);
+										Thread.sleep(2250);
 									} catch (InterruptedException e) {
 										e.printStackTrace();
 									}
 									if (Blacklist.getInstance().isUnderattack()) {
 										try {
-											Thread.sleep(2250);
+											Thread.sleep(3250);
 										} catch (InterruptedException e) {
 											e.printStackTrace();
 										}

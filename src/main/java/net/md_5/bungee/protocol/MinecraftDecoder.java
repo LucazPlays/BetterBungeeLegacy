@@ -82,11 +82,13 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
 					}
 				}
 
-				if (packetId == EnumPackets.SETTINGS.getId()) {
-					Blacklist.getInstance().getJoinedlist().remove(ip);
-					if (BungeeCord.getInstance().getBetterBungee().isDevdebugmode()) {
-						NotifyManager.getInstance().addmessage("§aDebug #323");
-						System.out.println("Settings Packet");
+				if (packetId == EnumPackets.SETTINGS.getId() || packetId == EnumPackets.PACKETPLAYERLOOK.getId() || packetId == EnumPackets.PacketPlayerPosition.getId()) {
+					if (Blacklist.getInstance().getJoinedlist().contains(ip)) {
+						Blacklist.getInstance().getJoinedlist().remove(ip);
+						if (BungeeCord.getInstance().getBetterBungee().isDevdebugmode()) {
+							NotifyManager.getInstance().addmessage("§aDebug #323");
+							System.out.println("Sended one of the needed packet Packets");
+						}
 					}
 				}
 
