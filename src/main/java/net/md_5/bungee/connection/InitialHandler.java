@@ -26,6 +26,7 @@ import net.md_5.bungee.api.AbstractReconnectHandler;
 import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.IPChecker;
 import net.md_5.bungee.api.NotifyManager;
@@ -71,6 +72,7 @@ import net.md_5.bungee.protocol.packet.PingPacket;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.StatusRequest;
 import net.md_5.bungee.protocol.packet.StatusResponse;
+import net.md_5.bungee.protocol.packet.Title;
 import net.md_5.bungee.util.AllowedCharacters;
 import net.md_5.bungee.util.BoundedArrayList;
 import net.md_5.bungee.util.BufUtil;
@@ -367,6 +369,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		if (hostprotection) {
 			if (!BetterBungee.getInstance().getHostnames().contains(handshake.getHost().toLowerCase(Locale.ROOT))) {
+				Blacklist.getInstance().addlimit(ip, 2);
 				Blacklist.getInstance().addConnectionratelimit(-1);
 				StatisticsAPI.getInstance().addblockedConnection();
 				ch.close();
@@ -385,19 +388,14 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			ch.setProtocol(Protocol.STATUS);
 			break;
 		case 2:
-			if (BetterBungee.getInstance().isDevdebugmode()) {
-				System.out.println(BetterBungee.getInstance().isPingcheck());
-			}
 			if (BetterBungee.getInstance().isPingcheck()) {
-				if (BetterBungee.getInstance().isDevdebugmode()) {
-					System.out.println(BetterBungee.getInstance().getPingcheckonconnectlimit());
-				}
 				if (Blacklist.getInstance().getConnectionratelimit() > BetterBungee.getInstance()
 						.getPingcheckonconnectlimit()) {
 					if (!Blacklist.getInstance().containswhitelist(ip)) {
 						if (!ServerListAPI.getInstance().pingedbefore(ip)) {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
+							Blacklist.getInstance().addlimit(ip, 4);
 							ch.close();
 							return;
 						}
@@ -539,21 +537,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							}
 							if (BetterBungee.getInstance().isProtection()) {
 								if (!list.containswhitelist(list.getRealAdress(ch))) {
-									list.addlimit(list.getRealAdress(ch), 60);
+									list.addlimit(list.getRealAdress(ch), 15);
 								}
 							}
 							disconnect(bungee.getTranslation("offline_mode_player"));
 						} else {
 							disconnect(bungee.getTranslation("mojang_fail"));
-
-							bungee.getLogger().log(Level.SEVERE,
-									"Error authenticating " + getName() + " with minecraft.net", error);
-
-							if (BetterBungee.getInstance().isProtection()) {
-								if (!list.containswhitelist(list.getRealAdress(ch))) {
-									list.addlimit(list.getRealAdress(ch), 20);
-								}
-							}
+							bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
 						}
 
 					} catch (Throwable e) {
@@ -680,14 +670,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 							IPChecker.getInstance().start(() -> {
 								if (!fastjoin) {
+//									userCon.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(""));
 									try {
-										Thread.sleep(2250);
+										Thread.sleep(1750);
 									} catch (InterruptedException e) {
 										e.printStackTrace();
 									}
 									if (Blacklist.getInstance().isUnderattack()) {
 										try {
-											Thread.sleep(3250);
+											Thread.sleep(2000);
 										} catch (InterruptedException e) {
 											e.printStackTrace();
 										}

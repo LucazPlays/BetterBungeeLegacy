@@ -318,11 +318,15 @@ public class Blacklist {
 									try {
 										webhook.execute();
 									} catch (IOException e) {
-										e.printStackTrace();
+										if (BetterBungee.getInstance().isDevdebugmode()) {
+											e.printStackTrace();
+										}
 									}
 
 								} catch (Throwable e) {
-									e.printStackTrace();
+									if (BetterBungee.getInstance().isDevdebugmode()) {
+										e.printStackTrace();
+									}
 								}
 							}).start();
 						}
@@ -335,7 +339,9 @@ public class Blacklist {
 					Thread.sleep(1000);
 
 				} catch (Exception e) {
-					e.printStackTrace();
+					if (BetterBungee.getInstance().isDevdebugmode()) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}).start();

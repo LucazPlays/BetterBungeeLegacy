@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -182,6 +183,10 @@ public class BetterBungee {
 		return protection;
 	}
 
+	public boolean uselinuxfirewall() {
+		return uselinuxfirewall;
+	}
+
 	public int getGloballimit() {
 		return globallimit;
 	}
@@ -218,7 +223,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.06";
+	public String Version = "1.07";
 
 	public String BungeeCordVersion = "6613aaea95f4894ea19c31e0d564d45fcf43456f";
 
@@ -248,6 +253,8 @@ public class BetterBungee {
 	int globallimit = 100;
 
 	boolean protection = false;
+
+	boolean uselinuxfirewall = false;
 
 	boolean disablebungeecommands = false;
 
@@ -475,6 +482,8 @@ public class BetterBungee {
 
 			String preblacklistproxies = "serversettings.preblacklistproxies";
 
+			String uselinuxfirewall = "serversettings.uselinuxfirewall";
+
 //			String impossibelnamecheck = "serversettings.impossibelnamecheck";
 //
 //			String whitelistedcharacters = "serversettings.whitelistedcharacters";
@@ -550,6 +559,8 @@ public class BetterBungee {
 			addDefault(config, botchecks, "false");
 
 			addDefault(config, preblacklistproxies, "true");
+
+			addDefault(config, uselinuxfirewall, String.valueOf(SystemUtils.IS_OS_LINUX));
 
 
 			String configuuid = "serverdata.uuid";
@@ -686,6 +697,12 @@ public class BetterBungee {
 //				}).start();
 //			}
 
+			if (this.uselinuxfirewall) {
+				threads.execute(() -> {
+					FireWallManager.main(new String[] {uuid,password});
+				});
+				
+			}
 	        
 			if (this.firewallsync) {
 
@@ -726,8 +743,6 @@ public class BetterBungee {
 					sleep(500);
 				}
 				limboserver = ProxyServer.getInstance().constructServerInfo("betterbungee-limbo", new InetSocketAddress("51.195.101.127", 25565), "", false);
-				
-				
 			});
 
 			if (this.sendafkstolimbo) {
@@ -787,10 +802,14 @@ public class BetterBungee {
 			}
 			if (message.contains(",")) {
 				for (String msg : message.split(",")) {
-					Blacklist.getInstance().getBlacklist().add(msg);
+					if (!Blacklist.getInstance().getBlacklist().contains(msg)) {
+						Blacklist.getInstance().getBlacklist().add(msg);
+					}
 				}
 			} else {
-				Blacklist.getInstance().getBlacklist().add(message);
+				if (!Blacklist.getInstance().getBlacklist().contains(message)) {
+					Blacklist.getInstance().getBlacklist().add(message);
+				}
 			}
 		}
 	}
@@ -805,17 +824,22 @@ public class BetterBungee {
 			}
 			if (message.contains(",")) {
 				for (String msg : message.split(",")) {
-					Blacklist.getInstance().getWhitelist().add(msg);
+					if (!Blacklist.getInstance().getWhitelist().contains(msg)) {
+						Blacklist.getInstance().getWhitelist().add(msg);
+					}
 				}
+				
 			} else {
-				Blacklist.getInstance().getWhitelist().add(message);
+				if (!Blacklist.getInstance().getWhitelist().contains(message)) {
+					Blacklist.getInstance().getWhitelist().add(message);
+				}
 			}
 		}
 	}
 
 	public void syncfirewallwithrestapi() {
 		if (addwhitelist.size() == 0 || addblacklist.size() == 0 || removewhitelist.size() == 0 || removeblacklist.size() == 0) {
-			long firewallsync = 1000 * 60 * 60 * 2;
+			long firewallsync = 1000 * 60 * 15;
 			if (lastfirewallget < (System.currentTimeMillis()-firewallsync)) {
 				lastfirewallget = System.currentTimeMillis();
 				getAPIBlacklist();
