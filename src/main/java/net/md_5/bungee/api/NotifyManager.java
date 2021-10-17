@@ -90,6 +90,11 @@ public class NotifyManager {
 
 	public NotifyManager loop() {
 		this.run(() -> {
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			while (true) {
 				send();
 				try {
