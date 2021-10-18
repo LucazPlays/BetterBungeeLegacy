@@ -92,7 +92,7 @@ public class Blacklist {
 	private boolean blacklistonconnectionlimit = false;
 	
 	@Setter
-	private int maxcpsperip = 30;
+	private int maxcpsperip = 20;
 	
 	private int globalratelimit = 0;
 
@@ -223,11 +223,11 @@ public class Blacklist {
 						if (entry.getValue() > 0) {
 							if (entry.getValue() > 10) {
 								if (!blacklistonconnectionlimit) {
-									if (entry.getValue() > 10+maxcpsperip) {
+									if (entry.getValue() > peripratelimit+maxcpsperip) {
 										addBlacklist(entry.getKey());
 									}
 								}
-								ratelimit.put(entry.getKey(), entry.getValue() - 3);
+								ratelimit.put(entry.getKey(), entry.getValue() - 2);
 							}
 							ratelimit.put(entry.getKey(), entry.getValue() - 1);
 						} else {

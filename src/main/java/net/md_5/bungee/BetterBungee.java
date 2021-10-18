@@ -248,7 +248,7 @@ public class BetterBungee {
 
 	boolean blacklistconnectionspam = false;
 	
-	int blacklistconnectionslimit = 30;
+	int blacklistconnectionslimit = 20;
 
 	int globallimit = 100;
 
