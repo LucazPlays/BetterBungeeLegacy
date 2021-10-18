@@ -12,42 +12,49 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 public class CommandIP extends PlayerCommand {
-	
+
 	public CommandIP() {
 		super("ip", "bungeecord.command.ip", new String[] { "bip", "betterip" });
 	}
-	
+
 	@Override
 	public void execute(final CommandSender sender, final String[] args) {
 		if (args.length < 1) {
 			sender.sendMessage(ProxyServer.getInstance().getTranslation("username_needed", new Object[0]));
 			return;
 		}
-		
 
-		final ProxiedPlayer user = ProxyServer.getInstance().getPlayer(args[0]);
-
-		if (user == null) {
-			String ip = args[0];
-			if (isValidInet4Address(ip)) {
-				IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
-				sendipmessage(sender, result,true);
-			} else {
-				sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
+		IPChecker.getInstance().start(() -> {
+			try {
+				final ProxiedPlayer user = ProxyServer.getInstance().getPlayer(args[0]);
+	
+				if (user == null) {
+					String ip = args[0];
+					if (isValidInet4Address(ip)) {
+						IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
+						sendipmessage(sender, result, true);
+					} else {
+						sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
+					}
+				} else {
+					IPCheckerResult result = IPChecker.getInstance()
+							.getIPInfo(user.getAddress().getAddress().getHostAddress());
+	
+					if (!IPChecker.getInstance().isServiceonline()) {
+						sender.sendMessage(TextComponent
+								.fromLegacyText("§8 - §7IP: §e" + user.getAddress().getAddress().getHostAddress()));
+						return;
+					}
+	
+					sendipmessage(sender, result, sender.hasPermission("bungeecord.command.ip.uncensored"));
+				}
+			} catch (Throwable t) {
+				sender.sendMessage(t.getMessage());
 			}
-		} else {
-			IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
-			
-			if (!IPChecker.getInstance().isServiceonline()) {
-				sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + user.getAddress().getAddress().getHostAddress()));
-				return;
-			}
-			
-			sendipmessage(sender, result,sender.hasPermission("bungeecord.command.ip.uncensored"));
-		}
+		});
 	}
 
-	public static void sendipmessage(final CommandSender sender, IPCheckerResult result,boolean uncensored) {
+	public static void sendipmessage(final CommandSender sender, IPCheckerResult result, boolean uncensored) {
 		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
 		if (uncensored) {
 			sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + result.getIP()));
