@@ -32,17 +32,23 @@ public class CommandIP extends PlayerCommand {
 					String ip = args[0];
 					if (isValidInet4Address(ip)) {
 						IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
+						if (result == null || !IPChecker.getInstance().isServiceonline()) {
+							sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
+							sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §c" + ip));
+							sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
+							return;
+						}
 						sendipmessage(sender, result, true);
 					} else {
 						sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
 					}
 				} else {
-					IPCheckerResult result = IPChecker.getInstance()
-							.getIPInfo(user.getAddress().getAddress().getHostAddress());
-	
-					if (!IPChecker.getInstance().isServiceonline()) {
-						sender.sendMessage(TextComponent
-								.fromLegacyText("§8 - §7IP: §e" + user.getAddress().getAddress().getHostAddress()));
+					IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
+
+					if (result == null || !IPChecker.getInstance().isServiceonline()) {
+						sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
+						sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §e" + user.getAddress().getAddress().getHostAddress()));
+						sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
 						return;
 					}
 	
