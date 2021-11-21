@@ -47,7 +47,7 @@ public class BungeeCordLauncher
 
 	public static boolean crashed = true;
 	
-	static String betterbungee = "http://betterbungee.skydb.de";
+	static String betterbungee = "http://betterbungeeapi.skydb.de";
 	
     public static void main(String[] args) throws Exception
     {

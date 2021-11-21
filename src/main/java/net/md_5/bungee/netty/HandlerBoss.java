@@ -157,16 +157,11 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 								ctx.close();
 								return;
 							}
-							ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}",
-									new Object[] { handler, cause.getMessage() });
+							ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - corrupted frame: {1}", new Object[] { handler, cause.getMessage() });
 						} else if (cause.getCause() instanceof BadPacketException) {
-							ProxyServer.getInstance().getLogger().log(Level.WARNING,
-									"{0} - bad packet ID, are mods in use!? {1}",
-									new Object[] { handler, cause.getCause().getMessage() });
+							ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - bad packet ID, are mods in use!? {1}", new Object[] { handler, cause.getCause().getMessage() });
 						} else if (cause.getCause() instanceof OverflowPacketException) {
-							ProxyServer.getInstance().getLogger().log(Level.WARNING,
-									"{0} - overflow in packet detected! {1}",
-									new Object[] { handler, cause.getCause().getMessage() });
+							ProxyServer.getInstance().getLogger().log(Level.WARNING, "{0} - overflow in packet detected! {1}", new Object[] { handler, cause.getCause().getMessage() });
 							if (Blacklist.getInstance().isProtection()) {
 								String ip = null;
 								if (isproxyprotocol) {
@@ -177,8 +172,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 
 								Blacklist.getInstance().addBlacklist(ip);
 								if (BetterBungee.getInstance().isDevdebugmode()) {
-									NotifyManager.getInstance()
-											.addmessage("§cBlocked §8- §e" + ip + " §8- §cPacket Overflow");
+									NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + ip + " §8- §cPacket Overflow");
 								}
 								ctx.close();
 								StatisticsAPI.getInstance().addblockedConnection();

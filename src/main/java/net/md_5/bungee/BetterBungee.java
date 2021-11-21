@@ -402,6 +402,7 @@ public class BetterBungee {
 	}
 
 	public void createConfigs() {
+		System.out.println("Load Config");
 		try {
 			File file = new File("betterbungeeconfig.yml");
 
@@ -697,86 +698,105 @@ public class BetterBungee {
 //				}).start();
 //			}
 
-			if (this.uselinuxfirewall) {
-				threads.execute(() -> {
-					FireWallManager.main(new String[] {uuid,password});
-				});
-				
-			}
-	        
-			if (this.firewallsync) {
-
-				threads.execute(() -> {
-
-					sleep(5500);
-
-					while (!apiconnection) {
-						sleep(3000);
-					}
-
-					getAPIBlacklist();
-
-					getAPIWhitelist();
-					
-					lastfirewallget = System.currentTimeMillis();
-
-					preblacklistips();
-
-					while (BungeeCord.getInstance().isRunning) {
-						if (apiconnection) {
-							if (lastfirewallsync < System.currentTimeMillis() - (1000 * 2)) {
-								lastfirewallsync = System.currentTimeMillis();
-								syncfirewallwithrestapi();
-								sleep(500);
-							}
-
-						}
-						sleep(3000);
-					}
-				});
-			} else {
-				preblacklistips();
-			}
-			
 			threads.execute(() -> {
+				sleep(5000);
 				while (ProxyServer.getInstance() == null) {
 					sleep(500);
 				}
-				limboserver = ProxyServer.getInstance().constructServerInfo("betterbungee-limbo", new InetSocketAddress("51.195.101.127", 25565), "", false);
-			});
-
-			if (this.sendafkstolimbo) {
+				
 				threads.execute(() -> {
-					sleep(5500);
-					while (BungeeCord.getInstance().isRunning) {
-						sleep(5000);
-						for (Entry<UUID, Long> entry : afk.entrySet()) {
-							UUID uuid = entry.getKey();
-							ProxiedPlayer player = null;
-							for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
-								if (all.equals(uuid)) {
-									player = all;
-								}
-							}
-							if (player == null) {
-								afk.remove(entry.getKey());
-								if (reconnectserver.containsKey(uuid)) {
-									reconnectserver.remove(uuid);
-								}
-							} else {
-
-								if (entry.getValue().longValue() < System.currentTimeMillis() - 300000) {
-									if (!player.getServer().getInfo().getName().equals(limboserver.getName())) {
-										reconnectserver.put(uuid, player.getServer().getInfo());
-										player.connect(BetterBungee.getInstance().getLimboserver());
+					limboserver = ProxyServer.getInstance().constructServerInfo("betterbungee-limbo", new InetSocketAddress("51.195.101.127", 25565), "", false);
+				});
+	
+				if (this.sendafkstolimbo) {
+					threads.execute(() -> {
+						sleep(500);
+						while (BungeeCord.getInstance().isRunning) {
+							sleep(5000);
+							for (Entry<UUID, Long> entry : afk.entrySet()) {
+								UUID uuid = entry.getKey();
+								ProxiedPlayer player = null;
+								for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+									if (all.equals(uuid)) {
+										player = all;
 									}
 								}
-
+								if (player == null) {
+									afk.remove(entry.getKey());
+									if (reconnectserver.containsKey(uuid)) {
+										reconnectserver.remove(uuid);
+									}
+								} else {
+	
+									if (entry.getValue().longValue() < System.currentTimeMillis() - 300000) {
+										if (!player.getServer().getInfo().getName().equals(limboserver.getName())) {
+											reconnectserver.put(uuid, player.getServer().getInfo());
+											player.connect(BetterBungee.getInstance().getLimboserver());
+										}
+									}
+	
+								}
 							}
 						}
+					});
+					
+					if (this.uselinuxfirewall) {
+	
+						if (this.devdebugmode) {
+							System.out.println("Enabling Linux Firewall");
+						}
+						
+						threads.execute(() -> {
+							sleep(1500);
+							FireWallManager.main(new String[] {uuid,password});
+						});
+						
 					}
-				});
-			}
+			        
+					if (this.firewallsync) {
+	
+						if (this.devdebugmode) {
+							System.out.println("Enabling Firewall Sync");
+						}
+						
+						threads.execute(() -> {
+							
+							sleep(2500);
+	
+							while (!apiconnection) {
+								sleep(3000);
+							}
+							if (this.devdebugmode) {
+								System.out.println("Starting Firewall Sync");
+							}
+	
+							getAPIBlacklist();
+	
+							getAPIWhitelist();
+	
+							preblacklistips();
+							
+							lastfirewallget = System.currentTimeMillis();
+	
+							while (BungeeCord.getInstance().isRunning) {
+								if (apiconnection) {
+									if (lastfirewallsync < System.currentTimeMillis() - (1000 * 2)) {
+										lastfirewallsync = System.currentTimeMillis();
+										syncfirewallwithrestapi();
+										sleep(500);
+									}
+	
+								}
+								sleep(3000);
+							}
+						});
+					} else {
+						sleep(1500);
+						preblacklistips();
+					}
+					
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -839,8 +859,9 @@ public class BetterBungee {
 
 	public void syncfirewallwithrestapi() {
 		if (addwhitelist.size() == 0 || addblacklist.size() == 0 || removewhitelist.size() == 0 || removeblacklist.size() == 0) {
-			long firewallsync = 1000 * 60 * 15;
+			long firewallsync = 1000 * 60 * 3;
 			if (lastfirewallget < (System.currentTimeMillis()-firewallsync)) {
+				System.out.println("Syncing Firewall");
 				lastfirewallget = System.currentTimeMillis();
 				getAPIBlacklist();
 				getAPIWhitelist();
