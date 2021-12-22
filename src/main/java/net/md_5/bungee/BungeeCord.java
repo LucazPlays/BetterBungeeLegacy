@@ -241,8 +241,6 @@ public class BungeeCord extends ProxyServer {
 		// to the essentially garbage version
 		// BungeeCord. This version is only used when extracting the libraries to their
 		// temp folder.
-
-		BetterBungee = new BetterBungee();
 		
 		System.setProperty("library.jansi.version", "BungeeCord");
 
@@ -265,15 +263,6 @@ public class BungeeCord extends ProxyServer {
 
 		pluginManager = new PluginManager(this);
 
-
-		if (!BetterBungee.isDisablebungeecommands()) {
-			getPluginManager().registerCommand(null, new CommandReload());
-			getPluginManager().registerCommand(null, new CommandEnd());
-			getPluginManager().registerCommand(null, new CommandIP());
-			getPluginManager().registerCommand(null, new CommandBungee());
-			getPluginManager().registerCommand(null, new CommandPerms());
-		}
-		getPluginManager().registerCommand(null, new CommandBungeeExtras());
 		
 		if (!Boolean.getBoolean("net.md_5.bungee.native.disable")) {
 			
@@ -289,6 +278,8 @@ public class BungeeCord extends ProxyServer {
 				logger.info("Using standard Java compressor.");
 			}
 		}
+		
+		
 	}
 
 	/**
@@ -350,52 +341,67 @@ public class BungeeCord extends ProxyServer {
 				independentThreadStop(getTranslation("restart"), false);
 			}
 		});
+
+		BetterBungee = new BetterBungee();
+
+		if (!BetterBungee.isDisablebungeecommands()) {
+			getPluginManager().registerCommand(null, new CommandReload());
+			getPluginManager().registerCommand(null, new CommandEnd());
+			getPluginManager().registerCommand(null, new CommandIP());
+			getPluginManager().registerCommand(null, new CommandBungee());
+			getPluginManager().registerCommand(null, new CommandPerms());
+		}
+		getPluginManager().registerCommand(null, new CommandBungeeExtras());
 	}
 
 	public void startListeners() {
 		for (final ListenerInfo info : config.getListeners()) {
-			if (info.isProxyProtocol()) {
-				getLogger().log(Level.WARNING, "Using PROXY protocol for listener {0}, please ensure this listener is adequately firewalled.",	info.getSocketAddress());
+			startlistener(info);
+		}
+	}
 
-				if (connectionThrottle != null) {
-					connectionThrottle = null;
-					getLogger().log(Level.INFO, "Since PROXY protocol is in use, internal connection throttle has been disabled.");
+	public void startlistener(final ListenerInfo info) {
+		if (info.isProxyProtocol()) {
+			getLogger().log(Level.WARNING, "Using PROXY protocol for listener {0}, please ensure this listener is adequately firewalled.",	info.getSocketAddress());
+
+			if (connectionThrottle != null) {
+				connectionThrottle = null;
+				getLogger().log(Level.INFO, "Since PROXY protocol is in use, internal connection throttle has been disabled.");
+			}
+		}
+
+		ChannelFutureListener listener = new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (future.isSuccess()) {
+					listeners.add(future.channel());
+					getLogger().log(Level.INFO, "Listening on {0}", info.getSocketAddress());
+				} else {
+					getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(), future.cause());
 				}
 			}
+		};
+		new ServerBootstrap().channel(PipelineUtils.getServerChannel(info.getSocketAddress()))
+				.option(ChannelOption.SO_REUSEADDR, true) // TODO: Move this elsewhere!
+				.childAttr(PipelineUtils.LISTENER, info).childHandler(PipelineUtils.SERVER_CHILD).group(eventLoops)
+				.localAddress(info.getSocketAddress()).bind().addListener(listener);
 
-			ChannelFutureListener listener = new ChannelFutureListener() {
+		if (info.isQueryEnabled()) {
+			Preconditions.checkArgument(info.getSocketAddress() instanceof InetSocketAddress, "Can only create query listener on UDP address");
+
+			ChannelFutureListener bindListener = new ChannelFutureListener() {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
 					if (future.isSuccess()) {
 						listeners.add(future.channel());
-						getLogger().log(Level.INFO, "Listening on {0}", info.getSocketAddress());
+						getLogger().log(Level.INFO, "Started query on {0}", future.channel().localAddress());
 					} else {
-						getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(), future.cause());
+						getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(),
+								future.cause());
 					}
 				}
 			};
-			new ServerBootstrap().channel(PipelineUtils.getServerChannel(info.getSocketAddress()))
-					.option(ChannelOption.SO_REUSEADDR, true) // TODO: Move this elsewhere!
-					.childAttr(PipelineUtils.LISTENER, info).childHandler(PipelineUtils.SERVER_CHILD).group(eventLoops)
-					.localAddress(info.getSocketAddress()).bind().addListener(listener);
-
-			if (info.isQueryEnabled()) {
-				Preconditions.checkArgument(info.getSocketAddress() instanceof InetSocketAddress, "Can only create query listener on UDP address");
-
-				ChannelFutureListener bindListener = new ChannelFutureListener() {
-					@Override
-					public void operationComplete(ChannelFuture future) throws Exception {
-						if (future.isSuccess()) {
-							listeners.add(future.channel());
-							getLogger().log(Level.INFO, "Started query on {0}", future.channel().localAddress());
-						} else {
-							getLogger().log(Level.WARNING, "Could not bind to host " + info.getSocketAddress(),
-									future.cause());
-						}
-					}
-				};
-				new RemoteQuery(this, info).start(PipelineUtils.getDatagramChannel(), new InetSocketAddress(info.getHost().getAddress(), info.getQueryPort()), eventLoops, bindListener);
-			}
+			new RemoteQuery(this, info).start(PipelineUtils.getDatagramChannel(), new InetSocketAddress(info.getHost().getAddress(), info.getQueryPort()), eventLoops, bindListener);
 		}
 	}
 

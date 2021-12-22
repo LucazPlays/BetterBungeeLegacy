@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Class representing the configuration of a server listener. Used for allowing
@@ -19,7 +21,10 @@ public class ListenerInfo
     /**
      * Host to bind to.
      */
-    private final SocketAddress socketAddress;
+	@Getter
+	@Setter
+    private SocketAddress socketAddress;
+    
     /**
      * Displayed MOTD.
      */

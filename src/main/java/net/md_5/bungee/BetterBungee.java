@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.SocketAddress;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,10 +26,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.Blacklist;
@@ -39,6 +43,7 @@ import net.md_5.bungee.api.ProxysResult;
 import net.md_5.bungee.api.RestAPI;
 import net.md_5.bungee.api.RestAPIResponse;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
@@ -485,6 +490,8 @@ public class BetterBungee {
 
 			String uselinuxfirewall = "serversettings.uselinuxfirewall";
 
+			String extralistener = "serversettings.extralistener";
+
 //			String impossibelnamecheck = "serversettings.impossibelnamecheck";
 //
 //			String whitelistedcharacters = "serversettings.whitelistedcharacters";
@@ -563,6 +570,7 @@ public class BetterBungee {
 
 			addDefault(config, uselinuxfirewall, String.valueOf(SystemUtils.IS_OS_LINUX));
 
+			addDefault(config, extralistener, "127.0.0.1:25565");
 
 			String configuuid = "serverdata.uuid";
 
@@ -582,6 +590,9 @@ public class BetterBungee {
 			}
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
 
+
+		
+			
 			this.uuid = config.getString(configuuid);
 
 			this.password = config.getString(configkey);
@@ -797,6 +808,20 @@ public class BetterBungee {
 					
 				}
 			});
+			
+
+			if (!config.getString(extralistener).equals("127.0.0.1:25565")) {
+				String listener = config.getString(extralistener);
+				if (listener.contains(":")) {
+					BungeeCord bungee = BungeeCordLauncher.bungeecord;
+					for (ListenerInfo info : bungee.config.getListeners()) {
+						SocketAddress address = new InetSocketAddress(listener.split(":")[0],Integer.valueOf(listener.split(":")[1]));
+						info.setSocketAddress(address);
+						bungee.startlistener(info);
+						break;
+					}
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

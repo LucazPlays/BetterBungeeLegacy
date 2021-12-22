@@ -46,6 +46,8 @@ public class BungeeCordLauncher
 	}
 
 	public static boolean crashed = true;
+
+	public static BungeeCord bungeecord;
 	
 	static String betterbungee = "http://betterbungeeapi.skydb.de";
 	
@@ -114,6 +116,9 @@ public class BungeeCordLauncher
         }
 
         BungeeCord bungee = new BungeeCord();
+        
+        bungeecord = bungee;
+        
         ProxyServer.setInstance( bungee );
         
         bungee.getLogger().info( "Enabled BungeeCord version " + bungee.getVersion() );
