@@ -805,28 +805,34 @@ public class BetterBungee {
 						sleep(1500);
 						preblacklistips();
 					}
+
+					if (!config.getString(extralistener).equals("127.0.0.1:25565")) {
+						listener = config.getString(extralistener);
+					}
 					
 				}
 			});
-			
-
-			if (!config.getString(extralistener).equals("127.0.0.1:25565")) {
-				String listener = config.getString(extralistener);
-				if (listener.contains(":")) {
-					BungeeCord bungee = BungeeCordLauncher.bungeecord;
-					for (ListenerInfo info : bungee.config.getListeners()) {
-						SocketAddress address = new InetSocketAddress(listener.split(":")[0],Integer.valueOf(listener.split(":")[1]));
-						info.setSocketAddress(address);
-						bungee.startlistener(info);
-						break;
-					}
-				}
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
+	String listener = null;
+	
+	public void startextralistener() {
+		if (listener != null) {
+			if (listener.contains(":")) {
+				BungeeCord bungee = BungeeCordLauncher.bungeecord;
+				for (ListenerInfo info : bungee.config.getListeners()) {
+					SocketAddress address = new InetSocketAddress(listener.split(":")[0],Integer.valueOf(listener.split(":")[1]));
+					info.setSocketAddress(address);
+					bungee.startlistener(info);
+					break;
+				}
+			}
+		}
+	}
+	
 	private void preblacklistips() {
 		if (this.preblacklistproxies) {
 			ProxysResult result = IPChecker.getInstance().getProxyList();

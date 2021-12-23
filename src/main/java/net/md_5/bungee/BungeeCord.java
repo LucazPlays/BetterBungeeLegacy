@@ -305,6 +305,18 @@ public class BungeeCord extends ProxyServer {
 		pluginsFolder.mkdir();
 		pluginManager.detectPlugins(pluginsFolder);
 
+		BetterBungee = new BetterBungee();
+
+		if (!BetterBungee.isDisablebungeecommands()) {
+			getPluginManager().registerCommand(null, new CommandReload());
+			getPluginManager().registerCommand(null, new CommandEnd());
+			getPluginManager().registerCommand(null, new CommandIP());
+			getPluginManager().registerCommand(null, new CommandBungee());
+			getPluginManager().registerCommand(null, new CommandPerms());
+		}
+		
+		getPluginManager().registerCommand(null, new CommandBungeeExtras());
+		
 		pluginManager.loadPlugins();
 		config.load();
 
@@ -324,6 +336,8 @@ public class BungeeCord extends ProxyServer {
 			connectionThrottle = new ConnectionThrottle(config.getThrottle(), config.getThrottleLimit());
 		}
 		startListeners();
+		
+		BetterBungee.startextralistener();
 
 		saveThread.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -341,17 +355,6 @@ public class BungeeCord extends ProxyServer {
 				independentThreadStop(getTranslation("restart"), false);
 			}
 		});
-
-		BetterBungee = new BetterBungee();
-
-		if (!BetterBungee.isDisablebungeecommands()) {
-			getPluginManager().registerCommand(null, new CommandReload());
-			getPluginManager().registerCommand(null, new CommandEnd());
-			getPluginManager().registerCommand(null, new CommandIP());
-			getPluginManager().registerCommand(null, new CommandBungee());
-			getPluginManager().registerCommand(null, new CommandPerms());
-		}
-		getPluginManager().registerCommand(null, new CommandBungeeExtras());
 	}
 
 	public void startListeners() {
