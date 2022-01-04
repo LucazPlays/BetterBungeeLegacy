@@ -3,6 +3,7 @@ package net.md_5.bungee.api.event;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;
@@ -30,7 +31,11 @@ public class ChatEvent extends TargetedEvent implements Cancellable
     public ChatEvent(Connection sender, Connection receiver, String message)
     {
         super( sender, receiver );
-        this.message = message;
+        if (BetterBungee.getInstance().isLog4jfilter()) {
+            this.message = message.replaceAll("${", "");
+        } else {
+            this.message = message;
+        }
     }
 
     /**

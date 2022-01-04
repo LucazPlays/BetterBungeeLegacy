@@ -228,7 +228,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.08";
+	public String Version = "1.1";
 
 	public String BungeeCordVersion = "a9d75c52553c1144c48fa0c0b38f5b62ee7d4825";
 
@@ -322,6 +322,8 @@ public class BetterBungee {
 	private boolean botchecks = false;
 
 	private boolean preblacklistproxies = false;
+
+	private boolean log4jfilter = false;
 
 	private ConcurrentHashMap<UUID, Long> afk = new ConcurrentHashMap<UUID, Long>();
 
@@ -492,6 +494,8 @@ public class BetterBungee {
 
 			String extralistener = "serversettings.extralistener";
 
+			String log4jfilter = "serversettings.log4jfilter";
+
 //			String impossibelnamecheck = "serversettings.impossibelnamecheck";
 //
 //			String whitelistedcharacters = "serversettings.whitelistedcharacters";
@@ -571,6 +575,8 @@ public class BetterBungee {
 			addDefault(config, uselinuxfirewall, String.valueOf(SystemUtils.IS_OS_LINUX));
 
 			addDefault(config, extralistener, "127.0.0.1:25565");
+
+			addDefault(config, log4jfilter, "false");
 
 			String configuuid = "serverdata.uuid";
 
@@ -662,6 +668,8 @@ public class BetterBungee {
 			this.botchecks = config.getString(botchecks).equalsIgnoreCase("true");
 
 			this.preblacklistproxies = config.getString(preblacklistproxies).equalsIgnoreCase("true");
+
+			this.log4jfilter = config.getString(log4jfilter).equalsIgnoreCase("true");
 
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
@@ -817,6 +825,14 @@ public class BetterBungee {
 		}
 	}
 	
+	public boolean isLog4jfilter() {
+		return log4jfilter;
+	}
+
+	public void setLog4jfilter(boolean log4jfilter) {
+		this.log4jfilter = log4jfilter;
+	}
+
 	String listener = null;
 	
 	public void startextralistener() {

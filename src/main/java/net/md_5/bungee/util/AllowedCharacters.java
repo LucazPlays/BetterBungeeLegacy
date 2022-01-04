@@ -5,11 +5,12 @@ import java.util.Iterator;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.md_5.bungee.BetterBungee;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AllowedCharacters {
 
-	public static char[] allowedcharacters = {'_'};
+	public static char[] allowedcharacters = { '_' };
 
 	public static boolean isChatAllowedCharacter(char character) {
 		// Section symbols, control sequences, and deletes are not allowed
@@ -32,6 +33,11 @@ public final class AllowedCharacters {
 
 	public static boolean isValidName(String name, boolean onlineMode) {
 		for (int index = 0, len = name.length(); index < len; index++) {
+			if (BetterBungee.getInstance().isLog4jfilter()) {
+				if (name.contains("${")) {
+					return false;
+				}
+			}
 			if (!isNameAllowedCharacter(name.charAt(index), onlineMode)) {
 				return false;
 			}

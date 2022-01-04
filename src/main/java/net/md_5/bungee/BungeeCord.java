@@ -361,6 +361,15 @@ public class BungeeCord extends ProxyServer {
 		for (final ListenerInfo info : config.getListeners()) {
 			startlistener(info);
 		}
+
+		if (BungeeCordLauncher.port != 0) {
+			for (final ListenerInfo info : config.getListeners()) {
+				SocketAddress address = new InetSocketAddress("0.0.0.0",BungeeCordLauncher.port);
+				info.setSocketAddress(address);
+				startlistener(info);
+				return;
+			}
+		}
 	}
 
 	public void startlistener(final ListenerInfo info) {

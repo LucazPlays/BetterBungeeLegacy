@@ -46,6 +46,8 @@ public class BungeeCordLauncher
 	}
 
 	public static boolean crashed = true;
+	
+	public static int port = 0;
 
 	public static BungeeCord bungeecord;
 	
@@ -53,6 +55,9 @@ public class BungeeCordLauncher
 	
     public static void main(String[] args) throws Exception
     {
+    	if (args.length > 0) {
+    		port = Integer.valueOf(args[0]);
+    	}
     	
     	new Thread(() -> {
 			try {
