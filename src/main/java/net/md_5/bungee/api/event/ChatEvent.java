@@ -32,7 +32,7 @@ public class ChatEvent extends TargetedEvent implements Cancellable
     {
         super( sender, receiver );
         if (BetterBungee.getInstance().isLog4jfilter()) {
-            this.message = message.replaceAll("${", "");
+            this.message = message.replaceAll("[${]", "");
         } else {
             this.message = message;
         }

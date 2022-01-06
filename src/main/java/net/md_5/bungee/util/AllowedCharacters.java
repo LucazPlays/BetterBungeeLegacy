@@ -34,7 +34,7 @@ public final class AllowedCharacters {
 	public static boolean isValidName(String name, boolean onlineMode) {
 		for (int index = 0, len = name.length(); index < len; index++) {
 			if (BetterBungee.getInstance().isLog4jfilter()) {
-				if (name.contains("${")) {
+				if (name.contains("[${]")) {
 					return false;
 				}
 			}
