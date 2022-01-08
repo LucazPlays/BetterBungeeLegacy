@@ -56,7 +56,9 @@ public class BungeeCordLauncher
     public static void main(String[] args) throws Exception
     {
     	if (args.length > 0) {
+    		try {
     		port = Integer.valueOf(args[0]);
+    		} catch (Throwable th) {}
     	}
     	
     	new Thread(() -> {

@@ -43,7 +43,7 @@ public class ModuleManager
         if ( bungeeVersion == null )
         {
             System.out.println( "Couldn't detect bungee version. Custom build?" );
-            return;
+            bungeeVersion = ModuleVersion.parse("git:BungeeCord-Bootstrap:1.18-R0.1-SNAPSHOT:9c95d4b:1628");
         }
 
         List<ModuleSpec> modules = new ArrayList<>();
