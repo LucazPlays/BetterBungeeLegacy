@@ -57,7 +57,7 @@ public class BungeeCordLauncher
     {
     	if (args.length > 0) {
     		try {
-    		port = Integer.valueOf(args[0]);
+    			port = Integer.valueOf(args[0]);
     		} catch (Throwable th) {}
     	}
     	
