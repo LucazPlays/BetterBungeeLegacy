@@ -1,6 +1,5 @@
 package net.md_5.bungee;
 
-import java.awt.desktop.ScreenSleepEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -230,7 +229,7 @@ public class BetterBungee {
 
 	public String Version = "1.1";
 
-	public String BungeeCordVersion = "a9d75c52553c1144c48fa0c0b38f5b62ee7d4825";
+	public String BungeeCordVersion = "7e47490e7053d110a33a3c86b025af91bd803388";
 
 
 	long lastfirewallget = 0;

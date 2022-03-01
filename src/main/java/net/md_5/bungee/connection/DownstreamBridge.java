@@ -11,7 +11,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.brigadier.tree.CommandNode;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.ServerConnection.KeepAliveData;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -68,6 +68,13 @@ import net.md_5.bungee.tab.TabList;
 public class DownstreamBridge extends PacketHandler
 {
 
+    // #3246: Recent versions of MinecraftForge alter Vanilla behaviour and require a command so that the executable flag is set
+    // If the flag is not set, then the command will appear and successfully tab complete, but cannot be successfully executed
+    private static final com.mojang.brigadier.Command DUMMY_COMMAND = (context) ->
+    {
+        return 0;
+    };
+    //
     private final ProxyServer bungee;
     private final UserConnection con;
     private final ServerConnection server;
@@ -265,10 +272,9 @@ public class DownstreamBridge extends PacketHandler
             String serverBrand = DefinedPacket.readString( brand );
             brand.release();
             
-			if (!BetterBungee.getInstance().isAllowSelfConnect() && !BetterBungee.getInstance().isLimbomode()) {
-				Preconditions.checkState( !serverBrand.contains( bungee.getName() ), "Cannot connect proxy to itself!" );
-			}
-
+            if (!BetterBungee.getInstance().isAllowSelfConnect() && !BetterBungee.getInstance().isLimbomode()) {
+            	Preconditions.checkState( !serverBrand.contains( bungee.getName() ), "Cannot connect proxy to itself!" );
+            }
             brand = ByteBufAllocator.DEFAULT.heapBuffer();
             DefinedPacket.writeString( bungee.getName() + " (" + bungee.getVersion() + ")" + " <- " + serverBrand, brand );
             pluginMessage.setData( DefinedPacket.toArray( brand ) );
@@ -656,9 +662,9 @@ public class DownstreamBridge extends PacketHandler
         {
             if ( !bungee.getDisabledCommands().contains( command.getKey() ) && commands.getRoot().getChild( command.getKey() ) == null && command.getValue().hasPermission( con ) )
             {
-                LiteralCommandNode dummy = LiteralArgumentBuilder.literal( command.getKey() )
+                CommandNode dummy = LiteralArgumentBuilder.literal( command.getKey() ).executes( DUMMY_COMMAND )
                         .then( RequiredArgumentBuilder.argument( "args", StringArgumentType.greedyString() )
-                                .suggests( Commands.SuggestionRegistry.ASK_SERVER ) )
+                                .suggests( Commands.SuggestionRegistry.ASK_SERVER ).executes( DUMMY_COMMAND ) )
                         .build();
                 commands.getRoot().addChild( dummy );
 
