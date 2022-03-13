@@ -1,5 +1,7 @@
 package net.md_5.bungee.api.event;
 
+import java.util.regex.Pattern;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -32,7 +34,7 @@ public class ChatEvent extends TargetedEvent implements Cancellable
     {
         super( sender, receiver );
         if (BetterBungee.getInstance().isLog4jfilter()) {
-            this.message = message.replaceAll("[${]", "");
+            this.message = message.replaceAll(Pattern.quote("${"), "");
         } else {
             this.message = message;
         }
