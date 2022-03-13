@@ -72,7 +72,6 @@ public abstract class EntityMap
             case ProtocolConstants.MINECRAFT_1_17_1:
                 return EntityMap_1_16_2.INSTANCE_1_17;
             case ProtocolConstants.MINECRAFT_1_18:
-                return EntityMap_1_16_2.INSTANCE_1_18;
             case ProtocolConstants.MINECRAFT_1_18_2:
                 return EntityMap_1_16_2.INSTANCE_1_18;
         }
@@ -298,8 +297,7 @@ public abstract class EntityMap
         packet.readerIndex( readerIndex );
     }
 
-    @SuppressWarnings("resource")
-	private static void readSkipSlot(ByteBuf packet, int protocolVersion)
+    private static void readSkipSlot(ByteBuf packet, int protocolVersion)
     {
         if ( ( protocolVersion >= ProtocolConstants.MINECRAFT_1_13_2 ) ? packet.readBoolean() : packet.readShort() != -1 )
         {
