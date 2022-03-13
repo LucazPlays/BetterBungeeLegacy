@@ -504,6 +504,18 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
 
 			ch.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
+			
+			LoginResult cached = BungeeCord.getInstance().getSessionCache().getCachedResult( getSocketAddress() );
+			
+			if ( cached != null && cached.getName().equals( getName() ) )
+			{
+				BungeeCord.getInstance().getLogger().log( Level.FINE, () -> "Logged in cached " + cached + " from " + getSocketAddress() );
+				loginProfile = cached;
+				name = cached.getName();
+				uniqueId = Util.getUUID( cached.getId() );
+				finish();
+				return;
+			}
 
 			String encName = URLEncoder.encode(InitialHandler.this.getName(), "UTF-8");
 
@@ -536,6 +548,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								loginProfile = obj;
 								name = obj.getName();
 								uniqueId = Util.getUUID(obj.getId());
+								BungeeCord.getInstance().getSessionCache().cacheSession( getSocketAddress(), obj );
 								finish();
 								return;
 							}
