@@ -510,6 +510,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			if ( cached != null && cached.getName().equals( getName() ) )
 			{
 				BungeeCord.getInstance().getLogger().log( Level.FINE, () -> "Logged in cached " + cached + " from " + getSocketAddress() );
+				thisState = State.FINISHING;
 				loginProfile = cached;
 				name = cached.getName();
 				uniqueId = Util.getUUID( cached.getId() );
