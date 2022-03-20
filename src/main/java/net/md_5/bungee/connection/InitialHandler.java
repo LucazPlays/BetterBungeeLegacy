@@ -95,13 +95,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private LoginRequest loginRequest;
 
 	private EncryptionRequest request;
-	
+
 	@Getter
-    private PluginMessage brandMessage;
-    
-    @Getter
-    private final Set<String> registeredChannels = new HashSet<>();
-    
+	private PluginMessage brandMessage;
+
+	@Getter
+	private final Set<String> registeredChannels = new HashSet<>();
+
 	private State thisState = State.HANDSHAKE;
 
 	private final Unsafe unsafe = new Unsafe() {
@@ -188,7 +188,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				StatisticsAPI.getInstance().addblockedConnection();
 				list.addBlacklist(list.getRealAdress(ch));
 				if (BetterBungee.getInstance().isDevdebugmode()) {
-					NotifyManager.getInstance().addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
+					NotifyManager.getInstance()
+							.addmessage("§cBlocked §8- §e" + list.getRealAdress(ch) + " §8- §c" + cause);
 				}
 				ch.close();
 			}
@@ -202,7 +203,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	@Override
 	public void handle(PluginMessage pluginMessage) throws Exception {
 		// TODO: Unregister?
-        this.relayMessage( pluginMessage );
+		this.relayMessage(pluginMessage);
 	}
 
 	@Override
@@ -430,22 +431,18 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	public void handle(LoginRequest loginRequest) throws Exception {
 		Preconditions.checkState(thisState == State.USERNAME, "Not expecting USERNAME");
 
-		
+		if (!AllowedCharacters.isValidName(loginRequest.getData(), onlineMode)) {
+			disconnect(bungee.getTranslation("name_invalid"));
+			return;
+		}
 
-        if (!AllowedCharacters.isValidName( loginRequest.getData(), onlineMode)) {
-            disconnect( bungee.getTranslation( "name_invalid" ) );
-            return;
-        }
-        
-        
 		this.loginRequest = loginRequest;
-		
+
 //		if (getName().length() > 16) {
 //			disconnect(bungee.getTranslation("name_too_long"));
 //			cancelcrash("Name To Long");
 //			return;
 //		}
-		
 
 		int limit = BungeeCord.getInstance().config.getPlayerLimit();
 
@@ -504,22 +501,23 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			BungeeCipher encrypt = EncryptionUtil.getCipher(true, sharedKey);
 
 			ch.addBefore(PipelineUtils.FRAME_PREPENDER, PipelineUtils.ENCRYPT_HANDLER, new CipherEncoder(encrypt));
-			
+
 			if (BetterBungee.getInstance().isSessionchache()) {
-			
-				LoginResult cached = BungeeCord.getInstance().getSessionCache().getCachedResult( getSocketAddress() );
-			
-				if ( cached != null && cached.getName().equals( getName() ) )
-				{
-					BungeeCord.getInstance().getLogger().log( Level.FINE, () -> "Logged in cached " + cached + " from " + getSocketAddress() );
+
+				LoginResult cached = BungeeCord.getInstance().getSessionCache().getCachedResult(getSocketAddress());
+
+				if (cached != null && cached.getName().equals(getName())) {
+					BungeeCord.getInstance().getLogger().log(Level.FINE,
+							() -> "Logged in cached " + cached + " from " + getSocketAddress());
+					thisState = State.FINISHING;
 					loginProfile = cached;
 					name = cached.getName();
-					uniqueId = Util.getUUID( cached.getId() );
+					uniqueId = Util.getUUID(cached.getId());
 					finish();
 					return;
 				}
-			}
 
+			}
 			String encName = URLEncoder.encode(InitialHandler.this.getName(), "UTF-8");
 
 			MessageDigest sha = MessageDigest.getInstance("SHA-1");
@@ -553,7 +551,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								uniqueId = Util.getUUID(obj.getId());
 
 								if (BetterBungee.getInstance().isSessionchache()) {
-									BungeeCord.getInstance().getSessionCache().cacheSession( getSocketAddress(), obj );
+									BungeeCord.getInstance().getSessionCache().cacheSession(getSocketAddress(), obj);
 								}
 								finish();
 								return;
@@ -566,7 +564,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							disconnect(bungee.getTranslation("offline_mode_player"));
 						} else {
 							disconnect(bungee.getTranslation("mojang_fail"));
-							bungee.getLogger().log(Level.SEVERE, "Error authenticating " + getName() + " with minecraft.net", error);
+							bungee.getLogger().log(Level.SEVERE,
+									"Error authenticating " + getName() + " with minecraft.net", error);
 						}
 
 					} catch (Throwable e) {
@@ -576,7 +575,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 					}
 				}
 			};
-	        thisState = State.FINISHING;
+			thisState = State.FINISHING;
 			HttpClient.get(authURL, ch.getHandle().eventLoop(), handler);
 
 		} catch (Throwable e) {
@@ -590,7 +589,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	private void finish() {
 		if (isOnlineMode()) {
-			
+
 			// Check for multiple connections
 			// We have to check for the old name first
 			ProxiedPlayer oldName = bungee.getPlayer(getName());
@@ -671,12 +670,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
 							}
 
-							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks() && !fastjoin) {
+							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks()
+									&& !fastjoin) {
 								if (!list.getJoinedlist().contains(ip)) {
 									list.getJoinedlist().add(ip);
 								}
 							}
-							
+
 //							if (isOnlineMode()) {
 //								if (Blacklist.getInstance().isProtection()) {
 //									if (!list.containswhitelist(ip)) {
@@ -727,23 +727,25 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 										} else {
 											if (!list.containswhitelist(ip)) {
 												list.addWhitelist(ip);
-												NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
+												NotifyManager.getInstance()
+														.addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 											}
 										}
 									}
-									
+
 									if (BetterBungee.getInstance().isLimbomode()) {
-											ServerInfo finalserver;
-											if (bungee.getReconnectHandler() != null) {
-												finalserver = bungee.getReconnectHandler().getServer(userCon);
-											} else {
-												finalserver = AbstractReconnectHandler.getForcedHost(InitialHandler.this);
-											}
-											if (finalserver == null) {
-												finalserver = bungee.getServerInfo(listener.getDefaultServer());
-											}
-											userCon.connect(finalserver, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK);
+										ServerInfo finalserver;
+										if (bungee.getReconnectHandler() != null) {
+											finalserver = bungee.getReconnectHandler().getServer(userCon);
+										} else {
+											finalserver = AbstractReconnectHandler.getForcedHost(InitialHandler.this);
 										}
+										if (finalserver == null) {
+											finalserver = bungee.getServerInfo(listener.getDefaultServer());
+										}
+										userCon.connect(finalserver, null, true,
+												ServerConnectEvent.Reason.LOBBY_FALLBACK);
+									}
 								} else {
 									vpncheck(ip, userCon);
 								}
@@ -773,11 +775,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							if (!IPChecker.getInstance().isipresidental(ip)) {
 								ProxiedPlayer player = userCon;
 								if (player != null) {
-									if (!player.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
-										player.disconnect(TextComponent.fromLegacyText(BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
-										NotifyManager.getInstance().addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
+									if (!player
+											.hasPermission(BetterBungee.getInstance().getDenyVPNbypasspermission())) {
+										player.disconnect(TextComponent.fromLegacyText(
+												BungeeCord.getInstance().getBetterBungee().getDenyVPNkickmessage()));
+										NotifyManager.getInstance()
+												.addmessage("§6Detected §8- §e" + player.getName() + " §8- §6VPN");
 									} else {
-										NotifyManager.getInstance().addmessage("§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
+										NotifyManager.getInstance().addmessage(
+												"§aDetected §8- §e" + player.getName() + " §8- §2VPN (bypassed)");
 									}
 								}
 								return;
@@ -804,38 +810,27 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		return null;
 	}
 
-	
+	public void relayMessage(PluginMessage input) throws Exception {
+		if (input.getTag().equals("REGISTER") || input.getTag().equals("minecraft:register")) {
+			String content = new String(input.getData(), StandardCharsets.UTF_8);
 
-    public void relayMessage(PluginMessage input) throws Exception
-    {
-        if ( input.getTag().equals( "REGISTER" ) || input.getTag().equals( "minecraft:register" ) )
-        {
-            String content = new String( input.getData(), StandardCharsets.UTF_8 );
+			for (String id : content.split("\0")) {
+				Preconditions.checkState(registeredChannels.size() < 128, "Too many registered channels");
+				Preconditions.checkArgument(id.length() < 128, "Channel name too long");
 
-            for ( String id : content.split( "\0" ) )
-            {
-                Preconditions.checkState( registeredChannels.size() < 128, "Too many registered channels" );
-                Preconditions.checkArgument( id.length() < 128, "Channel name too long" );
+				registeredChannels.add(id);
+			}
+		} else if (input.getTag().equals("UNREGISTER") || input.getTag().equals("minecraft:unregister")) {
+			String content = new String(input.getData(), StandardCharsets.UTF_8);
 
-                registeredChannels.add( id );
-            }
-        } else if ( input.getTag().equals( "UNREGISTER" ) || input.getTag().equals( "minecraft:unregister" ) )
-        {
-            String content = new String( input.getData(), StandardCharsets.UTF_8 );
+			for (String id : content.split("\0")) {
+				registeredChannels.remove(id);
+			}
+		} else if (input.getTag().equals("MC|Brand") || input.getTag().equals("minecraft:brand")) {
+			brandMessage = input;
+		}
+	}
 
-            for ( String id : content.split( "\0" ) )
-            {
-                registeredChannels.remove( id );
-            }
-        } else if ( input.getTag().equals( "MC|Brand" ) || input.getTag().equals( "minecraft:brand" ) )
-        {
-            brandMessage = input;
-        }
-    }
-	
-	
-	
-	
 	public Blacklist list = Blacklist.getInstance();
 
 	@Override
