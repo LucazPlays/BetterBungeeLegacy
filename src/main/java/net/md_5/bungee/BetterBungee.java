@@ -334,8 +334,18 @@ public class BetterBungee {
 
 	
 	private ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
+	private boolean sessionchache;
 	
 	
+	public boolean isSessionchache() {
+		return sessionchache;
+	}
+
+	public void setSessionchache(boolean sessionchache) {
+		this.sessionchache = sessionchache;
+	}
+
 	public BetterBungee() {
 		instance = this;
 		
@@ -495,6 +505,8 @@ public class BetterBungee {
 
 			String log4jfilter = "serversettings.log4jfilter";
 
+			String sessioncache = "serversettings.sessioncache";
+
 //			String impossibelnamecheck = "serversettings.impossibelnamecheck";
 //
 //			String whitelistedcharacters = "serversettings.whitelistedcharacters";
@@ -576,6 +588,8 @@ public class BetterBungee {
 			addDefault(config, extralistener, "127.0.0.1:25565");
 
 			addDefault(config, log4jfilter, "false");
+
+			addDefault(config, sessioncache, "false");
 
 			String configuuid = "serverdata.uuid";
 
@@ -669,6 +683,8 @@ public class BetterBungee {
 			this.preblacklistproxies = config.getString(preblacklistproxies).equalsIgnoreCase("true");
 
 			this.log4jfilter = config.getString(log4jfilter).equalsIgnoreCase("true");
+
+			this.sessionchache = config.getString(sessioncache).equalsIgnoreCase("true");
 
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
