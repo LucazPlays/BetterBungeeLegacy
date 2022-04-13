@@ -336,6 +336,8 @@ public class BetterBungee {
 	private ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
 	private boolean sessionchache;
+
+	private boolean github;
 	
 	
 	public boolean isSessionchache() {
@@ -433,6 +435,8 @@ public class BetterBungee {
 
 			String snapshotupdater = "serversettings.snapshotupdater";
 
+			String githubupdater = "serversettings.githubupdater";
+
 			String restartonupdate = "serversettings.restartonupdate";
 
 			String snapshotupdatercountdown = "serversettings.snapshotupdatercountdown";
@@ -512,6 +516,8 @@ public class BetterBungee {
 //			String whitelistedcharacters = "serversettings.whitelistedcharacters";
 
 			addDefault(config, prefix, "&6BetterBungee &7- &e ");
+
+			addDefault(config, githubupdater, "false");
 
 			addDefault(config, snapshotupdater, "false");
 
@@ -616,6 +622,8 @@ public class BetterBungee {
 
 			this.password = config.getString(configkey);
 
+			this.github = config.getString(snapshotupdater).equalsIgnoreCase("true");
+			
 			this.snapshotupdate = config.getString(snapshotupdater).equalsIgnoreCase("true");
 
 			this.restartonupdate = config.getString(restartonupdate).equalsIgnoreCase("true");
@@ -1014,7 +1022,23 @@ public class BetterBungee {
 		if (this.manuelupdates && !snapshotupdate) {
 			return false;
 		}
-		if (snapshotupdate) {
+		if (github) {
+			RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/gitupdate");
+			if (!response.getFailed()) {
+				try {
+					String newestnapshotid = response.getText().replaceAll("\n", "").split(":")[1];
+					if (!newestnapshotid.equals(String.valueOf(
+							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+									.length()))) {
+						return updatefromlink(betterbungee + "/downloadgit");
+					}
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("API Timed Out");
+			}
+		} else if (snapshotupdate) {
 			RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/update");
 			if (!response.getFailed()) {
 				try {

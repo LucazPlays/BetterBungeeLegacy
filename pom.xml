@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Luca</groupId>
 	<artifactId>BetterBungee</artifactId>
-	<version>0.98-SNAPSHOT</version>
+	<version>DEV</version>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -10,20 +10,62 @@
 	</properties>
 
 
+	<build>
+		<sourceDirectory>src/</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>de.luca.discordbots.main.CountingBot</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.0</version>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.22</version>
+						</path>
+					</annotationProcessorPaths>
+					<source>8</source>
+					<target>8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
 	<repositories>
 
 
-		<repository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 
 
 		<repository>
@@ -45,29 +87,6 @@
 
 
 		<!-- 		<dependency> -->
-		<!-- 			<groupId>com.mojang</groupId> -->
-		<!-- 			<artifactId>brigadier</artifactId> -->
-		<!-- 			<version>1.0.17</version> -->
-		<!-- 			<scope>compile</scope> -->
-		<!-- 		</dependency> -->
-
-
-		<!-- 		<dependency> -->
-		<!-- 			<groupId>se.llbit</groupId> -->
-		<!-- 			<artifactId>jo-nbt</artifactId> -->
-		<!-- 			<version>1.3.0</version> -->
-		<!-- 			<scope>compile</scope> -->
-		<!-- 		</dependency> -->
-
-
-		<!-- 		<dependency> -->
-		<!-- 			<groupId>org.yaml</groupId> -->
-		<!-- 			<artifactId>snakeyaml</artifactId> -->
-		<!-- 			<version>1.30-SNAPSHOT</version> -->
-		<!-- 			<scope>compile</scope> -->
-		<!-- 		</dependency> -->
-
-		<!-- 		<dependency> -->
 		<!-- 			<groupId>mysql</groupId> -->
 		<!-- 			<artifactId>mysql-connector-java</artifactId> -->
 		<!-- 			<version>8.0.27</version> -->
@@ -76,12 +95,25 @@
 
 
 		<dependency>
-			<groupId>gnu.trove</groupId>
-			<artifactId>trove</artifactId>
-			<version>3.0.3</version>
+			<groupId>net.md-5</groupId>
+			<artifactId>brigadier</artifactId>
+			<version>1.0.16-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 
+
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>core</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.30</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.github.wolf480pl</groupId>
@@ -132,20 +164,6 @@
 			<version>5.0.4</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>net.sf.jopt-simple</groupId> -->
-		<!-- <artifactId>jopt-simple</artifactId> -->
-		<!-- <version>5.0.4</version> -->
-		<!-- <scope>compile</scope> -->
-		<!-- </dependency> -->
-
-
-		<!-- <dependency> -->
-		<!-- <groupId>junit</groupId> -->
-		<!-- <artifactId>junit</artifactId> -->
-		<!-- <version>4.13.1</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
@@ -158,7 +176,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.22</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 
 
@@ -166,30 +184,20 @@
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-resolver-provider</artifactId>
 			<version>3.8.4</version>
-			<!-- not part of the API proper -->
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-connector-basic</artifactId>
 			<version>1.7.2</version>
-			<!-- not part of the API proper -->
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-transport-http</artifactId>
 			<version>1.7.2</version>
-			<!-- not part of the API proper -->
 			<scope>compile</scope>
 		</dependency>
-
-
-		<!-- 		<dependency> -->
-		<!-- 			<groupId>com.puppycrawl.tools</groupId> -->
-		<!-- 			<artifactId>checkstyle</artifactId> -->
-		<!-- 			<version>8.45.1</version> -->
-		<!-- 		</dependency> -->
 
 
 		<dependency>
@@ -214,20 +222,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-
-		<!-- <dependency> -->
-		<!-- <groupId>com.pingcap.tikv</groupId> -->
-		<!-- <artifactId>tikv-client</artifactId> -->
-		<!-- <version>2.3.10</version> -->
-		<!-- </dependency> -->
-
-
-		<!-- <dependency> -->
-		<!-- <groupId>com.joliciel.talismane</groupId> -->
-		<!-- <artifactId>talismane-core</artifactId> -->
-		<!-- <version>6.1.1</version> -->
-		<!-- <scope>compile</scope> -->
-		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.eclipse.jetty.npn</groupId>
