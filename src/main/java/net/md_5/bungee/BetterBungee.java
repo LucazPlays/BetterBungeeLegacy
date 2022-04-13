@@ -708,7 +708,7 @@ public class BetterBungee {
 
 			Blacklist.getInstance().setGlobalfaviconlimit(this.faviconlimit);
 
-			if (snapshotupdate) {
+			if (snapshotupdate || github) {
 				Version = String.valueOf(
 						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
 								.length());
