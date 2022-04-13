@@ -167,8 +167,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		try {
 			if (packet.packet == null) {
 				cancelcrash("QuietException");
-				throw new QuietException(
-						"Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
+//				throw new QuietException( "Unexpected packet received during login process! " + BufUtil.dump(packet.buf, 16));
 			}
 		} catch (Throwable e) {
 			if (BetterBungee.getInstance().isDevdebugmode()) {

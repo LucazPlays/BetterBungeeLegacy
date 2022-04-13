@@ -82,7 +82,7 @@ public class HandlerBoss extends ChannelInboundHandlerAdapter {
 		if (msg instanceof HAProxyMessage) {
 
 			HAProxyMessage proxy = (HAProxyMessage) msg;
-
+			
 			try {
 				if (proxy.sourceAddress() != null) {
 					channel.setProxyAddress(list.getRealAdress(ctx.channel().remoteAddress()));
