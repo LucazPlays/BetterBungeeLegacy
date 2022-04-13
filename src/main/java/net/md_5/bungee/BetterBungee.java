@@ -1323,4 +1323,8 @@ public class BetterBungee {
 	public boolean isAllowSelfConnect() {
 		return allowselfconnect;
 	}
+
+	public boolean isGithub() {
+		return github;
+	}
 }

@@ -31,7 +31,9 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 	public void execute(final CommandSender sender, final String[] args) {
 		if (!sender.hasPermission("bungeecord.command.betterbungee")) {
 			String Version = "";
-			if (BungeeCord.getInstance().getBetterBungee().isSnapshotupdate()) {
+			if (BungeeCord.getInstance().getBetterBungee().isGithub()) {
+				Version = "§7Github§8(§f" + BungeeCord.getInstance().getBetterBungee().Version + "§8)";
+			} else if (BungeeCord.getInstance().getBetterBungee().isSnapshotupdate()) {
 				Version = "§7Snapshot§8(§c" + BungeeCord.getInstance().getBetterBungee().Version + "§8)";
 			} else {
 				Version = "§7Stable§8(§a" + BungeeCord.getInstance().getBetterBungee().Version + "§8)";
