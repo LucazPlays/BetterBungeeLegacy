@@ -622,7 +622,7 @@ public class BetterBungee {
 
 			this.password = config.getString(configkey);
 
-			this.github = config.getString(snapshotupdater).equalsIgnoreCase("true");
+			this.github = config.getString(githubupdater).equalsIgnoreCase("true");
 			
 			this.snapshotupdate = config.getString(snapshotupdater).equalsIgnoreCase("true");
 
