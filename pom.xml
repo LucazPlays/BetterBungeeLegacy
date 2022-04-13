@@ -11,7 +11,17 @@
 
 
 	<build>
+	
 		<sourceDirectory>src/</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -37,6 +47,7 @@
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>net.md_5.bungee.BungeeCordLauncher</mainClass>
+									.properties
 								</transformer>
 							</transformers>
 						</configuration>
