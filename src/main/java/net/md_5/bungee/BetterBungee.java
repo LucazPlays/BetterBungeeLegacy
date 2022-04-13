@@ -365,7 +365,19 @@ public class BetterBungee {
 				sleep(3500);
 				if (alive()) {
 					apiconnection = true;
-					if (snapshotupdate) {
+					if (github) {
+						if (update()) {
+							if (restartonupdate) {
+								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§fGithub Commit§7 Found"));
+								for (int i = 5; i > 0; i--) {
+									sleep(1000);
+									ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§7Restart in §f" + i + "§7 seconds"));
+								}
+								sleep(1000);
+								ProxyServer.getInstance().stop(updatemessage);
+							}
+						}
+					} if (snapshotupdate) {
 						if (update()) {
 							if (restartonupdate) {
 								ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§eSnapshot§7 Update Found"));
