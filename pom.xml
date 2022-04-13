@@ -67,12 +67,23 @@
 
 
 
-
 		<repository>
 			<id>minecraft-libraries</id>
 			<name>Minecraft Libraries</name>
 			<url>https://libraries.minecraft.net</url>
 		</repository>
+		
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 
 
@@ -92,7 +103,6 @@
 		<!-- 			<version>8.0.27</version> -->
 		<!-- 			<scope>compile</scope> -->
 		<!-- 		</dependency> -->
-
 
 		<dependency>
 			<groupId>net.md-5</groupId>
