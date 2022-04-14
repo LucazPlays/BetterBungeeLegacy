@@ -1,5 +1,6 @@
 package net.md_5.bungee.command;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -33,14 +34,25 @@ public class CommandIP extends PlayerCommand {
 					if (isValidInet4Address(ip)) {
 						IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
 						if (result == null || !IPChecker.getInstance().isServiceonline()) {
-							sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
-							sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §c" + ip));
-							sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
+							sendipinfos(sender, ip);
 							return;
 						}
 						sendipmessage(sender, result, true);
 					} else {
-						sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
+						try {
+							InetAddress ipv6 = InetAddress.getByName(ip);
+
+							if (ipv6 != null) {
+								IPCheckerResult result = IPChecker.getInstance().getIPInfo(ip);
+								if (result == null || !IPChecker.getInstance().isServiceonline()) {
+									sendipinfos(sender, ip);
+									return;
+								}
+								sendipmessage(sender, result, true);
+							}
+						} catch (Exception ex) {
+							sender.sendMessage(ProxyServer.getInstance().getTranslation("user_not_online", new Object[0]));
+						}
 					}
 				} else {
 					IPCheckerResult result = IPChecker.getInstance().getIPInfo(user.getAddress().getAddress().getHostAddress());
@@ -58,6 +70,12 @@ public class CommandIP extends PlayerCommand {
 				sender.sendMessage(t.getMessage());
 			}
 		});
+	}
+
+	private void sendipinfos(final CommandSender sender, String ip) {
+		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
+		sender.sendMessage(TextComponent.fromLegacyText("§8 - §7IP: §c" + ip));
+		sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.getInstance().PREFIX + "§8[§6IPINFO§8]"));
 	}
 
 	public static void sendipmessage(final CommandSender sender, IPCheckerResult result, boolean uncensored) {
