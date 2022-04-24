@@ -1093,8 +1093,7 @@ public class BetterBungee {
 			try {
 				if (pathtotemplatejar.equalsIgnoreCase("none")) {
 					new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()).delete();
-					new File("UpdatedBungeeCord.jar").renameTo(
-							new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+					new File("UpdatedBungeeCord.jar").renameTo(new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
 				} else {
 					new File(pathtotemplatejar).delete();
 					new File("UpdatedBungeeCord.jar").renameTo(new File(pathtotemplatejar));

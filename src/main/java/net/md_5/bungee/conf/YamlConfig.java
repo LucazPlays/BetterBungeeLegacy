@@ -219,18 +219,11 @@ public class YamlConfig implements ConfigurationAdapter {
 			boolean pingPassthrough = get("ping_passthrough", false, val);
 
 			boolean query = get("query_enabled", false, val);
+			
 			int queryPort = get("query_port", 25577, val);
 
 			boolean proxyProtocol = get("proxy_protocol", false, val);
-			new Thread(() -> {
-				try {
-					Thread.sleep(5000);
-//					BungeeCord.getInstance().getBetterBungee().setProxyProtocol(proxyProtocol);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}).start();
+
 			List<String> serverPriority = new ArrayList<>(get("priorities", Collections.EMPTY_LIST, val));
 
 			// Default server list migration
