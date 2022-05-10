@@ -445,7 +445,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		int limit = BungeeCord.getInstance().config.getPlayerLimit();
 
-		if (limit > 0 && bungee.getOnlineCount() >= limit) {
+		if (limit > 0 && bungee.getOnlineCount() >= limit && !BetterBungee.getInstance().isFullproxyjoin()) {
 			disconnect(bungee.getTranslation("proxy_full"));
 			return;
 		}
@@ -690,6 +690,19 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 //							thisState = State.FINISHED;
 //						
 
+
+							if (BetterBungee.getInstance().isFullproxyjoin()) {
+								if (!BetterBungee.getInstance().getFullProxyJoinPermission().equals("none")) {
+									if (!userCon.hasPermission(BetterBungee.getInstance().getFullProxyJoinPermission())) {
+										int limit = BungeeCord.getInstance().config.getPlayerLimit();
+										if (limit > 0 && bungee.getOnlineCount() >= limit) {
+											disconnect(bungee.getTranslation("proxy_full"));
+											return;
+										}
+									}
+								}
+							}
+							
 							IPChecker.getInstance().start(() -> {
 								if (!fastjoin) {
 //									userCon.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(""));

@@ -317,11 +317,9 @@ public class CommandBungeeExtras extends PlayerCommand implements TabExecutor {
 				sender.sendMessage(TextComponent.fromLegacyText(BungeeCord.PREFIX + "§aPlayerlist"));
 				for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
 					if (all.getProxyAddress() != null) {
-						sender.sendMessage(TextComponent.fromLegacyText("   §8 - §a" + all.getName() + " §8- §e"
-								+ all.getAddress().getAddress().getHostAddress() + " §8- §d" + all.getProxyAddress()));
+						sender.sendMessage(TextComponent.fromLegacyText("   §8 - §a" + all.getName() + " §8- §e" + all.getAddress().getAddress().getHostAddress() + " §8- §d" + all.getProxyAddress()));
 					} else {
-						sender.sendMessage(TextComponent.fromLegacyText("   §8 - §a" + all.getName() + " §8- §e"
-								+ all.getAddress().getAddress().getHostAddress() + " §8- §d"));
+						sender.sendMessage(TextComponent.fromLegacyText("   §8 - §a" + all.getName() + " §8- §e" + all.getAddress().getAddress().getHostAddress() + " §8- §d"));
 					}
 				}
 				return;

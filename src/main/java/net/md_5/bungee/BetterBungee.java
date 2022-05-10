@@ -147,6 +147,10 @@ public class BetterBungee {
 		this.discordintegration = discordintegration;
 	}
 
+	public String getFullProxyJoinPermission() {
+		return fullproxyjoinpermission;
+	}
+
 	public String getDenyVPNbypasspermission() {
 		return denyVPNbypasspermission;
 	}
@@ -227,7 +231,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.1";
+	public String Version = "1.2";
 
 	public String BungeeCordVersion = "7e47490e7053d110a33a3c86b025af91bd803388";
 
@@ -266,9 +270,13 @@ public class BetterBungee {
 
 	boolean denyVPNonJoin = false;
 
+	boolean fullproxyjoin = false;
+
 	String denyVPNkickmessage = "Kicked by AntiVPN";
 
 	String denyVPNbypasspermission = "antivpn.bypass";
+
+	String fullproxyjoinpermission = "none";
 
 	boolean discordintegration = false;
 
@@ -523,6 +531,11 @@ public class BetterBungee {
 
 			String sessioncache = "serversettings.sessioncache";
 
+			String fullproxyjoin = "serversettings.fullproxyjoin";
+
+			String fullproxyjoinpermission = "serversettings.fullproxyjoinpermission";
+			
+
 //			String impossibelnamecheck = "serversettings.impossibelnamecheck";
 //
 //			String whitelistedcharacters = "serversettings.whitelistedcharacters";
@@ -608,6 +621,10 @@ public class BetterBungee {
 			addDefault(config, log4jfilter, "false");
 
 			addDefault(config, sessioncache, "false");
+
+			addDefault(config, fullproxyjoin, "false");
+
+			addDefault(config, fullproxyjoinpermission, "none");
 
 			String configuuid = "serverdata.uuid";
 
@@ -706,6 +723,10 @@ public class BetterBungee {
 
 			this.sessionchache = config.getString(sessioncache).equalsIgnoreCase("true");
 
+			this.fullproxyjoin = config.getString(fullproxyjoin).equalsIgnoreCase("true");
+
+			this.fullproxyjoinpermission = config.getString(fullproxyjoinpermission);
+
 			BungeeCord.PREFIX = config.getString(prefix).replaceAll("&", "§");
 
 			Blacklist.getInstance().setProtection(this.protection);
@@ -725,32 +746,6 @@ public class BetterBungee {
 						new File(BetterBungee.class.getProtectionDomain().getCodeSource().getLocation().toURI())
 								.length());
 			}
-
-//			if (this.discordintegration) {
-//				NotifyManager.getInstance().setDiscord(this.discordintegration);
-//				new Thread(() -> {
-//					sleep(5500);
-//					while (BungeeCord.getInstance().isRunning) {
-//						if (apiconnection) {
-//							if (NotifyManager.getInstance().getDiscordmessages().size() > 0) {
-//
-//								Set<String> set = ConcurrentHashMap.newKeySet();
-//								
-//								if (NotifyManager.getInstance().getDiscordmessages().size() > 15) {
-//									for (int i = 0; i < 15; i++) {
-//										set.add(NotifyManager.getInstance().getDiscordmessages().poll());
-//									}
-//								} else {
-//									set.addAll(NotifyManager.getInstance().getDiscordmessages());
-//									NotifyManager.getInstance().deleteDiscordmessages();
-//								}
-//								discord(set);
-//							}
-//						}
-//						sleep(1000);
-//					}
-//				}).start();
-//			}
 
 			threads.execute(() -> {
 				sleep(5000);
@@ -1337,5 +1332,13 @@ public class BetterBungee {
 
 	public boolean isGithub() {
 		return github;
+	}
+
+	public boolean isFullproxyjoin() {
+		return fullproxyjoin;
+	}
+
+	public void setFullproxyjoin(boolean fullproxyjoin) {
+		this.fullproxyjoin = fullproxyjoin;
 	}
 }
