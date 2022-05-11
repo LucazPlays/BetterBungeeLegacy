@@ -25,19 +25,15 @@ import net.md_5.bungee.netty.ChannelWrapper;
 
 public class Blacklist {
 
-	
-	
-	
-
 	public boolean filter(Channel ch) {
 		String ip = null;
 		ip = this.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
-		
+
 		if (this.isProtection()) {
 			if (isforcewhitelistedip(ip)) {
 				return false;
 			}
-			
+
 			if (this.isBlacklisted(ip)) {
 				ch.close();
 				StatisticsAPI.getInstance().addblockedConnection();
@@ -70,17 +66,7 @@ public class Blacklist {
 		}
 		return false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	private static Blacklist Instance = new Blacklist();
 
 	private ConcurrentHashMap<String, Integer> ratelimit = new ConcurrentHashMap<String, Integer>();
@@ -90,10 +76,10 @@ public class Blacklist {
 	@Setter
 	@Getter
 	private boolean blacklistonconnectionlimit = false;
-	
+
 	@Setter
 	private int maxcpsperip = 20;
-	
+
 	private int globalratelimit = 0;
 
 	private int globalfaviconlimit = 0;
@@ -127,7 +113,7 @@ public class Blacklist {
 
 	@Getter
 	private Set<String> joinedlist = ConcurrentHashMap.newKeySet();
-	
+
 	@Getter
 	private Set<String> movementlist = ConcurrentHashMap.newKeySet();
 
@@ -140,8 +126,7 @@ public class Blacklist {
 	public boolean isforcewhitelistedip(String stg) {
 		return forcewhitelistedips.contains(stg);
 	}
-	
-	
+
 	public Set<String> getBlacklist() {
 		return blacklist;
 	}
@@ -223,7 +208,7 @@ public class Blacklist {
 						if (entry.getValue() > 0) {
 							if (entry.getValue() > 10) {
 								if (!blacklistonconnectionlimit) {
-									if (entry.getValue() > peripratelimit+maxcpsperip) {
+									if (entry.getValue() > peripratelimit + maxcpsperip) {
 										addBlacklist(entry.getKey());
 									}
 								}
@@ -253,40 +238,41 @@ public class Blacklist {
 					} else {
 						averagecps = average / averagecpslist.size();
 					}
-					
+
 					if (averagecps > 12) {
 						if (!underattack) {
 							underattack = true;
 							int cps = connectionspersecond;
-							new Thread(() -> {
-								try {
-
-									blockedipadresses = Blacklist.getInstance().getBlacklist().size();
-									blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
-
-									DiscordWebhook webhook = new DiscordWebhook(
-											BetterBungee.getInstance().discordwebhook);
-
-									EmbedObject object2 = new EmbedObject();
-
-									object2.setColor(Color.RED);
-									object2.addField("Attack Detected", "BetterBungee", true);
-									object2.addField("Connections Per Second", "" + cps, true);
-									object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
-
-									webhook.addEmbed(object2);
-
+							if (!BetterBungee.getInstance().discordwebhook.equals("none")) {
+								new Thread(() -> {
 									try {
-										webhook.execute();
-									} catch (IOException e) {
+
+										blockedipadresses = Blacklist.getInstance().getBlacklist().size();
+										blockedconnections = StatisticsAPI.getInstance().getBlockedConnections();
+
+										DiscordWebhook webhook = new DiscordWebhook(
+												BetterBungee.getInstance().discordwebhook);
+
+										EmbedObject object2 = new EmbedObject();
+
+										object2.setColor(Color.RED);
+										object2.addField("Attack Detected", "BetterBungee", true);
+										object2.addField("Connections Per Second", "" + cps, true);
+										object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
+
+										webhook.addEmbed(object2);
+
+										try {
+											webhook.execute();
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
+
+									} catch (Throwable e) {
 										e.printStackTrace();
 									}
-
-								} catch (Throwable e) {
-									e.printStackTrace();
-								}
-
-							}).start();
+								}).start();
+							}
 						}
 					} else {
 						if (underattack) {
@@ -299,15 +285,17 @@ public class Blacklist {
 									EmbedObject object2 = new EmbedObject();
 
 									object2.setColor(Color.GREEN);
-									
+
 									object2.addField("Attack Stopped", "BetterBungee", true);
-									
-									object2.addField("IPAdresses Blocked", "" + (Blacklist.getInstance().getBlacklist().size() - blockedipadresses),
+
+									object2.addField("IPAdresses Blocked",
+											"" + (Blacklist.getInstance().getBlacklist().size() - blockedipadresses),
 											true);
-									object2.addField("Connections Blocked", "" + (StatisticsAPI.getInstance().getBlockedConnections()
+									object2.addField("Connections Blocked",
+											"" + (StatisticsAPI.getInstance().getBlockedConnections()
 													- blockedconnections),
 											true);
-									
+
 									object2.setThumbnail("https://s20.directupload.net/images/210808/2c6o8nwx.jpg");
 
 									blockedipadresses = Blacklist.getInstance().getBlacklist().size();
