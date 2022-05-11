@@ -70,11 +70,13 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
         loggerFactory = new org.slf4j.impl.JDK14LoggerFactory();
     }
 
-    public ILoggerFactory getLoggerFactory() {
+    @Override
+	public ILoggerFactory getLoggerFactory() {
         return loggerFactory;
     }
 
-    public String getLoggerFactoryClassStr() {
+    @Override
+	public String getLoggerFactoryClassStr() {
         return loggerFactoryClassStr;
     }
 }
