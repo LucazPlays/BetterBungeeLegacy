@@ -34,8 +34,6 @@ import java.util.logging.Level;
 
 import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.BungeeServerInfo;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.NotifyManager;
@@ -55,8 +53,6 @@ import net.md_5.bungee.protocol.Varint21LengthFieldPrepender;
 public class PipelineUtils {
 
 	public static final AttributeKey<ListenerInfo> LISTENER = AttributeKey.valueOf("ListerInfo");
-	public static final AttributeKey<UserConnection> USER = AttributeKey.valueOf("User");
-	public static final AttributeKey<BungeeServerInfo> TARGET = AttributeKey.valueOf("Target");
 	public static final ChannelInitializer<Channel> SERVER_CHILD = new ChannelInitializer<Channel>() {
 		@Override
 		protected void initChannel(Channel ch) throws Exception {
@@ -71,8 +67,10 @@ public class PipelineUtils {
 			}
 
 			ListenerInfo listener = ch.attr(LISTENER).get();
+			
+			boolean proxyprotocol = listener.isProxyProtocol();
 
-			if (!listener.isProxyProtocol()) {
+			if (!proxyprotocol) {
 				if (Blacklist.getInstance().filter(ch)) {
 					return;
 				}
@@ -86,6 +84,7 @@ public class PipelineUtils {
 			}
 
 			BASE.initChannel(ch);
+			
 			ch.pipeline().addBefore(FRAME_DECODER, LEGACY_DECODER, new LegacyDecoder());
 			ch.pipeline().addAfter(FRAME_DECODER, PACKET_DECODER,
 					new MinecraftDecoder(Protocol.HANDSHAKE, true, ProxyServer.getInstance().getProtocolVersion()));
@@ -94,7 +93,7 @@ public class PipelineUtils {
 			ch.pipeline().addBefore(FRAME_PREPENDER, LEGACY_KICKER, legacyKicker);
 			ch.pipeline().get(HandlerBoss.class).setHandler(new InitialHandler(BungeeCord.getInstance(), listener));
 
-			if (listener.isProxyProtocol()) {
+			if (proxyprotocol) {
 				ch.pipeline().addFirst(new HAProxyMessageDecoder());
 			}
 		}

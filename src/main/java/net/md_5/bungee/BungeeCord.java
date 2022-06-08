@@ -336,6 +336,7 @@ public class BungeeCord extends ProxyServer {
 		if (config.getThrottle() > 0) {
 			connectionThrottle = new ConnectionThrottle(config.getThrottle(), config.getThrottleLimit());
 		}
+		
 		startListeners();
 		
 		BetterBungee.startextralistener();
