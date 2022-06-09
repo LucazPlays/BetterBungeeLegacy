@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -60,6 +61,7 @@ import net.md_5.bungee.netty.cipher.CipherDecoder;
 import net.md_5.bungee.netty.cipher.CipherEncoder;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.PlayerPublicKey;
 import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.packet.EncryptionRequest;
@@ -434,6 +436,30 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			disconnect(bungee.getTranslation("name_invalid"));
 			return;
 		}
+		
+        if ( BungeeCord.getInstance().config.isEnforceSecureProfile() )
+        {
+            PlayerPublicKey publicKey = loginRequest.getPublicKey();
+            if ( publicKey == null )
+            {
+                disconnect( bungee.getTranslation( "secure_profile_required" ) );
+                return;
+            }
+
+            if ( Instant.ofEpochMilli( publicKey.getExpiry() ).isBefore( Instant.now() ) )
+            {
+                disconnect( bungee.getTranslation( "secure_profile_expired" ) );
+                return;
+            }
+
+            if ( !EncryptionUtil.check( publicKey ) )
+            {
+                disconnect( bungee.getTranslation( "secure_profile_invalid" ) );
+                return;
+            }
+        }
+
+
 
 		this.loginRequest = loginRequest;
 
@@ -489,7 +515,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				NotifyManager.getInstance().addmessage((System.currentTimeMillis() - startedhandshake) + "ms");
 			}
 
-			Preconditions.checkState(thisState == State.ENCRYPT, "Not expecting ENCRYPT");
+	         Preconditions.checkState( EncryptionUtil.check( loginRequest.getPublicKey(), encryptResponse, request ), "Invalid verification" );
 
 			SecretKey sharedKey = EncryptionUtil.getSecret(encryptResponse, request);
 
@@ -641,8 +667,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							userCon.setCompressionThreshold(BungeeCord.getInstance().config.getCompressionThreshold());
 							userCon.init();
 
-							unsafe.sendPacket(new LoginSuccess(getUniqueId(), getName()));
-
+                            unsafe.sendPacket( new LoginSuccess( getUniqueId(), getName(), ( loginProfile == null ) ? null : loginProfile.getProperties() ) );
 							ch.setProtocol(Protocol.GAME);
 
 							ch.getHandle().pipeline().get(HandlerBoss.class)
