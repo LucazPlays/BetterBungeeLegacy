@@ -329,7 +329,6 @@ public final class UserConnection implements ProxiedPlayer
         ChannelFutureListener listener = new ChannelFutureListener()
         {
             @Override
-            @SuppressWarnings("ThrowableResultIgnored")
             public void operationComplete(ChannelFuture future) throws Exception
             {
                 if ( callback != null )
