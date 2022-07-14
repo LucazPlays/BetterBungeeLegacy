@@ -749,7 +749,9 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 										if (list.getJoinedlist().contains(ip)) {
 											ch.close();
 											list.getJoinedlist().remove(ip);
-											Blacklist.getInstance().addBlacklist(ip);
+											if (Blacklist.getInstance().isUnderattack()) {
+												Blacklist.getInstance().addBlacklist(ip);
+											}
 											list.removeWhitelist(ip);
 											return;
 										} else {
