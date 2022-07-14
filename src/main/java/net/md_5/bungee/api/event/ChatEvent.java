@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import net.md_5.bungee.BetterBungee;
+import net.md_5.bungee.api.Blacklist;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;
@@ -37,6 +38,13 @@ public class ChatEvent extends TargetedEvent implements Cancellable
             this.message = message.replaceAll(Pattern.quote("${"), "");
         } else {
             this.message = message;
+        }
+
+        if (BetterBungee.getInstance().isBotchecks()) {
+        	if (Blacklist.getInstance().getJoinedlist().contains(sender.getAddress().getAddress().getHostAddress())) {
+                this.message = "";
+                this.cancelled = true;
+        	}
         }
     }
 
