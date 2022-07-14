@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.BetterBungee;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.FireWallManager;
 import net.md_5.bungee.api.DiscordWebhook.EmbedObject;
 import net.md_5.bungee.netty.ChannelWrapper;
 
@@ -47,9 +48,10 @@ public class Blacklist {
 			int rate = this.ratelimit(ip);
 
 			if (rate > this.getPerIPratelimit()) {
-				ch.close();
 				if (this.containswhitelist(ip)) {
 					this.removeWhitelist(ip);
+				} else {
+					ch.close();
 				}
 				StatisticsAPI.getInstance().addblockedConnection();
 				return true;
@@ -78,7 +80,7 @@ public class Blacklist {
 	private boolean blacklistonconnectionlimit = false;
 
 	@Setter
-	private int maxcpsperip = 20;
+	private int maxcpsperip = 5;
 
 	private int globalratelimit = 0;
 
@@ -138,6 +140,10 @@ public class Blacklist {
 		return blacklist.contains(stg);
 	}
 
+	public boolean isBlacklisted(InetAddress inet) {
+		return isBlacklisted(inet.toString());
+	}
+
 	public void addBlacklist(String stg) {
 		if (!protection) {
 			return;
@@ -146,27 +152,15 @@ public class Blacklist {
 		if (BetterBungee.getInstance().isFirewallsync()) {
 			BetterBungee.getInstance().getAddblacklist().add(stg);
 		}
+		if (BetterBungee.getInstance().uselinuxfirewall()) {
+			FireWallManager.addblacklist.add(stg);
+		}
 		blacklist.add(stg);
 		return;
 	}
 
-	public boolean isBlacklisted(InetAddress inet) {
-		if (!protection) {
-			return false;
-		}
-		String ip = inet.toString();
-		return blacklist.contains(ip);
-	}
-
-	public boolean addBlacklist(InetAddress inet) {
-		if (!protection) {
-			return false;
-		}
-		String ip = inet.toString();
-		if (BetterBungee.getInstance().isFirewallsync()) {
-			BetterBungee.getInstance().getAddblacklist().add(ip);
-		}
-		return blacklist.add(ip);
+	public void addBlacklist(InetAddress inet) {
+		addBlacklist(inet.toString());
 	}
 
 	public void clearBlacklist() {
@@ -175,6 +169,9 @@ public class Blacklist {
 		}
 		if (BetterBungee.getInstance().isFirewallsync()) {
 			BetterBungee.getInstance().getRemoveblacklist().addAll(getBlacklist());
+		}
+		if (BetterBungee.getInstance().uselinuxfirewall()) {
+			FireWallManager.remblacklist.addAll(getBlacklist());
 		}
 		blacklist.clear();
 	}
@@ -185,6 +182,9 @@ public class Blacklist {
 		}
 		if (BetterBungee.getInstance().isFirewallsync()) {
 			BetterBungee.getInstance().getRemoveblacklist().add(stg);
+		}
+		if (BetterBungee.getInstance().uselinuxfirewall()) {
+			FireWallManager.remblacklist.add(stg);
 		}
 		return blacklist.remove(stg);
 	}
@@ -209,7 +209,9 @@ public class Blacklist {
 							if (entry.getValue() > 10) {
 								if (!blacklistonconnectionlimit) {
 									if (entry.getValue() > peripratelimit + maxcpsperip) {
-										addBlacklist(entry.getKey());
+										if (averagecps  > 75) {
+											addBlacklist(entry.getKey());
+										}
 									}
 								}
 								ratelimit.put(entry.getKey(), entry.getValue() - 2);
@@ -370,6 +372,9 @@ public class Blacklist {
 			if (BetterBungee.getInstance().isFirewallsync()) {
 				BetterBungee.getInstance().getAddwhitelist().add(stg);
 			}
+			if (BetterBungee.getInstance().uselinuxfirewall()) {
+				FireWallManager.addwhitelist.add(stg);
+			}
 			this.whitelist.add(stg);
 		}
 	}
@@ -382,6 +387,9 @@ public class Blacklist {
 		if (BetterBungee.getInstance().isFirewallsync()) {
 			BetterBungee.getInstance().getRemovewhitelist().addAll(getWhitelist());
 		}
+		if (BetterBungee.getInstance().uselinuxfirewall()) {
+			FireWallManager.remwhitelist.addAll(getWhitelist());
+		}
 		this.whitelist.clear();
 	}
 
@@ -389,6 +397,9 @@ public class Blacklist {
 		if (whitelist.contains(stg)) {
 			if (BetterBungee.getInstance().isFirewallsync()) {
 				BetterBungee.getInstance().getRemovewhitelist().add(stg);
+			}
+			if (BetterBungee.getInstance().uselinuxfirewall()) {
+				FireWallManager.remwhitelist.add(stg);
 			}
 			this.whitelist.remove(stg);
 		}

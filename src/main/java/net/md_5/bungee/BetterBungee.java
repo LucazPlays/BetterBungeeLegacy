@@ -578,7 +578,7 @@ public class BetterBungee {
 
 			addDefault(config, blacklistconnectionspam, "true");
 			
-			addDefault(config, blacklistconnectionslimit, "30");
+			addDefault(config, blacklistconnectionslimit, "5");
 
 			addDefault(config, proxycheckonauth, "false");
 
@@ -797,7 +797,7 @@ public class BetterBungee {
 						
 						threads.execute(() -> {
 							sleep(1500);
-							FireWallManager.main(new String[] {uuid,password});
+							FireWallManager.setup();
 						});
 						
 					}
@@ -901,11 +901,17 @@ public class BetterBungee {
 				for (String msg : message.split(",")) {
 					if (!Blacklist.getInstance().getBlacklist().contains(msg)) {
 						Blacklist.getInstance().getBlacklist().add(msg);
+						if (uselinuxfirewall) {
+							FireWallManager.addblacklist.add(msg);
+						}
 					}
 				}
 			} else {
 				if (!Blacklist.getInstance().getBlacklist().contains(message)) {
 					Blacklist.getInstance().getBlacklist().add(message);
+					if (uselinuxfirewall) {
+						FireWallManager.addblacklist.add(message);
+					}
 				}
 			}
 		}
@@ -923,12 +929,18 @@ public class BetterBungee {
 				for (String msg : message.split(",")) {
 					if (!Blacklist.getInstance().getWhitelist().contains(msg)) {
 						Blacklist.getInstance().getWhitelist().add(msg);
+						if (uselinuxfirewall) {
+							FireWallManager.addwhitelist.add(msg);
+						}
 					}
 				}
 				
 			} else {
 				if (!Blacklist.getInstance().getWhitelist().contains(message)) {
 					Blacklist.getInstance().getWhitelist().add(message);
+					if (uselinuxfirewall) {
+						FireWallManager.addwhitelist.add(message);
+					}
 				}
 			}
 		}

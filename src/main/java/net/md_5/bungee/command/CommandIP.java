@@ -69,7 +69,7 @@ public class CommandIP extends PlayerCommand {
 			} catch (Throwable t) {
 				sender.sendMessage(t.getMessage());
 			}
-		});
+		},0l);
 	}
 
 	private void sendipinfos(final CommandSender sender, String ip) {

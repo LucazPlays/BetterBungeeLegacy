@@ -7,8 +7,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
@@ -24,11 +27,13 @@ public class IPChecker {
 
 	Set<String> badips = ConcurrentHashMap.newKeySet();
 
-	ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+	ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+	ExecutorService threads = Executors.newCachedThreadPool();
 
 	public IPChecker() {
-		new Thread(() -> {
-			while (true) {
+		scheduler.scheduleAtFixedRate(() -> {
+			threads.execute(() -> {
 				try {
 					RestAPIResponse ipcheckeralive = RestAPI.getInstance().get("http://ipcheck.skydb.de/alive");
 					if (ipcheckeralive.getFailed()) {
@@ -42,8 +47,8 @@ public class IPChecker {
 						e.printStackTrace();
 					}
 				}
-			}
-		}).start();
+			});
+		}, 0, 1, TimeUnit.MINUTES);
 	}
 
 	public boolean isipresidental(String ip) {
@@ -95,8 +100,8 @@ public class IPChecker {
 		return null;
 	}
 
-	public void start(Runnable run) {
-		threads.execute(run);
+	public void start(Runnable run, long time) {
+		scheduler.schedule(() -> threads.execute(run) , time, TimeUnit.MILLISECONDS);
 	}
 
 	public static IPChecker getInstance() {

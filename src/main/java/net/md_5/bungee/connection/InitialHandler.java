@@ -694,8 +694,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 								userCon.connect(server, null, true, ServerConnectEvent.Reason.JOIN_PROXY);
 							}
 
-							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks()
-									&& !fastjoin) {
+							if (Blacklist.getInstance().isProtection() && BetterBungee.getInstance().isBotchecks() && !fastjoin) {
 								if (!list.getJoinedlist().contains(ip)) {
 									list.getJoinedlist().add(ip);
 								}
@@ -730,19 +729,11 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							
 							IPChecker.getInstance().start(() -> {
 								if (!fastjoin) {
-//									userCon.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(""));
-									try {
-										Thread.sleep(1750);
-									} catch (InterruptedException e) {
-										e.printStackTrace();
+									if (ch.isClosed()) {
+										return;
 									}
-									if (Blacklist.getInstance().isUnderattack()) {
-										try {
-											Thread.sleep(2000);
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-										}
-									} else {
+									
+									if (!Blacklist.getInstance().isUnderattack()) {
 										vpncheck(ip, userCon);
 									}
 
@@ -764,8 +755,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 										} else {
 											if (!list.containswhitelist(ip)) {
 												list.addWhitelist(ip);
-												NotifyManager.getInstance()
-														.addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
+												NotifyManager.getInstance().addmessage("§aAdded §8- §e" + ip + " §8- §2Whitelist");
 											}
 										}
 									}
@@ -780,13 +770,12 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 										if (finalserver == null) {
 											finalserver = bungee.getServerInfo(listener.getDefaultServer());
 										}
-										userCon.connect(finalserver, null, true,
-												ServerConnectEvent.Reason.LOBBY_FALLBACK);
+										userCon.connect(finalserver, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK);
 									}
 								} else {
 									vpncheck(ip, userCon);
 								}
-							});
+							}, Blacklist.getInstance().isUnderattack() ? 750 : 2000);
 
 //							if (BetterBungee.getInstance().isDenyVPNonJoin()) {
 //								IPChecker.getInstance().start(() -> {
