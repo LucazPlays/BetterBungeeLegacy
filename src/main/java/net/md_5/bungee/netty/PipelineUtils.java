@@ -172,8 +172,12 @@ public class PipelineUtils {
 			ch.config().setWriteBufferWaterMark(MARK);
 
 			ch.pipeline().addLast(FRAME_DECODER, new Varint21FrameDecoder());
-			ch.pipeline().addLast(TIMEOUT_HANDLER,
-					new ReadTimeoutHandler(BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
+			
+			if (Blacklist.getInstance().getAveragecps() < 20) {
+				ch.pipeline().addLast(TIMEOUT_HANDLER, new ReadTimeoutHandler(BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
+			} else {
+				ch.pipeline().addLast(TIMEOUT_HANDLER, new ReadTimeoutHandler(250, TimeUnit.MILLISECONDS));
+			}
 			ch.pipeline().addLast(FRAME_PREPENDER, framePrepender);
 
 			ch.pipeline().addLast(BOSS_HANDLER, new HandlerBoss());
