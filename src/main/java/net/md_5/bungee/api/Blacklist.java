@@ -206,7 +206,6 @@ public class Blacklist {
 				try {
 					for (Entry<String, Integer> entry : ratelimit.entrySet()) {
 						if (entry.getValue() > 0) {
-							if (entry.getValue() > 10) {
 								if (blacklistonconnectionlimit) {
 									if (entry.getValue() > maxcpsperip) {
 										if (averagecps  > 75) {
@@ -214,8 +213,6 @@ public class Blacklist {
 										}
 									}
 								}
-								ratelimit.put(entry.getKey(), entry.getValue() - 2);
-							}
 							ratelimit.put(entry.getKey(), entry.getValue() - 1);
 						} else {
 							ratelimit.remove(entry.getKey());
