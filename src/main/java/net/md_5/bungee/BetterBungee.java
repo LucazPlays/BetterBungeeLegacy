@@ -596,7 +596,7 @@ public class BetterBungee {
 
 			addDefault(config, pathtotemplatejar, "none");
 
-			addDefault(config, packetsizelimit, "false");
+			addDefault(config, packetsizelimit, "true");
 
 			addDefault(config, packetsizelimitsize, "8000");
 

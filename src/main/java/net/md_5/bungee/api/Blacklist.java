@@ -207,8 +207,8 @@ public class Blacklist {
 					for (Entry<String, Integer> entry : ratelimit.entrySet()) {
 						if (entry.getValue() > 0) {
 							if (entry.getValue() > 10) {
-								if (!blacklistonconnectionlimit) {
-									if (entry.getValue() > peripratelimit + maxcpsperip) {
+								if (blacklistonconnectionlimit) {
+									if (entry.getValue() > maxcpsperip) {
 										if (averagecps  > 75) {
 											addBlacklist(entry.getKey());
 										}
