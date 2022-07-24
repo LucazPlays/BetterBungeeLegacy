@@ -66,11 +66,11 @@ public class FireWallManager {
 				try {
 					run.exec("sudo iptables -D INPUT -m set --match-set blacklist src -j DROP");
 					sleep(200);
-					run.exec("sudo iptables -D FORWARD -m set --match-set blacklist src -j DROP");
+					run.exec("sudo iptables -D PREROUTING -m set --match-set blacklist src -j DROP");
 					sleep(200);
-					run.exec("sudo iptables -D INPUT -m set --match-set whitelist src -j DROP");
+					run.exec("sudo iptables -D INPUT -m set --match-set whitelist src -j ACCEPT");
 					sleep(200);
-					run.exec("sudo iptables -D FORWARD -m set --match-set whitelist src -j DROP");
+					run.exec("sudo iptables -D PREROUTING -m set --match-set whitelist src -j ACCEPT");
 					sleep(200);
 					run.exec("sudo ipset destroy blacklist");
 					sleep(200);
