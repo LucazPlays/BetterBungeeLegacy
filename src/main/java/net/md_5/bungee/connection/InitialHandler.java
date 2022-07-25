@@ -119,6 +119,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private InetSocketAddress virtualHost;
 
 	private String name;
+	
 	@Getter
 	private UUID uniqueId;
 	@Getter
@@ -395,13 +396,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			break;
 		case 2:
 			if (BetterBungee.getInstance().isPingcheck()) {
-				if (Blacklist.getInstance().getConnectionratelimit() > BetterBungee.getInstance()
+				if (Blacklist.getInstance().getAveragecps() > BetterBungee.getInstance()
 						.getPingcheckonconnectlimit()) {
 					if (!Blacklist.getInstance().containswhitelist(ip)) {
 						if (!ServerListAPI.getInstance().pingedbefore(ip)) {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
-							Blacklist.getInstance().addlimit(ip, 4);
+							Blacklist.getInstance().addlimit(ip, 1);
 							ch.close();
 							return;
 						}

@@ -42,7 +42,6 @@ public class FireWallManager {
 				sleep(200);
 				run.exec("sudo ipset create whitelist nethash");
 				sleep(200);
-
 				run.exec("sudo ipset destroy blacklist");
 				sleep(200);
 				run.exec("sudo ipset flush blacklist");
@@ -50,10 +49,6 @@ public class FireWallManager {
 				run.exec("sudo ipset create blacklist nethash");
 				sleep(200);
 				run.exec("sudo iptables -t mangle -I PREROUTING -m set --match-set blacklist src -j DROP");
-				sleep(200);
-				run.exec("sudo iptables -t mangle -I PREROUTING -m set --match-set blacklist src -j DROP");
-				sleep(200);
-				run.exec("sudo iptables -t mangle -I PREROUTING -m set --match-set whitelist src -j ACCEPT");
 				sleep(200);
 				run.exec("sudo iptables -t mangle -I PREROUTING -m set --match-set whitelist src -j ACCEPT");
 
@@ -64,19 +59,12 @@ public class FireWallManager {
 
 			run.addShutdownHook(new Thread(() -> {
 				try {
-					run.exec("sudo iptables -D INPUT -m set --match-set blacklist src -j DROP");
-					sleep(200);
 					run.exec("sudo iptables -D PREROUTING -m set --match-set blacklist src -j DROP");
-					sleep(200);
-					run.exec("sudo iptables -D INPUT -m set --match-set whitelist src -j ACCEPT");
-					sleep(200);
 					run.exec("sudo iptables -D PREROUTING -m set --match-set whitelist src -j ACCEPT");
-					sleep(200);
 					run.exec("sudo ipset destroy blacklist");
-					sleep(200);
 					run.exec("sudo ipset destroy whitelist");
+					sleep(200);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}));

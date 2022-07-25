@@ -174,6 +174,8 @@ public class PipelineUtils {
 			ch.config().setWriteBufferWaterMark(MARK);
 
 			ch.pipeline().addLast(FRAME_DECODER, new Varint21FrameDecoder());
+
+			ListenerInfo listener = ch.attr(LISTENER).get();
 			
 			if (Blacklist.getInstance().getAveragecps() < 20) {
 				ch.pipeline().addLast(TIMEOUT_HANDLER, new ReadTimeoutHandler(BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
