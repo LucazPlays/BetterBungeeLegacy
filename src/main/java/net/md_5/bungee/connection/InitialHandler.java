@@ -376,7 +376,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		if (hostprotection) {
 			if (!BetterBungee.getInstance().getHostnames().contains(handshake.getHost().toLowerCase(Locale.ROOT))) {
-				Blacklist.getInstance().addlimit(ip, 2);
+				Blacklist.getInstance().addlimit(ip, 1);
 				Blacklist.getInstance().addConnectionratelimit(-1);
 				StatisticsAPI.getInstance().addblockedConnection();
 				ch.close();
@@ -584,7 +584,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							}
 							if (BetterBungee.getInstance().isProtection()) {
 								if (!list.containswhitelist(list.getRealAdress(ch))) {
-									list.addlimit(list.getRealAdress(ch), 15);
+									list.addlimit(list.getRealAdress(ch), 1);
 								}
 							}
 							disconnect(bungee.getTranslation("offline_mode_player"));
