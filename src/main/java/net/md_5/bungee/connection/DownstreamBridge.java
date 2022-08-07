@@ -28,6 +28,7 @@ import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.BetterBungee;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -276,7 +277,7 @@ public class DownstreamBridge extends PacketHandler
             	Preconditions.checkState( !serverBrand.contains( bungee.getName() ), "Cannot connect proxy to itself!" );
             }
             brand = ByteBufAllocator.DEFAULT.heapBuffer();
-            DefinedPacket.writeString( bungee.getName() + " (" + bungee.getVersion() + ")" + " <- " + serverBrand, brand );
+            DefinedPacket.writeString( "BetterBungee" + " (" + BungeeCord.getInstance().getBetterBungee().Version + ")" + " <- " + serverBrand, brand );
             pluginMessage.setData( DefinedPacket.toArray( brand ) );
             brand.release();
             // changes in the packet are ignored so we need to send it manually
