@@ -231,7 +231,7 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.2";
+	public String Version = "1.3";
 
 	public String BungeeCordVersion = "ff5727c5ef9c0b56ad35f9816ae6bd660b622cf0";
 
@@ -596,7 +596,7 @@ public class BetterBungee {
 
 			addDefault(config, pathtotemplatejar, "none");
 
-			addDefault(config, packetsizelimit, "false");
+			addDefault(config, packetsizelimit, "true");
 
 			addDefault(config, packetsizelimitsize, "8000");
 

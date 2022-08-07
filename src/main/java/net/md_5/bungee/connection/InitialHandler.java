@@ -119,6 +119,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	private InetSocketAddress virtualHost;
 
 	private String name;
+	
 	@Getter
 	private UUID uniqueId;
 	@Getter
@@ -375,7 +376,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 		if (hostprotection) {
 			if (!BetterBungee.getInstance().getHostnames().contains(handshake.getHost().toLowerCase(Locale.ROOT))) {
-				Blacklist.getInstance().addlimit(ip, 2);
+				Blacklist.getInstance().addlimit(ip, 1);
 				Blacklist.getInstance().addConnectionratelimit(-1);
 				StatisticsAPI.getInstance().addblockedConnection();
 				ch.close();
@@ -395,13 +396,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			break;
 		case 2:
 			if (BetterBungee.getInstance().isPingcheck()) {
-				if (Blacklist.getInstance().getConnectionratelimit() > BetterBungee.getInstance()
+				if (Blacklist.getInstance().getAveragecps() > BetterBungee.getInstance()
 						.getPingcheckonconnectlimit()) {
 					if (!Blacklist.getInstance().containswhitelist(ip)) {
 						if (!ServerListAPI.getInstance().pingedbefore(ip)) {
 							Blacklist.getInstance().addConnectionratelimit(-1);
 							StatisticsAPI.getInstance().addblockedConnection();
-							Blacklist.getInstance().addlimit(ip, 4);
+							Blacklist.getInstance().addlimit(ip, 1);
 							ch.close();
 							return;
 						}
@@ -583,7 +584,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 							}
 							if (BetterBungee.getInstance().isProtection()) {
 								if (!list.containswhitelist(list.getRealAdress(ch))) {
-									list.addlimit(list.getRealAdress(ch), 15);
+									list.addlimit(list.getRealAdress(ch), 1);
 								}
 							}
 							disconnect(bungee.getTranslation("offline_mode_player"));

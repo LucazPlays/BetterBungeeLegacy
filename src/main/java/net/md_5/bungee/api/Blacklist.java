@@ -206,15 +206,12 @@ public class Blacklist {
 				try {
 					for (Entry<String, Integer> entry : ratelimit.entrySet()) {
 						if (entry.getValue() > 0) {
-							if (entry.getValue() > 10) {
-								if (!blacklistonconnectionlimit) {
-									if (entry.getValue() > peripratelimit + maxcpsperip) {
-										if (averagecps  > 75) {
-											addBlacklist(entry.getKey());
-										}
+							if (blacklistonconnectionlimit) {
+								if (entry.getValue() > maxcpsperip) {
+									if (averagecps  > 75) {
+										addBlacklist(entry.getKey());
 									}
 								}
-								ratelimit.put(entry.getKey(), entry.getValue() - 2);
 							}
 							ratelimit.put(entry.getKey(), entry.getValue() - 1);
 						} else {

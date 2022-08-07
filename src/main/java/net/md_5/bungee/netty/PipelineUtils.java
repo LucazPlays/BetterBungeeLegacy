@@ -61,10 +61,6 @@ public class PipelineUtils {
 
 			SocketAddress remoteAddress = (ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress();
 			
-			if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
-				ch.close();
-				return;
-			}
 
 			ListenerInfo listener = ch.attr(LISTENER).get();
 			
@@ -75,7 +71,13 @@ public class PipelineUtils {
 					return;
 				}
 			}
+			
 
+			if (BungeeCord.getInstance().getConnectionThrottle() != null && BungeeCord.getInstance().getConnectionThrottle().throttle(remoteAddress)) {
+				ch.close();
+				return;
+			}
+			
 			ch.config().setOption( ChannelOption.TCP_NODELAY, true );
 
 			if (BungeeCord.getInstance().getPluginManager().callEvent(new ClientConnectEvent(remoteAddress, listener)).isCancelled()) {
@@ -172,6 +174,8 @@ public class PipelineUtils {
 			ch.config().setWriteBufferWaterMark(MARK);
 
 			ch.pipeline().addLast(FRAME_DECODER, new Varint21FrameDecoder());
+
+			ListenerInfo listener = ch.attr(LISTENER).get();
 			
 			if (Blacklist.getInstance().getAveragecps() < 20) {
 				ch.pipeline().addLast(TIMEOUT_HANDLER, new ReadTimeoutHandler(BungeeCord.getInstance().config.getTimeout(), TimeUnit.MILLISECONDS));
