@@ -1075,7 +1075,7 @@ public class BetterBungee {
 			}
 		} else if (!updated) {
 			lastupdatecheck = System.currentTimeMillis();
-			System.out.println("Checking for Updates");
+//			System.out.println("Checking for Updates");
 			RestAPIResponse response = RestAPI.getInstance().get(betterbungee + "/update?version=" + Version);
 			if (!response.getFailed()) {
 				try {
