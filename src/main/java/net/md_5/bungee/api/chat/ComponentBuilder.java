@@ -57,7 +57,8 @@ public final class ComponentBuilder
      */
     public ComponentBuilder(ComponentBuilder original)
     {
-        this( original.parts.toArray( new BaseComponent[ 0 ] ) );    }
+        this( original.parts.toArray( new BaseComponent[ 0 ] ) );
+    }
 
     /**
      * Creates a ComponentBuilder with the given text as the first part.
@@ -160,7 +161,7 @@ public final class ComponentBuilder
             previous = dummy;
             dummy = null;
         }
-        if ( previous != null )
+        if ( previous != null && !component.isReset() )
         {
             component.copyFormatting( previous, retention, false );
         }

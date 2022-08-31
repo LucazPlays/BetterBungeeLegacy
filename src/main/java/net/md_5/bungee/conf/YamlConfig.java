@@ -84,7 +84,7 @@ public class YamlConfig implements ConfigurationAdapter {
 			set("permissions.default",
 					Arrays.asList(new String[] { "bungeecord.command.server", "bungeecord.command.list" }));
 			set("permissions.admin", Arrays.asList(new String[] { "bungeecord.command.alert", "bungeecord.command.end",
-					"bungeecord.command.ip","bungeecord.command.ip.uncensored", "bungeecord.command.reload", "bungeecord.command.betterbungee", "bungeecord.command.betterbungee.firewall", "bungeecord.command.betterbungee.statistics", "bungeecord.command.betterbungee.blacklist", "bungeecord.command.betterbungee.whitelist", "bungeecord.command.betterbungee.pluginmanager", "bungeecord.command.betterbungee.notifications" }));
+					"bungeecord.command.ip","bungeecord.command.ip.uncensored", "bungeecord.command.reload", "bungeecord.command.kick", "bungeecord.command.betterbungee", "bungeecord.command.betterbungee.firewall", "bungeecord.command.betterbungee.statistics", "bungeecord.command.betterbungee.blacklist", "bungeecord.command.betterbungee.whitelist", "bungeecord.command.betterbungee.pluginmanager", "bungeecord.command.betterbungee.notifications" }));
 		}
 
 		Map<String, Object> groups = get("groups", null);
