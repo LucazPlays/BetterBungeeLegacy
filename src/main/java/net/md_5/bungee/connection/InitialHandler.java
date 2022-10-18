@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.HashSet;
@@ -214,46 +215,72 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		ch.close(bungee.getTranslation("outdated_client", bungee.getGameVersion()));
 	}
 
-	@Override
-	public void handle(LegacyPing ping) throws Exception {
-		this.legacy = true;
-		final boolean v1_5 = ping.isV1_5();
+    @Override
+    public void handle(LegacyPing ping) throws Exception
+    {
+        this.legacy = true;
+        final boolean v1_5 = ping.isV1_5();
 
-		String Version = (BetterBungee.getInstance().isSnapshotupdate() ? "§c" : "§a")
-				+ BetterBungee.getInstance().Version;
+        ServerInfo forced = AbstractReconnectHandler.getForcedHost( this );
+        final String motd = ( forced != null ) ? forced.getMotd() : listener.getMotd();
+        final int protocol = bungee.getProtocolVersion();
 
-		ServerPing legacy = new ServerPing(
-				new ServerPing.Protocol("§eBetterBungee" + " §8- " + Version, bungee.getProtocolVersion()),
-				new ServerPing.Players(listener.getMaxPlayers(), bungee.getOnlineCount(), null),
-				new TextComponent(TextComponent.fromLegacyText(listener.getMotd())), (Favicon) null);
+        Callback<ServerPing> pingBack = new Callback<ServerPing>()
+        {
+            @Override
+            public void done(ServerPing result, Throwable error)
+            {
+                if ( error != null )
+                {
+                    result = getPingInfo( bungee.getTranslation( "ping_cannot_connect" ), protocol );
+                    bungee.getLogger().log( Level.WARNING, "Error pinging remote server", error );
+                }
 
-		Callback<ProxyPingEvent> callback = new Callback<ProxyPingEvent>() {
-			@Override
-			public void done(ProxyPingEvent result, Throwable error) {
-				if (ch.isClosed()) {
-					return;
-				}
+                Callback<ProxyPingEvent> callback = new Callback<ProxyPingEvent>()
+                {
+                    @Override
+                    public void done(ProxyPingEvent result, Throwable error)
+                    {
+                        if ( ch.isClosed() )
+                        {
+                            return;
+                        }
 
-				ServerPing legacy = result.getResponse();
-				String kickMessage;
+                        ServerPing legacy = result.getResponse();
+                        String kickMessage;
 
-				if (v1_5) {
-					kickMessage = ChatColor.DARK_BLUE + "\00" + 127 + '\00' + legacy.getVersion().getName() + '\00'
-							+ getFirstLine(legacy.getDescription()) + '\00' + legacy.getPlayers().getOnline() + '\00'
-							+ legacy.getPlayers().getMax();
-				} else {
-					// Clients <= 1.3 don't support colored motds because the color char is used as
-					// delimiter
-					kickMessage = ChatColor.stripColor(getFirstLine(legacy.getDescription())) + '\u00a7'
-							+ legacy.getPlayers().getOnline() + '\u00a7' + legacy.getPlayers().getMax();
-				}
+                        if ( v1_5 )
+                        {
+                            kickMessage = ChatColor.DARK_BLUE
+                                    + "\00" + 127
+                                    + '\00' + legacy.getVersion().getName()
+                                    + '\00' + getFirstLine( legacy.getDescription() )
+                                    + '\00' + ( ( legacy.getPlayers() != null ) ? legacy.getPlayers().getOnline() : "-1" )
+                                    + '\00' + ( ( legacy.getPlayers() != null ) ? legacy.getPlayers().getMax() : "-1" );
+                        } else
+                        {
+                            // Clients <= 1.3 don't support colored motds because the color char is used as delimiter
+                            kickMessage = ChatColor.stripColor( getFirstLine( legacy.getDescription() ) )
+                                    + '\u00a7' + ( ( legacy.getPlayers() != null ) ? legacy.getPlayers().getOnline() : "-1" )
+                                    + '\u00a7' + ( ( legacy.getPlayers() != null ) ? legacy.getPlayers().getMax() : "-1" );
+                        }
 
-				ch.close(kickMessage);
-			}
-		};
+                        ch.close( kickMessage );
+                    }
+                };
 
-		bungee.getPluginManager().callEvent(new ProxyPingEvent(this, legacy, callback));
-	}
+                bungee.getPluginManager().callEvent( new ProxyPingEvent( InitialHandler.this, result, callback ) );
+            }
+        };
+
+        if ( forced != null && listener.isPingPassthrough() )
+        {
+            ( (BungeeServerInfo) forced ).ping( pingBack, bungee.getProtocolVersion() );
+        } else
+        {
+            pingBack.done( getPingInfo( motd, protocol ), null );
+        }
+    }
 
 	private static String getFirstLine(String str) {
 		int pos = str.indexOf('\n');
@@ -453,10 +480,13 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
                 return;
             }
 
-            if ( !EncryptionUtil.check( publicKey ) )
+            if ( getVersion() < ProtocolConstants.MINECRAFT_1_19_1 )
             {
-                disconnect( bungee.getTranslation( "secure_profile_invalid" ) );
-                return;
+                if ( !EncryptionUtil.check( publicKey, null ) )
+                {
+                    disconnect( bungee.getTranslation( "secure_profile_invalid" ) );
+                    return;
+                }
             }
         }
 
@@ -489,7 +519,8 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			@Override
 			public void done(PreLoginEvent result, Throwable error) {
 				if (result.isCancelled()) {
-					disconnect(result.getCancelReasonComponents());
+                    BaseComponent[] reason = result.getCancelReasonComponents();
+                    disconnect( ( reason != null ) ? reason : TextComponent.fromLegacyText( bungee.getTranslation( "kick_message" ) ) );
 					return;
 				}
 				if (ch.isClosed()) {
@@ -639,17 +670,40 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			}
 		}
 
-		offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getName()).getBytes(Charsets.UTF_8));
+        offlineId = UUID.nameUUIDFromBytes( ( "OfflinePlayer:" + getName() ).getBytes( Charsets.UTF_8 ) );
+        if ( uniqueId == null )
+        {
+            uniqueId = offlineId;
+        }
 
-		if (uniqueId == null) {
-			uniqueId = offlineId;
-		}
+        if ( BungeeCord.getInstance().config.isEnforceSecureProfile() )
+        {
+            if ( getVersion() >= ProtocolConstants.MINECRAFT_1_19_1 )
+            {
+                boolean secure = false;
+                try
+                {
+                    secure = EncryptionUtil.check( loginRequest.getPublicKey(), uniqueId );
+                } catch ( GeneralSecurityException ex )
+                {
+                }
+
+                if ( !secure )
+                {
+                    disconnect( bungee.getTranslation( "secure_profile_invalid" ) );
+                    return;
+                }
+            }
+        }
+
+
 
 		Callback<LoginEvent> complete = new Callback<LoginEvent>() {
 			@Override
 			public void done(LoginEvent result, Throwable error) {
 				if (result.isCancelled()) {
-					disconnect(result.getCancelReasonComponents());
+                    BaseComponent[] reason = result.getCancelReasonComponents();
+                    disconnect( ( reason != null ) ? reason : TextComponent.fromLegacyText( bungee.getTranslation( "kick_message" ) ) );
 					return;
 				}
 
