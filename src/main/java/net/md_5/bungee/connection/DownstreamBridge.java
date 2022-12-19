@@ -1,5 +1,11 @@
 package net.md_5.bungee.connection;
 
+import java.io.DataInput;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -12,23 +18,19 @@ import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.CommandNode;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.unix.DomainSocketAddress;
-import java.io.DataInput;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.BetterBungee;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.ServerConnection.KeepAliveData;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.BetterBungee;
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -56,6 +58,8 @@ import net.md_5.bungee.protocol.packet.Commands;
 import net.md_5.bungee.protocol.packet.KeepAlive;
 import net.md_5.bungee.protocol.packet.Kick;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 import net.md_5.bungee.protocol.packet.Respawn;
 import net.md_5.bungee.protocol.packet.ScoreboardDisplay;
@@ -150,6 +154,20 @@ public class DownstreamBridge extends PacketHandler
 
     @Override
     public void handle(PlayerListItem playerList) throws Exception
+    {
+        con.getTabListHandler().onUpdate( TabList.rewrite( playerList ) );
+        throw CancelSendSignal.INSTANCE; // Always throw because of profile rewriting
+    }
+    
+    @Override
+    public void handle(PlayerListItemRemove playerList) throws Exception
+    {
+        con.getTabListHandler().onUpdate( TabList.rewrite( playerList ) );
+        throw CancelSendSignal.INSTANCE; // Always throw because of profile rewriting
+    }
+
+    @Override
+    public void handle(PlayerListItemUpdate playerList) throws Exception
     {
         con.getTabListHandler().onUpdate( TabList.rewrite( playerList ) );
         throw CancelSendSignal.INSTANCE; // Always throw because of profile rewriting

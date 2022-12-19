@@ -356,6 +356,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		Preconditions.checkState(thisState == State.HANDSHAKE, "Not expecting HANDSHAKE");
 
 		this.handshake = handshake;
+		
+		ch.setVersion(handshake.getProtocolVersion());
+		
+        ch.getHandle().pipeline().remove( PipelineUtils.LEGACY_KICKER );
 
 		boolean hostprotection = BetterBungee.getInstance().isHostprotectionnames();
 
@@ -367,8 +371,6 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			hostprotection = false;
 			pingprotection = false;
 		}
-
-		ch.setVersion(handshake.getProtocolVersion());
 
 		// Starting with FML 1.8, a "\0FML\0" token is appended to the handshake. This
 		// interferes
@@ -465,7 +467,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			return;
 		}
 		
-        if ( BungeeCord.getInstance().config.isEnforceSecureProfile() )
+        if ( BungeeCord.getInstance().config.isEnforceSecureProfile() && getVersion() < ProtocolConstants.MINECRAFT_1_19_3 )
         {
             PlayerPublicKey publicKey = loginRequest.getPublicKey();
             if ( publicKey == null )
@@ -676,8 +678,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
             uniqueId = offlineId;
         }
 
-        if ( BungeeCord.getInstance().config.isEnforceSecureProfile() )
-        {
+        if ( getVersion() >= ProtocolConstants.MINECRAFT_1_19_1 && getVersion() < ProtocolConstants.MINECRAFT_1_19_3 ) {
             if ( getVersion() >= ProtocolConstants.MINECRAFT_1_19_1 )
             {
                 boolean secure = false;

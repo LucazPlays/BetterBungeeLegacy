@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.text.Format;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -92,6 +94,7 @@ import net.md_5.bungee.conf.Configuration;
 import net.md_5.bungee.conf.YamlConfig;
 import net.md_5.bungee.forge.ForgeConstants;
 import net.md_5.bungee.log.BungeeLogger;
+import net.md_5.bungee.log.LoggingForwardHandler;
 import net.md_5.bungee.log.LoggingOutputStream;
 import net.md_5.bungee.module.ModuleManager;
 import net.md_5.bungee.netty.PipelineUtils;
@@ -117,11 +120,9 @@ public class BungeeCord extends ProxyServer {
 	@Getter
 	public final Configuration config = new Configuration();
 	/**
-	 * Localization bundle.
+	 * Localization formats.
 	 */
-	private ResourceBundle baseBundle;
-	
-	private ResourceBundle customBundle;
+    private Map<String, Format> messageFormats;
 	
 	public EventLoopGroup eventLoops;
 	/**
@@ -218,12 +219,6 @@ public class BungeeCord extends ProxyServer {
 				"Cannot use BungeeCord in directory with ! in path.");
 
 
-		try {
-			baseBundle = ResourceBundle.getBundle("messages");
-		} catch (MissingResourceException ex) {
-			baseBundle = ResourceBundle.getBundle("messages", Locale.ENGLISH);
-		}
-
 		reloadMessages();
 
 		// This is a workaround for quite possibly the weirdest bug I have ever
@@ -256,6 +251,22 @@ public class BungeeCord extends ProxyServer {
         logger = new BungeeLogger("BungeeCord", "proxy.log", consoleReader);
         
         JDK14LoggerFactory.LOGGER = logger;
+        
+
+        // Before we can set the Err and Out streams to our LoggingOutputStream we also have to remove
+        // the default ConsoleHandler from the root logger, which writes to the err stream.
+        // But we still want to log these records, so we add our own handler which forwards the LogRecord to the BungeeLogger.
+        // This way we skip the err stream and the problem of only getting a string without context, and can handle the LogRecord itself.
+        // Thus improving the default bahavior for projects that log on other Logger instances not created by BungeeCord.
+        Logger rootLogger = Logger.getLogger( "" );
+        for ( Handler handler : rootLogger.getHandlers() )
+        {
+            rootLogger.removeHandler( handler );
+        }
+        rootLogger.addHandler( new LoggingForwardHandler( logger ) );
+
+        // We want everything that reaches these output streams to be handled by our logger
+        // since it applies a nice looking format and also writes to the logfile.
         
         System.setErr(new PrintStream(new LoggingOutputStream(this.logger, Level.SEVERE), true));
         System.setOut(new PrintStream(new LoggingOutputStream(this.logger, Level.INFO), true));
@@ -554,28 +565,52 @@ public class BungeeCord extends ProxyServer {
 		return (BungeeCord.class.getPackage().getImplementationVersion() == null) ? "unknown" : BungeeCord.class.getPackage().getImplementationVersion();
 	}
 
-	public void reloadMessages() {
-		File file = new File("messages.properties");
-		if (file.isFile()) {
-			try (FileReader rd = new FileReader(file)) {
-				customBundle = new PropertyResourceBundle(rd);
-			} catch (IOException ex) {
-				getLogger().log(Level.SEVERE, "Could not load custom messages.properties", ex);
-			}
-		}
-	}
 
-	@Override
-	public String getTranslation(String name, Object... args) {
-		String translation = "<translation '" + name + "' missing>";
-		try {
-			translation = MessageFormat
-					.format(customBundle != null && customBundle.containsKey(name) ? customBundle.getString(name)
-							: baseBundle.getString(name), args);
-		} catch (MissingResourceException ex) {
-		}
-		return translation;
-	}
+    public final void reloadMessages()
+    {
+        Map<String, Format> cachedFormats = new HashMap<>();
+
+        File file = new File( "messages.properties" );
+        if ( file.isFile() )
+        {
+            try ( FileReader rd = new FileReader( file ) )
+            {
+                cacheResourceBundle( cachedFormats, new PropertyResourceBundle( rd ) );
+            } catch ( IOException ex )
+            {
+                getLogger().log( Level.SEVERE, "Could not load custom messages.properties", ex );
+            }
+        }
+
+        ResourceBundle baseBundle;
+        try
+        {
+            baseBundle = ResourceBundle.getBundle( "messages" );
+        } catch ( MissingResourceException ex )
+        {
+            baseBundle = ResourceBundle.getBundle( "messages", Locale.ENGLISH );
+        }
+        cacheResourceBundle( cachedFormats, baseBundle );
+
+        messageFormats = Collections.unmodifiableMap( cachedFormats );
+    }
+
+    private void cacheResourceBundle(Map<String, Format> map, ResourceBundle resourceBundle)
+    {
+        Enumeration<String> keys = resourceBundle.getKeys();
+        while ( keys.hasMoreElements() )
+        {
+            map.computeIfAbsent( keys.nextElement(), (key) -> new MessageFormat( resourceBundle.getString( key ) ) );
+        }
+    }
+
+    @Override
+    public String getTranslation(String name, Object... args)
+    {
+        Format format = messageFormats.get( name );
+        return ( format != null ) ? format.format( args ) : "<translation '" + name + "' missing>";
+    }
+
 
 	@Override
 	public Collection<ProxiedPlayer> getPlayers() {

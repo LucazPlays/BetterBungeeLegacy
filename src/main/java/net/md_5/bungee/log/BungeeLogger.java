@@ -17,7 +17,8 @@ public class BungeeLogger extends Logger
     public BungeeLogger(String loggerName, String filePattern, ConsoleReader reader) {
         super( loggerName, null );
         setLevel( Level.ALL );
-
+        setUseParentHandlers( false );
+        
         try {
             FileHandler fileHandler = new FileHandler( filePattern, 1 << 24, 8, true );
             fileHandler.setLevel( Level.parse( System.getProperty( "net.md_5.bungee.file-log-level", "INFO" ) ) );
