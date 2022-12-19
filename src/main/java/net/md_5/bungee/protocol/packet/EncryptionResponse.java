@@ -20,7 +20,8 @@ public class EncryptionResponse extends DefinedPacket
     private byte[] verifyToken;
     private EncryptionData encryptionData;
 
-    public void read(ByteBuf buf, ProtocolConstants.Direction direction, int protocolVersion)
+    @Override
+	public void read(ByteBuf buf, ProtocolConstants.Direction direction, int protocolVersion)
     {
         sharedSecret = readArray( buf, 128 );
         if ( protocolVersion < ProtocolConstants.MINECRAFT_1_19 || protocolVersion >= ProtocolConstants.MINECRAFT_1_19_3 || buf.readBoolean() )
