@@ -14,6 +14,7 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Node;
@@ -29,7 +30,10 @@ public class YamlConfiguration extends ConfigurationProvider
         @Override
         protected Yaml initialValue()
         {
-            Representer representer = new Representer()
+            DumperOptions options = new DumperOptions();
+            options.setDefaultFlowStyle( DumperOptions.FlowStyle.BLOCK );
+
+            Representer representer = new Representer( options )
             {
                 {
                     representers.put( Configuration.class, new Represent()
@@ -43,10 +47,7 @@ public class YamlConfiguration extends ConfigurationProvider
                 }
             };
 
-            DumperOptions options = new DumperOptions();
-            options.setDefaultFlowStyle( DumperOptions.FlowStyle.BLOCK );
-
-            return new Yaml( new Constructor(), representer, options );
+            return new Yaml( new Constructor( new LoaderOptions() ), representer, options );
         }
     };
 
@@ -87,6 +88,7 @@ public class YamlConfiguration extends ConfigurationProvider
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Configuration load(Reader reader, Configuration defaults)
     {
         Map<String, Object> map = yaml.get().loadAs( reader, LinkedHashMap.class );
@@ -104,6 +106,7 @@ public class YamlConfiguration extends ConfigurationProvider
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Configuration load(InputStream is, Configuration defaults)
     {
         Map<String, Object> map = yaml.get().loadAs( is, LinkedHashMap.class );
@@ -121,6 +124,7 @@ public class YamlConfiguration extends ConfigurationProvider
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Configuration load(String string, Configuration defaults)
     {
         Map<String, Object> map = yaml.get().loadAs( string, LinkedHashMap.class );

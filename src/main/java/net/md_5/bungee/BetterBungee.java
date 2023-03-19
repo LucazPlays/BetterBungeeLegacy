@@ -231,9 +231,9 @@ public class BetterBungee {
 
 	String session = "";
 
-	public String Version = "1.4";
+	public String Version = "1.5";
 
-	public String BungeeCordVersion = "e71767688d81ebff2b913920a04c5a958b57e4d9";
+	public String BungeeCordVersion = "7790783949fdb43555634d1eab232b0d6dbb6074";
 
 
 	long lastfirewallget = 0;

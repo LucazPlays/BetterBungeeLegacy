@@ -26,7 +26,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.4.1</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -63,7 +63,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.22</version>
+							<version>1.18.26</version>
 						</path>
 					</annotationProcessorPaths>
 					<source>8</source>
@@ -263,10 +263,10 @@
 		
 		
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.29</version>
-			<scope>compile</scope>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.32</version>
+            <scope>runtime</scope>
 		</dependency>
 	</dependencies>
 </project>

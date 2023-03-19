@@ -26,6 +26,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
@@ -58,7 +59,7 @@ public class PluginManager {
 		this.commandsByPlugin =  ArrayListMultimap.create();
 		this.listenersByPlugin =  ArrayListMultimap.create();
 		this.proxy = proxy;
-		final Constructor yamlConstructor = new Constructor();
+		final Constructor yamlConstructor = new Constructor(new LoaderOptions());
 		final PropertyUtils propertyUtils = yamlConstructor.getPropertyUtils();
 		propertyUtils.setSkipMissingProperties(true);
 		yamlConstructor.setPropertyUtils(propertyUtils);
