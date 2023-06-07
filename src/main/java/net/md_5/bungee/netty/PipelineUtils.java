@@ -49,6 +49,10 @@ import net.md_5.bungee.protocol.MinecraftEncoder;
 import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.Varint21FrameDecoder;
 import net.md_5.bungee.protocol.Varint21LengthFieldPrepender;
+import net.md_5.bungee.protocol.Varint21LengthFieldExtraBufPrepender;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 public class PipelineUtils {
 
@@ -100,9 +104,12 @@ public class PipelineUtils {
 			}
 		}
 	};
-	public static final Base BASE = new Base();
+	
+	public static final Base BASE = new Base( false );
+    public static final Base BASE_SERVERSIDE = new Base( true );
 	private static final KickStringWriter legacyKicker = new KickStringWriter();
 	private static final Varint21LengthFieldPrepender framePrepender = new Varint21LengthFieldPrepender();
+    private static final Varint21LengthFieldExtraBufPrepender serverFramePrepender = new Varint21LengthFieldExtraBufPrepender();
 	public static final String TIMEOUT_HANDLER = "timeout";
 	public static final String PACKET_DECODER = "packet-decoder";
 	public static final String PACKET_ENCODER = "packet-encoder";
@@ -161,8 +168,12 @@ public class PipelineUtils {
 	private static final int HIGH_MARK = Integer.getInteger("net.md_5.bungee.high_mark", 2 << 20); // 2 mb
 	private static final WriteBufferWaterMark MARK = new WriteBufferWaterMark(LOW_MARK, HIGH_MARK);
 
+	@NoArgsConstructor // for backwards compatibility
+    @AllArgsConstructor
 	public static final class Base extends ChannelInitializer<Channel> {
-
+		
+        private boolean toServer = false;
+        
 		@Override
 		public void initChannel(Channel ch) throws Exception {
 			try {
@@ -182,51 +193,12 @@ public class PipelineUtils {
 			} else {
 				ch.pipeline().addLast(TIMEOUT_HANDLER, new ReadTimeoutHandler(250, TimeUnit.MILLISECONDS));
 			}
-			ch.pipeline().addLast(FRAME_PREPENDER, framePrepender);
+			
+			// No encryption bungee -> server, therefore use extra buffer to avoid copying everything for length prepending
+            // Not used bungee -> client as header would need to be encrypted separately through expensive JNI call
+            ch.pipeline().addLast( FRAME_PREPENDER, ( toServer ) ? serverFramePrepender : framePrepender );
 
 			ch.pipeline().addLast(BOSS_HANDLER, new HandlerBoss());
 		}
 	}
-
-//	public static NotifyManager notify = NotifyManager.getInstance();
-
-//	public static boolean filter(Channel ch) {
-//		String ip = null;
-//		ip = list.getRealAdress((ch.remoteAddress() == null) ? ch.parent().localAddress() : ch.remoteAddress());
-//
-//		if (list.isProtection()) {
-//			if (list.isBlacklisted(ip)) {
-//				ch.close();
-//				StatisticsAPI.getInstance().addblockedConnection();
-//				return true;
-//			}
-//
-//			list.createlimit(ip);
-//
-//			list.addlimit(ip);
-//
-//			int rate = list.ratelimit(ip);
-//
-//			if (rate > list.getPerIPratelimit()) {
-//				ch.close();
-//				if (list.containswhitelist(ip)) {
-//					list.removeWhitelist(ip);
-//				}
-//				StatisticsAPI.getInstance().addblockedConnection();
-//				
-//				return true;
-//			}
-//
-//			if (!list.containswhitelist(ip)) {
-//				list.addConnectionratelimit(1);
-//				if (list.getGlobalratelimit() < list.getConnectionratelimit()) {
-//					ch.close();
-//					StatisticsAPI.getInstance().addblockedConnection();
-//					return true;
-//				}
-//			}
-//		}
-//		return false;
-//	}
-
 }

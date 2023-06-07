@@ -154,7 +154,8 @@ public class BungeeServerInfo implements ServerInfo
         Preconditions.checkNotNull( callback, "callback" );
 
         int pingCache = ProxyServer.getInstance().getConfig().getRemotePingCache();
-        if ( pingCache > 0 && cachedPing != null && ( System.currentTimeMillis() - lastPing ) > pingCache ) {
+        if ( pingCache > 0 && cachedPing != null && ( System.currentTimeMillis() - lastPing ) > pingCache )
+        {
             cachedPing = null;
         }
 
@@ -181,7 +182,7 @@ public class BungeeServerInfo implements ServerInfo
         new Bootstrap()
                 .channel( PipelineUtils.getChannel( socketAddress ) )
                 .group( BungeeCord.getInstance().eventLoops )
-                .handler( PipelineUtils.BASE )
+                .handler( PipelineUtils.BASE_SERVERSIDE )
                 .option( ChannelOption.CONNECT_TIMEOUT_MILLIS, BungeeCord.getInstance().getConfig().getRemotePingTimeout() )
                 .remoteAddress( socketAddress )
                 .connect()
